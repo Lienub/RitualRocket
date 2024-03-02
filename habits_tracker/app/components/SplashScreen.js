@@ -43,7 +43,7 @@ const SplashScreen = ({ navigation }) => {
     return (
       <Animated.View style={[styles.container, { opacity }]}>
         <LottieView
-          source={require('../assets/splashscreen.json')} // Replace 'your-animation.json' with the path to your Lottie JSON file
+          source={require('../assets/splashscreen.json')}
           autoPlay
           loop={false} // Set to true if you want the animation to loop
           style={styles.animation}
