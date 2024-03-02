@@ -79,4 +79,11 @@ export default StyleSheet.create({
     width: 40,
     height: 40,
   },
+  textError: {
+    color: "red",
+    fontSize: 20,
+    borderRadius: 20,
+    alignSelf: "center",
+    marginBottom: 10,
+  },
 });
