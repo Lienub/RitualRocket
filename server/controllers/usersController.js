@@ -52,14 +52,14 @@ const login = async (req, res) => {
     }
 
     const { email, password, googleId } = req.body;
-
+    let user = null;
     if (googleId) {
-      const user = await Users.findOne({ where: { googleId } });
+      user = await Users.findOne({ where: { googleId } });
       if (!user) {
         return res.status(401).json({ message: 'Invalid Google ID' });
       }
     } else {
-      const user = await Users.findOne({ where: { email } });
+      user = await Users.findOne({ where: { email } });
       if (!user) {
         return res.status(401).json({ message: 'Invalid email or password' });
       }
@@ -79,4 +79,36 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { register, login };
+const getUserByGoogleId = async (googleId) => {
+  const user = await Users.findOne({ where: { googleId } });
+  return user;
+}
+
+const resetPassword = async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    if (!token || !newPassword) {
+      return res.status(400).json({ message: 'Token de réinitialisation et nouveau mot de passe requis' });
+    }
+
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+
+    const user = await Users.findByPk(decodedToken.userId);
+    if (!user) {
+      return res.status(404).json({ message: 'Utilisateur non trouvé' });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+
+    await user.update({ password: hashedPassword });
+
+    res.status(200).json({ message: 'Mot de passe réinitialisé avec succès' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+module.exports = { register, login, getUserByGoogleId, resetPassword };

@@ -3,13 +3,23 @@ const controller = require("../controllers/usersController");
 
 module.exports = [
   {
-    url: "/users/register",
+    url: "/auth/register",
     method: "post",
     func: controller.register,
   },
   {
-    url: "/users/login",
+    url: "/auth/login",
     method: "post",
     func: controller.login,
   },
+  {
+    url: "/auth/reset-password",
+    method: "post",
+    func: controller.resetPassword,
+  },
+  {
+    url: "/auth/google",
+    method: "post",
+    func: controller.getUserByGoogleId,
+  }
 ];
