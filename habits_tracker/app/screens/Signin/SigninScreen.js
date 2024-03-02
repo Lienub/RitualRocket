@@ -3,7 +3,7 @@ import { StatusBar } from "expo-status-bar";
 import { styles } from "./styles";
 import { Text, View } from "react-native";
 
-export default function Signin() {
+export default function SigninScreen() {
   return (
     <View style={styles.container}>
       <Text>Login</Text>

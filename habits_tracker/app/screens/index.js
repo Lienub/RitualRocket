@@ -1,4 +1,4 @@
-import Signin from "./Signin/Signin";
-import Signup from "./Signup/Signup";
+import SigninScreen from "./Signin/SigninScreen";
+import SignupScreen from "./Signup/SignupScreen";
 
-export { Signin, Signup };
+export { SigninScreen, SignupScreen };

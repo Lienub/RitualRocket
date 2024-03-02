@@ -12,7 +12,7 @@ import Images from "../../utils/constants/images";
 import styles from "./styles";
 import { register } from "../../services/users";
 
-export default function Signup({ navigation }) {
+export default function SignupScreen({ navigation }) {
   const [error, setError] = useState("");
   const [errorMail, setErrorMail] = useState("");
   const [errorPassword, setErrorPassword] = useState("");
