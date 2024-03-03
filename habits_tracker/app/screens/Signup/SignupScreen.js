@@ -106,6 +106,7 @@ export default function SignupScreen({ navigation }) {
           <SocialMediaButton
             source={Images.GoogleIcon}
             onPress={() => console.log("Google")}
+            title="Google"
           />
         </View>
       </View>
