@@ -15,14 +15,19 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com-abidwalterwawrzyniak-ritualrocket",
+      "scheme": "com-abidwalterwawrzyniak-ritualrocket"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./app/assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.anonymous.habits_tracker",
+      "scheme": "habits_tracker"
     },
+    "scheme":"habitstracker",
     "web": {
       "favicon": "./app/assets/images/favicon.png"
     }

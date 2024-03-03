@@ -1,22 +1,40 @@
 import React, { useState, useEffect } from "react";
 import {
+  IOS_CLIENT_ID,
+  ANDROID_CLIENT_ID,
+  WEB_CLIENT_ID,
+  REDIRECT_URL,
+} from '@env';;
+import {
   SafeAreaView,
   Image,
   Text,
   TextInput,
   TouchableOpacity,
   View,
+  Button,
 } from "react-native";
+import * as Google from "expo-auth-session/providers/google";
 import SocialMediaButton from "../../components/Buttons/SocialMediaButton";
 import Images from "../../utils/constants/images";
 import styles from "./styles";
-import { register } from "../../services/users";
+import { register, signInWithGoogle } from "../../services/users";
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 export default function SignupScreen({ navigation }) {
   const [error, setError] = useState("");
   const [errorMail, setErrorMail] = useState("");
   const [errorPassword, setErrorPassword] = useState("");
   const [errorUsername, setErrorUsername] = useState("");
+  const [userInfo, setUserInfo] = useState({});
+
+  // Google Auth
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    iosClientId: IOS_CLIENT_ID,
+    androidClientId: ANDROID_CLIENT_ID,
+    webClientId: WEB_CLIENT_ID,
+    redirectUri: REDIRECT_URL,
+  });
 
   const [userData, setUserData] = useState({
     username: "",
@@ -25,8 +43,18 @@ export default function SignupScreen({ navigation }) {
     token: "",
   });
 
+  // Get user info from google
   useEffect(() => {
-    if (error !== "" || errorMail !== "" || errorPassword !== "" || errorUsername !== "") {
+    signInWithGoogle(setUserInfo, response);
+  }, [response]);
+
+  useEffect(() => {
+    if (
+      error !== "" ||
+      errorMail !== "" ||
+      errorPassword !== "" ||
+      errorUsername !== ""
+    ) {
       setTimeout(() => {
         setError("");
         setErrorMail("");
@@ -42,10 +70,10 @@ export default function SignupScreen({ navigation }) {
         setUserData({ ...userData, token: response.token });
       })
       .catch((error) => {
-        if(error.status == "username_failed") setErrorUsername(error.message);
-        if(error.status == "email_failed") setErrorMail(error.message);
-        if(error.status == "password_failed") setErrorPassword(error.message);
-        if(error.status == "failed") setError(error.message);
+        if (error.status == "username_failed") setErrorUsername(error.message);
+        if (error.status == "email_failed") setErrorMail(error.message);
+        if (error.status == "password_failed") setErrorPassword(error.message);
+        if (error.status == "failed") setError(error.message);
       });
   };
 
@@ -62,7 +90,7 @@ export default function SignupScreen({ navigation }) {
           autoCapitalize="none"
           onChangeText={(text) => setUserData({ ...userData, username: text })}
         />
-        {(errorUsername) && (<Text style={styles.textError}>{errorUsername}</Text>)}
+        {errorUsername && <Text style={styles.textError}>{errorUsername}</Text>}
         <TextInput
           style={styles.input}
           placeholder="E-mail"
@@ -71,7 +99,7 @@ export default function SignupScreen({ navigation }) {
           autoCapitalize="none"
           onChangeText={(text) => setUserData({ ...userData, email: text })}
         />
-        {(errorMail) && (<Text style={styles.textError}>{errorMail}</Text>)}
+        {errorMail && <Text style={styles.textError}>{errorMail}</Text>}
         <TextInput
           style={styles.input}
           placeholderTextColor="#aaaaaa"
@@ -81,7 +109,7 @@ export default function SignupScreen({ navigation }) {
           autoCapitalize="none"
           onChangeText={(text) => setUserData({ ...userData, password: text })}
         />
-        {(errorPassword) && (<Text style={styles.textError}>{errorPassword}</Text>)}
+        {errorPassword && <Text style={styles.textError}>{errorPassword}</Text>}
         <TouchableOpacity style={styles.button} onPress={registerUser}>
           <Text style={styles.buttonTitle}>Créer son compte</Text>
         </TouchableOpacity>
@@ -105,7 +133,7 @@ export default function SignupScreen({ navigation }) {
         <View style={styles.socialMedia}>
           <SocialMediaButton
             source={Images.GoogleIcon}
-            onPress={() => console.log("Google")}
+            onPress={() => promptAsync({ useProxy: true })}
             title="Google"
           />
         </View>
