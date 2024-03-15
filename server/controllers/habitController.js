@@ -55,6 +55,17 @@ const getAllHabits = async (req, res) => {
   }
 }
 
+const getAllHabitsByCategory = async (req, res) => {
+  try {
+    const category = req.params.category;
+    const habits = await Habit.findAll({ where: { category } });
+    res.status(200).json(habits);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+}
+
 const getAllHabitsByUserId = async (req, res) => {
   try {
     const habits = await Habit.findAll({ where: { userId: null } });
@@ -65,4 +76,4 @@ const getAllHabitsByUserId = async (req, res) => {
   }
 }
 
-module.exports = { createHabit, createHabitByUserId, removeHabitById, updateHabitById, getAllHabits, getAllHabitsByUserId};
+module.exports = { createHabit, createHabitByUserId, removeHabitById, updateHabitById, getAllHabits, getAllHabitsByUserId, getAllHabitsByCategory};

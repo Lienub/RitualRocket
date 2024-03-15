@@ -32,4 +32,9 @@ module.exports = [
     method: "put",
     func: controller.updateHabitById,
   },
+  {
+    url: "/categories/:category/habits",
+    method: "get",
+    func: controller.getAllHabitsByCategory,
+  }
 ];
