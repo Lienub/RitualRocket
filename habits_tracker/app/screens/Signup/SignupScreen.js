@@ -74,6 +74,16 @@ export default function SignupScreen({ navigation }) {
     setLoading(false);
   };
 
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setError("");
+      setErrorMail("");
+      setErrorPassword("");
+      setErrorUsername("");
+    }, 2000);
+    return () => clearTimeout(timeout);
+  }, [error, errorMail, errorPassword, errorUsername]);
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.background}>

@@ -18,7 +18,11 @@ import * as Google from "expo-auth-session/providers/google";
 import SocialMediaButton from "../../components/Buttons/SocialMediaButton";
 import Images from "../../utils/constants/images";
 import styles from "./styles";
-import { login, signInWithGoogle, storeUserInfoInStorage } from "../../services/users";
+import {
+  login,
+  signInWithGoogle,
+  storeUserInfoInStorage,
+} from "../../services/users";
 
 export default function SigninScreen({ navigation }) {
   const [error, setError] = useState("");
@@ -53,10 +57,11 @@ export default function SigninScreen({ navigation }) {
           let response = await login(userData);
           // store user info in storage
           await storeUserInfoInStorage(response);
-          navigation.navigate('MainNavigation');
+          navigation.navigate("MainNavigation");
         } catch (error) {
           if (error.status === "email_failed") setErrorMail(error.message);
-          else if (error.status === "password_failed") setErrorPassword(error.message);
+          else if (error.status === "password_failed")
+            setErrorPassword(error.message);
           else setError(error.message);
         }
         break;
@@ -69,6 +74,15 @@ export default function SigninScreen({ navigation }) {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setErrorMail("");
+      setErrorPassword("");
+      setError("");
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [errorMail, errorPassword, error]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -94,21 +108,30 @@ export default function SigninScreen({ navigation }) {
           onChangeText={(text) => setUserData({ ...userData, password: text })}
         />
         {errorPassword && <Text style={styles.textError}>{errorPassword}</Text>}
-        <TouchableOpacity style={styles.button} onPress={() => signInUser('login')}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => signInUser("login")}
+        >
           {loading ? (
             <ActivityIndicator color="#ffffff" />
           ) : (
             <Text style={styles.buttonTitle}>Se connecter</Text>
           )}
         </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("Signup")}
+        >
+          <Text style={styles.buttonTitle}>Se créer un compte</Text>
+        </TouchableOpacity>
         <View style={styles.footerView}>
           <Text style={styles.footerText}>
-            Tu n'as pas de compte?{" "}
+            Mot de passe oublié ?{" "}
             <Text
-              onPress={() => navigation.navigate("Signup")}
+              onPress={() => navigation.navigate("ResetPassword")}
               style={styles.footerLink}
             >
-              Créer un compte
+              Réinitialise-le
             </Text>
           </Text>
           <Text style={styles.textError}>{error}</Text>
