@@ -14,11 +14,6 @@ const Category = sequelize.define('Category', {
   description: {
     type: DataTypes.STRING,
   },
-  userId: {
-    type: DataTypes.INTEGER,
-    allowNull: true,
-  },
 });
-
 
 module.exports = Category;
