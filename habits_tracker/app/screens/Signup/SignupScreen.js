@@ -12,14 +12,12 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  Button,
 } from "react-native";
 import * as Google from "expo-auth-session/providers/google";
 import SocialMediaButton from "../../components/Buttons/SocialMediaButton";
 import Images from "../../utils/constants/images";
 import styles from "./styles";
 import { register, signInWithGoogle } from "../../services/users";
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 export default function SignupScreen({ navigation }) {
   const [error, setError] = useState("");
@@ -45,36 +43,31 @@ export default function SignupScreen({ navigation }) {
 
   // Get user info from google
   useEffect(() => {
-    signInWithGoogle(setUserInfo, response);
+    if (response?.type === "success" && response.authentication.accessToken) {
+      signInWithGoogle(setUserInfo, response, "register");
+    }
   }, [response]);
 
-  useEffect(() => {
-    if (
-      error !== "" ||
-      errorMail !== "" ||
-      errorPassword !== "" ||
-      errorUsername !== ""
-    ) {
-      setTimeout(() => {
-        setError("");
-        setErrorMail("");
-        setErrorPassword("");
-        setErrorUsername("");
-      }, 3000);
+  const registerUser = async (type) => {
+    switch (type) {
+      case 'register':
+        try {
+          const response = await register(userData);
+          setUserData({ ...userData, googleId: '', token: response.token });
+          navigation.navigate('Home');
+        } catch (error) {
+          if (error.status === "username_failed") setErrorUsername(error.message);
+          else if (error.status === "email_failed") setErrorMail(error.message);
+          else if (error.status === "password_failed") setErrorPassword(error.message);
+          else setError(error.message);
+        }
+        break;
+      case 'google':
+        promptAsync({ useProxy: true });
+        break;
+      default:
+        break;
     }
-  }, [error || errorMail || errorPassword || errorUsername]);
-
-  const registerUser = async () => {
-    const response = await register(userData)
-      .then((response) => {
-        setUserData({ ...userData, token: response.token });
-      })
-      .catch((error) => {
-        if (error.status == "username_failed") setErrorUsername(error.message);
-        if (error.status == "email_failed") setErrorMail(error.message);
-        if (error.status == "password_failed") setErrorPassword(error.message);
-        if (error.status == "failed") setError(error.message);
-      });
   };
 
   return (
@@ -110,14 +103,14 @@ export default function SignupScreen({ navigation }) {
           onChangeText={(text) => setUserData({ ...userData, password: text })}
         />
         {errorPassword && <Text style={styles.textError}>{errorPassword}</Text>}
-        <TouchableOpacity style={styles.button} onPress={registerUser}>
+        <TouchableOpacity style={styles.button} onPress={() => registerUser('register')}>
           <Text style={styles.buttonTitle}>Créer son compte</Text>
         </TouchableOpacity>
         <View style={styles.footerView}>
           <Text style={styles.footerText}>
             As-tu deja un compte ?{" "}
             <Text
-              onPress={() => console.log("Login")}
+              onPress={() => navigation.navigate("Signin")}
               style={styles.footerLink}
             >
               Se connecter
@@ -133,7 +126,7 @@ export default function SignupScreen({ navigation }) {
         <View style={styles.socialMedia}>
           <SocialMediaButton
             source={Images.GoogleIcon}
-            onPress={() => promptAsync({ useProxy: true })}
+            onPress={() => registerUser("google")}
             title="Google"
           />
         </View>

@@ -2,9 +2,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useApiUrl } from "./api";
 
 /**
- * This function will register the user without google
- * @param {*} userData 
- * @returns 
+ * Registers the user.
+ * @param {Object} userData - User data to be registered.
+ * @returns {Promise<Object>} - A promise that resolves to the response data.
  */
 export const register = async (userData) => {
   const apiUrl = useApiUrl("/auth/register");
@@ -19,53 +19,144 @@ export const register = async (userData) => {
 
   if (!response.ok) {
     const errorData = await response.json();
-    const errorMessage = errorData || "Network response was not ok";
-    throw errorMessage;
+    throw errorData || "Network response was not ok";
   }
 
   return await response.json();
 };
 
 /**
- * This function will get the user info from the google api
- * @param {*} token 
- * @param {*} setUserInfo 
- * @param {*} response 
+ * Logins the user
+ * @param {*} userData 
  * @returns 
  */
-export const getUserInfo = async (token, setUserInfo, response) => {
-  if (!token) return;
+export const login = async (userData) => {
+  const apiUrl = useApiUrl("/auth/login");
+
+  const response = await fetch(apiUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(userData),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw errorData || "Network response was not ok";
+  }
+
+  return await response.json();
+};
+
+/**
+ * Retrieves user information from the Google API.
+ * @param {string} token - Access token obtained from Google authentication.
+ * @param {Function} setUserInfo - Function to set user information in state.
+ * @returns {Promise<void>}
+ */
+export const createUserGoogleId = async (token, setUserInfo) => {
   try {
     const response = await fetch("https://www.googleapis.com/userinfo/v2/me", {
       headers: { Authorization: `Bearer ${token}` },
     });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch user data from Google API");
+    }
+
     const user = await response.json();
-    await AsyncStorage.setItem("user", JSON.stringify(user));
-    setUserInfo(user);
+    const createUser = {
+      email: user.email,
+      username: user.name,
+      password: user.id,
+      googleId: user.id,
+      token,
+    };
+    
+    // Check if user exists in AsyncStorage before registering
+    const userExists = await authUserExists();
+    if (!userExists) {
+      await register(createUser);
+      AsyncStorage.setItem("user", JSON.stringify(createUser));
+      setUserInfo(createUser);
+    }
   } catch (error) {
-    console.error(
-      "Failed to fetch user data:",
-      response.status,
-      response.statusText
-    );
+    console.error("Error creating user with Google ID:", error.message);
   }
 };
 
 /**
- * This function will sign in with google and set the user info
+ * Retrieves user information from the Google API and logs the user in.
+ * @param {*} token 
  * @param {*} setUserInfo 
- * @param {*} response 
  */
-export const signInWithGoogle = async (setUserInfo, response) => {
+export const loginUserGoogleId = async (token, setUserInfo) => {
   try {
-    const userJSON = await AsyncStorage.getItem("user");
-    console.log(response?.type);
-    if (userJSON) {
-      setUserInfo(JSON.parse(userJSON));
-    } else if (response?.type === "success") {
-      getUserInfo(response.authentication.accessToken, setUserInfo, response);
+    const response = await fetch("https://www.googleapis.com/userinfo/v2/me", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch user data from Google API");
+    }
+
+    const user = await response.json();
+    const getUser = {
+      email: user.email,
+      username: user.name,
+      password: user.id,
+      googleId: user.id,
+      token,
+    };
+
+    const userExists = await authUserExists();
+    if (!userExists) {
+      AsyncStorage.setItem("user", JSON.stringify(getUser));
+      setUserInfo(getUser);
+      await login(getUser);
+    } else {
+      AsyncStorage.setItem("user", JSON.stringify(getUser));
+      setUserInfo(getUser);
+      await register(getUser);
     }
   } catch (error) {
-    console.error("Error retrieving user data from AsyncStorage:", error);
+  }
+};
+
+/**
+ * Signs in with Google authentication and sets the user info.
+ * @param {Function} setUserInfo - Function to set user information in state.
+ * @param {Object} response - Response object from Google authentication.
+ * @param {string} type - Type of action (register or login).
+ */
+export const signInWithGoogle = async (setUserInfo, response, type, navigation) => {
+  try {
+    switch (type) {
+      case "register":
+        await createUserGoogleId(response.authentication.accessToken, setUserInfo);
+        navigation.navigate('Home')
+        break;
+      case "login":
+        await loginUserGoogleId(response.authentication.accessToken, setUserInfo);
+        navigation.navigate('Home')
+        break;
+      default:
+        break;
+    }
+  } catch (error) {
+  }
+};
+
+/**
+ * Checks if the user is authenticated via Google.
+ * @returns {Promise<boolean>} - A promise that resolves to true if the user is authenticated, false otherwise.
+ */
+export const authUserExists = async () => {
+  try {
+    AsyncStorage.clear()
+    const user = await AsyncStorage.getItem("user");
+    return !!user;
+  } catch (error) {
   }
 };
