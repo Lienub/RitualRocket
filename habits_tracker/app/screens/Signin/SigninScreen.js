@@ -51,7 +51,7 @@ export default function SigninScreen({ navigation }) {
       case "login":
         try {
           await login(userData);
-          navigation.navigate('Home');
+          navigation.navigate('MainNavigation');
         } catch (error) {
           if (error.status === "email_failed") setErrorMail(error.message);
           else if (error.status === "password_failed") setErrorPassword(error.message);

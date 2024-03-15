@@ -57,7 +57,7 @@ export default function SignupScreen({ navigation }) {
         try {
           const response = await register(userData);
           setUserData({ ...userData, googleId: "", token: response.token });
-          navigation.navigate("Home");
+          navigation.navigate("MainNavigation");
         } catch (error) {
           if (error.status === "username_failed") setErrorUsername(error.message);
           else if (error.status === "email_failed") setErrorMail(error.message);

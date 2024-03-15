@@ -134,11 +134,11 @@ export const signInWithGoogle = async (setUserInfo, response, type, navigation) 
     switch (type) {
       case "register":
         await createUserGoogleId(response.authentication.accessToken, setUserInfo);
-        navigation.navigate('Home')
+        navigation.navigate('MainNavigation')
         break;
       case "login":
         await loginUserGoogleId(response.authentication.accessToken, setUserInfo);
-        navigation.navigate('Home')
+        navigation.navigate('MainNavigation')
         break;
       default:
         break;

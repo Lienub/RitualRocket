@@ -4,7 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { authUserExists } from "./app/services/users";
 import SignupScreen from "./app/screens/Signup/SignupScreen";
 import SigninScreen from "./app/screens/Signin/SigninScreen";
-import HomeScreen from "./app/screens/Home/HomeScreen";
+import MainNavigation from "./app/navigation/MainNavigation";
 
 const Stack = createNativeStackNavigator();
 
@@ -44,8 +44,8 @@ export default function App() {
               }}
             />
             <Stack.Screen
-              name="Home"
-              component={HomeScreen}
+              name="MainNavigation"
+              component={MainNavigation}
               options={{
                 headerShown: false,
                 gestureEnabled: false,
@@ -54,8 +54,8 @@ export default function App() {
           </>
         ) : (
           <Stack.Screen
-            name="Home"
-            component={HomeScreen}
+            name="MainNavigation"
+            component={MainNavigation}
             options={{
               headerShown: false,
               gestureEnabled: false,
