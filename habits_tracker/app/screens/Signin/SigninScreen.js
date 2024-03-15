@@ -18,7 +18,7 @@ import * as Google from "expo-auth-session/providers/google";
 import SocialMediaButton from "../../components/Buttons/SocialMediaButton";
 import Images from "../../utils/constants/images";
 import styles from "./styles";
-import { login, signInWithGoogle } from "../../services/users";
+import { login, signInWithGoogle, storeUserInfoInStorage } from "../../services/users";
 
 export default function SigninScreen({ navigation }) {
   const [error, setError] = useState("");
@@ -46,11 +46,13 @@ export default function SigninScreen({ navigation }) {
   }, [response]);
 
   const signInUser = async (type) => {
-    setLoading(true); // Set loading state to true when sign-in is initiated
+    setLoading(true);
     switch (type) {
       case "login":
         try {
-          await login(userData);
+          let response = await login(userData);
+          // store user info in storage
+          await storeUserInfoInStorage(response);
           navigation.navigate('MainNavigation');
         } catch (error) {
           if (error.status === "email_failed") setErrorMail(error.message);
@@ -59,12 +61,13 @@ export default function SigninScreen({ navigation }) {
         }
         break;
       case "google":
+        // Prompt the user to sign in with Google
         promptAsync({ useProxy: true });
         break;
       default:
         break;
     }
-    setLoading(false); // Set loading state to false after sign-in attempt
+    setLoading(false);
   };
 
   return (

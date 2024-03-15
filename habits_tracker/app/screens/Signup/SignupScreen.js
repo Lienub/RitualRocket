@@ -18,7 +18,7 @@ import * as Google from "expo-auth-session/providers/google";
 import SocialMediaButton from "../../components/Buttons/SocialMediaButton";
 import Images from "../../utils/constants/images";
 import styles from "./styles";
-import { register, signInWithGoogle } from "../../services/users";
+import { register, signInWithGoogle, storeUserInfoInStorage } from "../../services/users";
 
 export default function SignupScreen({ navigation }) {
   const [error, setError] = useState("");
@@ -46,17 +46,17 @@ export default function SignupScreen({ navigation }) {
   // Get user info from google
   useEffect(() => {
     if (response?.type === "success" && response.authentication.accessToken) {
-      signInWithGoogle(setUserInfo, response, "register");
+      signInWithGoogle(setUserInfo, response, "register", navigation);
     }
   }, [response]);
 
   const registerUser = async (type) => {
-    setLoading(true); // Set loading state to true when registration is initiated
+    setLoading(true);
     switch (type) {
       case "register":
         try {
           const response = await register(userData);
-          setUserData({ ...userData, googleId: "", token: response.token });
+          await storeUserInfoInStorage(response);
           navigation.navigate("MainNavigation");
         } catch (error) {
           if (error.status === "username_failed") setErrorUsername(error.message);
@@ -71,7 +71,7 @@ export default function SignupScreen({ navigation }) {
       default:
         break;
     }
-    setLoading(false); // Set loading state to false after registration attempt
+    setLoading(false);
   };
 
   return (
