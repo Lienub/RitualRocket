@@ -64,11 +64,12 @@ const login = async (req, res) => {
     let user = null;
     if (googleId) {
       user = await Users.findOne({ where: { googleId } });
+      console.log(user)
       if (!user) {
         return res.status(401).json({ message: "Invalid Google ID" });
       }
     } else {
-      user = await Users.findOne({ where: { email } });
+      user = await Users.findOne({ where: { email } })
       if (!user) {
         return res.status(401).json({ message: "Invalid email or password" });
       }
@@ -120,4 +121,9 @@ const resetPassword = async (req, res) => {
   }
 };
 
-module.exports = { register, login, getUserByGoogleId, resetPassword };
+const verifyGoogleId = async (googleId) => {
+  const user = await Users.findOne({ where: { googleId } });
+  return user;
+}
+
+module.exports = { register, login, getUserByGoogleId, resetPassword, verifyGoogleId };
