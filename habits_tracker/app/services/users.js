@@ -207,6 +207,7 @@ export const getUserInfo = async () => {
 export const storeUserInfoInStorage = async (userInfo) => {
   try {
     const user = {
+      id: userInfo.id,
       email: userInfo.email,
       username: userInfo.username,
       password: userInfo.password,
