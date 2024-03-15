@@ -120,18 +120,17 @@ const getUserByGoogleId = async (googleId) => {
 };
 
 const resetPassword = async (req, res) => {
-  try {
-    const { token, newPassword } = req.body;
 
-    if (!token || !newPassword) {
+  try {
+    const { email, newPassword } = req.body;
+
+    if (!email || !newPassword) {
       return res.status(400).json({
-        message: "Token de réinitialisation et nouveau mot de passe requis",
+        message: "L'e-mail et le nouveau mot de passe sont requis",
       });
     }
 
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-
-    const user = await Users.findByPk(decodedToken.userId);
+    const user = await Users.findOne({ where: { email } });
     if (!user) {
       return res.status(404).json({ message: "Utilisateur non trouvé" });
     }
@@ -143,9 +142,10 @@ const resetPassword = async (req, res) => {
     res.status(200).json({ message: "Mot de passe réinitialisé avec succès" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: "Erreur interne du serveur" });
   }
 };
+
 
 const verifyGoogleId = async (googleId) => {
   const user = await Users.findOne({ where: { googleId } });

@@ -5,6 +5,7 @@ import { authUserExists } from "./app/services/users";
 import SignupScreen from "./app/screens/Signup/SignupScreen";
 import SigninScreen from "./app/screens/Signin/SigninScreen";
 import MainNavigation from "./app/navigation/MainNavigation";
+import ResetPasswordScreen from "./app/screens/ResetPassword/ResetPassword";
 
 const Stack = createNativeStackNavigator();
 
@@ -34,6 +35,7 @@ export default function App() {
               component={SigninScreen}
               options={{
                 headerShown: false,
+                gestureEnabled: false,
               }}
             />
             <Stack.Screen
@@ -41,6 +43,15 @@ export default function App() {
               component={SignupScreen}
               options={{
                 headerShown: false,
+                gestureEnabled: false,
+              }}
+            />
+            <Stack.Screen
+              name="ResetPassword"
+              component={ResetPasswordScreen}
+              options={{
+                headerShown: false,
+                gestureEnabled: false,
               }}
             />
             <Stack.Screen

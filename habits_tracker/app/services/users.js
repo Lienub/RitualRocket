@@ -50,6 +50,33 @@ export const login = async (userData) => {
 };
 
 /**
+ * Resets the user's password.
+ * @param {string} email - User's email.
+ * @param {string} newPassword - New password.
+ * @returns {Promise<string>} - A promise that resolves to a success message.
+ */
+export const resetPassword = async (email, newPassword) => {
+  const apiUrl = useApiUrl("/auth/reset-password");
+
+  const response = await fetch(apiUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, newPassword }),
+  });
+  if (!response.ok) {
+    console.log(response)
+    const errorData = await response.json();
+    throw errorData || "Network response was not ok";
+  }
+
+  const responseData = await response.json();
+  return responseData.message;
+};
+
+
+/**
  * Retrieves user information from the Google API.
  * @param {string} token - Access token obtained from Google authentication.
  * @param {Function} setUserInfo - Function to set user information in state.
@@ -154,6 +181,7 @@ export const signInWithGoogle = async (setUserInfo, response, type, navigation) 
  */
 export const authUserExists = async () => {
   try {
+    AsyncStorage.clear()
     const user = await AsyncStorage.getItem("user");
     return !!user;
   } catch (error) {
