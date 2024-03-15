@@ -154,7 +154,6 @@ export const signInWithGoogle = async (setUserInfo, response, type, navigation) 
  */
 export const authUserExists = async () => {
   try {
-    AsyncStorage.clear()
     const user = await AsyncStorage.getItem("user");
     return !!user;
   } catch (error) {
