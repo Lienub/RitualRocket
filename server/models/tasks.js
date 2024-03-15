@@ -1,8 +1,5 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../database/connection");
-const User = require("./users");
-const Habit = require("./habit");
-const Category = require("./category");
 
 const Task = sequelize.define("Task", {
   id: {
@@ -62,36 +59,12 @@ const Task = sequelize.define("Task", {
     allowNull: true,
     type: DataTypes.DATE,
   },
-  habitId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: Habit,
-      key: "id",
-    },
-  },
-  categoryId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: Category,
-      key: "id",
-    },
-  },
-  userId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: User,
-      key: "id",
-    },
-  },
 });
 
 Task.associate = (db) => {
-  Task.belongsTo(User, { foreignKey: "userId" });
-  Task.belongsTo(Habit, { foreignKey: "habitId" });
-  Task.belongsTo(Category, { foreignKey: "categoryId" });
-};
+  Task.belongsTo(db.Habit);
+  Task.belongsTo(db.User);
+  Task.belongsTo(db.Category);
+}
 
 module.exports = Task;
