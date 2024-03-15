@@ -4,7 +4,7 @@ import {
   ANDROID_CLIENT_ID,
   WEB_CLIENT_ID,
   REDIRECT_URL,
-} from '@env';;
+} from "@env";
 import {
   SafeAreaView,
   Image,
@@ -12,6 +12,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  ActivityIndicator,
 } from "react-native";
 import * as Google from "expo-auth-session/providers/google";
 import SocialMediaButton from "../../components/Buttons/SocialMediaButton";
@@ -25,6 +26,7 @@ export default function SignupScreen({ navigation }) {
   const [errorPassword, setErrorPassword] = useState("");
   const [errorUsername, setErrorUsername] = useState("");
   const [userInfo, setUserInfo] = useState({});
+  const [loading, setLoading] = useState(false); // State for loading indicator
 
   // Google Auth
   const [request, response, promptAsync] = Google.useAuthRequest({
@@ -49,12 +51,13 @@ export default function SignupScreen({ navigation }) {
   }, [response]);
 
   const registerUser = async (type) => {
+    setLoading(true); // Set loading state to true when registration is initiated
     switch (type) {
-      case 'register':
+      case "register":
         try {
           const response = await register(userData);
-          setUserData({ ...userData, googleId: '', token: response.token });
-          navigation.navigate('Home');
+          setUserData({ ...userData, googleId: "", token: response.token });
+          navigation.navigate("Home");
         } catch (error) {
           if (error.status === "username_failed") setErrorUsername(error.message);
           else if (error.status === "email_failed") setErrorMail(error.message);
@@ -62,12 +65,13 @@ export default function SignupScreen({ navigation }) {
           else setError(error.message);
         }
         break;
-      case 'google':
+      case "google":
         promptAsync({ useProxy: true });
         break;
       default:
         break;
     }
+    setLoading(false); // Set loading state to false after registration attempt
   };
 
   return (
@@ -103,12 +107,16 @@ export default function SignupScreen({ navigation }) {
           onChangeText={(text) => setUserData({ ...userData, password: text })}
         />
         {errorPassword && <Text style={styles.textError}>{errorPassword}</Text>}
-        <TouchableOpacity style={styles.button} onPress={() => registerUser('register')}>
-          <Text style={styles.buttonTitle}>Créer son compte</Text>
+        <TouchableOpacity style={styles.button} onPress={() => registerUser("register")}>
+          {loading ? (
+            <ActivityIndicator color="#ffffff" /> // Show loading indicator when loading is true
+          ) : (
+            <Text style={styles.buttonTitle}>Créer son compte</Text>
+          )}
         </TouchableOpacity>
         <View style={styles.footerView}>
           <Text style={styles.footerText}>
-            As-tu deja un compte ?{" "}
+            As-tu déjà un compte ?{" "}
             <Text
               onPress={() => navigation.navigate("Signin")}
               style={styles.footerLink}

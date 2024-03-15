@@ -12,6 +12,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  ActivityIndicator,
 } from "react-native";
 import * as Google from "expo-auth-session/providers/google";
 import SocialMediaButton from "../../components/Buttons/SocialMediaButton";
@@ -23,6 +24,7 @@ export default function SigninScreen({ navigation }) {
   const [error, setError] = useState("");
   const [errorMail, setErrorMail] = useState("");
   const [errorPassword, setErrorPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   // Google Auth
   const [request, response, promptAsync] = Google.useAuthRequest({
@@ -42,7 +44,9 @@ export default function SigninScreen({ navigation }) {
       signInWithGoogle(setUserData, response, "login", navigation);
     }
   }, [response]);
+
   const signInUser = async (type) => {
+    setLoading(true); // Set loading state to true when sign-in is initiated
     switch (type) {
       case "login":
         try {
@@ -60,6 +64,7 @@ export default function SigninScreen({ navigation }) {
       default:
         break;
     }
+    setLoading(false); // Set loading state to false after sign-in attempt
   };
 
   return (
@@ -87,7 +92,11 @@ export default function SigninScreen({ navigation }) {
         />
         {errorPassword && <Text style={styles.textError}>{errorPassword}</Text>}
         <TouchableOpacity style={styles.button} onPress={() => signInUser('login')}>
-          <Text style={styles.buttonTitle}>Se connecter</Text>
+          {loading ? (
+            <ActivityIndicator color="#ffffff" />
+          ) : (
+            <Text style={styles.buttonTitle}>Se connecter</Text>
+          )}
         </TouchableOpacity>
         <View style={styles.footerView}>
           <Text style={styles.footerText}>
