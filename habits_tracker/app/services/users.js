@@ -16,7 +16,7 @@ export const register = async (userData) => {
     },
     body: JSON.stringify(userData),
   });
-
+  
   if (!response.ok) {
     const errorData = await response.json();
     throw errorData || "Network response was not ok";
@@ -128,15 +128,16 @@ export const loginUserGoogleId = async (token, setUserInfo) => {
  * @param {Function} setUserInfo - Function to set user information in state.
  * @param {Object} response - Response object from Google authentication.
  * @param {string} type - Type of action (register or login).
+ * @param {Object} navigation - Navigation object.
  */
 export const signInWithGoogle = async (setUserInfo, response, type, navigation) => {
   try {
     switch (type) {
-      case "register":
+      case "register": // Verify if user is in register page
         await createUserGoogleId(response.authentication.accessToken, setUserInfo);
         navigation.navigate('MainNavigation')
         break;
-      case "login":
+      case "login": // Verify if user is in login page
         await loginUserGoogleId(response.authentication.accessToken, setUserInfo);
         navigation.navigate('MainNavigation')
         break;
@@ -153,9 +154,38 @@ export const signInWithGoogle = async (setUserInfo, response, type, navigation) 
  */
 export const authUserExists = async () => {
   try {
-    AsyncStorage.clear();
     const user = await AsyncStorage.getItem("user");
     return !!user;
   } catch (error) {
   }
 };
+
+/**
+ * This function gets the user information from the AsyncStorage
+ * @returns user info
+ */
+export const getUserInfo = async () => {
+  try {
+    const user = await AsyncStorage.getItem("user");
+    return JSON.parse(user);
+  } catch (error) {
+  }
+};
+
+/**
+ * This function stores the user information in the AsyncStorage
+ * @param {*} userInfo
+ */
+export const storeUserInfoInStorage = async (userInfo) => {
+  try {
+    const user = {
+      email: userInfo.email,
+      username: userInfo.username,
+      password: userInfo.password,
+      googleId: userInfo.googleId,
+      token: userInfo.token,
+    };
+    AsyncStorage.setItem("user", JSON.stringify(user));
+  } catch (error) {
+  }
+}
