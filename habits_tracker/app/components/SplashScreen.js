@@ -5,7 +5,6 @@ import LottieView from 'lottie-react-native';
 const SplashScreen = ({ navigation }) => {
     const [assetsLoaded, setAssetsLoaded] = useState(false);
     const opacity = useRef(new Animated.Value(1)).current;
-
     useEffect(() => {
         // Loading of assets
         const loadAssets = async () => {
@@ -34,7 +33,7 @@ const SplashScreen = ({ navigation }) => {
             duration: 1000,
             useNativeDriver: true,
           }).start(() => {
-            navigation.replace('MainTest');
+            navigation.jumpTo('MainTest');
           });
         };
         animate();

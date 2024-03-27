@@ -2,22 +2,22 @@
 import { Platform } from 'react-native';
 // Navigation imports
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 // Component / Screen imports
 import SplashScreen from './app/components/SplashScreen';
 import MainTest from './app/screens/MainTest';
 
-const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
 
 export default function App() {
 // Check if the platform is not web
   if (Platform.OS !== 'web') {
     return (
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="SplashScreen" headerMode="none">
-          <Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }}/>
-          <Stack.Screen name="MainTest" component={MainTest} options={{ headerShown: false, animation: 'none' }}/>
-        </Stack.Navigator>
+        <Tab.Navigator tabBar={props => <BottomTabBar {...props} state={{...props.state, routes: props.state.routes.slice(1,1)}} initialRouteName="Splash" headerMode="none"></BottomTabBar> }>
+          <Tab.Screen name="Splash" component={SplashScreen} options={{ headerShown: false, tabBarStyle: { display: "none" }, tabBarVisible: false }}/>
+          <Tab.Screen name="MainTest" component={MainTest} options={{ headerShown: false, animation: 'none' }}/>
+        </Tab.Navigator>
       </NavigationContainer>
     );
   }
@@ -25,9 +25,9 @@ export default function App() {
   // Render only main screen on web
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="MainTest" headerMode="none">
-        <Stack.Screen name="MainTest" component={MainTest} options={{ headerShown: false }}/>
-      </Stack.Navigator>
+      <Tab.Navigator initialRouteName="MainTest" headerMode="none">
+        <Tab.Screen name="MainTest" component={MainTest} options={{ headerShown: false }}/>
+      </Tab.Navigator>
     </NavigationContainer>
   );
 }
