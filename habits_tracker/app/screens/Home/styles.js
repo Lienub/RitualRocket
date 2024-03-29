@@ -4,7 +4,7 @@ export default StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#404040",
-    paddingHorizontal: 20,
+    
   },
   block: {
     height: 300,
@@ -13,30 +13,44 @@ export default StyleSheet.create({
   },
   calendarStrip: {
     height: 100,
-    marginTop: 80,
+    marginTop: 20,
     width: "100%",
   },
   taskList: {
     marginTop: 20,
   },
   taskItem: {
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#363636",
     borderRadius: 10,
-    padding: 15,
-    marginBottom: 10,
+    padding: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+    
+  },
+  taskIcon: {
+    marginRight: 4,
+    flexDirection: "row",
+  },
+  description: {
+    fontWeight: "400",
+    fontSize: 20,
+    marginTop: 5,
   },
   taskName: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 5,
-  },
-  taskDescription: {
-    fontSize: 16,
   },
   noTasks: {
     fontSize: 18,
     color: "gray",
     textAlign: "center",
     marginTop: 20,
+  },
+  appbar: {
+    flexDirection: "row-reverse",
+    width: "100%",
+    backgroundColor: "#303030",
   },
 });

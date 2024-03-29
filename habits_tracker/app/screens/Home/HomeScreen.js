@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, ScrollView } from "react-native";
+import { ListItem, Icon } from "react-native-elements";
 import CalendarStrip from "react-native-calendar-strip";
+import { Appbar } from "react-native-paper";
 import { getUserInfo } from "../../services/users";
 import { getTasksByUserId } from "../../services/habits";
 import styles from "./styles";
@@ -31,7 +33,6 @@ export default function HomeScreen({ navigation }) {
       try {
         const tasks = await getTasksByUserId(user.userId);
         setTasks(tasks);
-        console.log("Tasks:", tasks);
       } catch (error) {
         console.error("Error fetching tasks:", error);
       }
@@ -42,13 +43,17 @@ export default function HomeScreen({ navigation }) {
 
   useEffect(() => {
     const filteredTasks = tasks.filter((task) => {
-      const endDate = new Date(task.endDate).toISOString().split("T")[0]
-      const repeatDaysArray = task.repeatDays.split(",").map(day => day.replace(/"/g, "").trim());
-      const selectedDayOfWeek = new Date(selectedDate).toLocaleString("en-US", { weekday: "long" }).toLowerCase();
+      const endDate = new Date(task.endDate).toISOString().split("T")[0];
+      const repeatDaysArray = task.repeatDays
+        .split(",")
+        .map((day) => day.replace(/"/g, "").trim());
+      const selectedDayOfWeek = new Date(selectedDate)
+        .toLocaleString("en-US", { weekday: "long" })
+        .toLowerCase();
       if (endDate < selectedDate) {
         return false;
       }
-  
+
       if (repeatDaysArray.includes(selectedDayOfWeek)) {
         return true;
       }
@@ -56,10 +61,24 @@ export default function HomeScreen({ navigation }) {
     });
     setFilteredTasks(filteredTasks);
   }, [selectedDate, tasks]);
-  
 
   return (
     <View style={styles.container}>
+      <Appbar.Header style={styles.appbar}>
+        <Appbar.Action
+          icon="account-circle"
+          onPress={() => console.log("Profile")}
+          color="#fff"
+          size={40}
+          style={{ marginLeft: "auto" }}
+        />
+        <Appbar.Content
+          title={new Date(selectedDate).toLocaleString("fr-FR", {
+            weekday: "long",
+          })}
+          color="#fff"
+        />
+      </Appbar.Header>
       <View style={styles.block}>
         <CalendarStrip
           scrollable={true}
@@ -67,37 +86,68 @@ export default function HomeScreen({ navigation }) {
           calendarAnimation={{ type: "sequence", duration: 30 }}
           daySelectionAnimation={{
             type: "border",
-            borderWidth: 2,
-            borderHighlightColor: "white",
             duration: 300,
           }}
           style={styles.calendarStrip}
-          calendarHeaderStyle={{ color: "white", fontSize: 20 }}
-          dateNumberStyle={{ color: "white" }}
-          dateNameStyle={{ color: "white" }}
-          highlightDateNumberStyle={{ color: "white" }}
-          highlightDateNameStyle={{ color: "white" }}
+          calendarHeaderStyle={{ color: "transparent", display: "none" }}
+          dateNumberStyle={{ color: "white", fontSize: 20 }}
+          dateNameStyle={{ color: "white", fontSize: 10 }}
+          highlightDateNumberStyle={{
+            color: "yellow",
+            fontSize: 23,
+            fontWeight: "bold",
+          }}
+          highlightDateNameStyle={{
+            color: "yellow",
+            fontSize: 14,
+            fontWeight: "bold",
+          }}
           selectedDate={selectedDate}
           onDateSelected={(date) => {
             setSelectedDate(date.toISOString().split("T")[0]);
           }}
         />
-        <View style={styles.taskList}>
+        <ScrollView style={styles.taskList}>
           {filteredTasks.length > 0 ? (
             filteredTasks.map((task) => (
-              <TouchableOpacity
+              <ListItem
                 key={task.id}
-                style={styles.taskItem}
+                containerStyle={{
+                  borderRadius: 20,
+                  backgroundColor: "#363636",
+                  width: "90%",
+                  alignSelf: "center",
+                }}
                 onPress={() => console.log("Task clicked:", task)}
               >
-                <Text style={styles.taskName}>{task.name}</Text>
-                <Text style={styles.taskDescription}>{task.description}</Text>
-              </TouchableOpacity>
+                <Icon name={task.iconType} size={50} color={task.color} />
+                <ListItem.Content>
+                  <ListItem.Title
+                    style={{
+                      color: task.color,
+                      fontWeight: "bold",
+                      fontSize: 20,
+                    }}
+                  >
+                    {task.name}
+                  </ListItem.Title>
+                  <ListItem.Subtitle
+                    style={{
+                      color: task.color,
+                      fontWeight: "400",
+                      fontSize: 20,
+                      marginTop: 10,
+                    }}
+                  >
+                    * Fonce !
+                  </ListItem.Subtitle>
+                </ListItem.Content>
+              </ListItem>
             ))
           ) : (
             <Text style={styles.noTasks}>Pas d'habitudes à cette date</Text>
           )}
-        </View>
+        </ScrollView>
       </View>
     </View>
   );
