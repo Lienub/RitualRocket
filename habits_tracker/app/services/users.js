@@ -94,6 +94,7 @@ export const createUserGoogleId = async (token, setUserInfo) => {
 
     const user = await response.json();
     const createUser = {
+      id: user.userId,
       email: user.email,
       username: user.name,
       password: user.id,
@@ -105,7 +106,7 @@ export const createUserGoogleId = async (token, setUserInfo) => {
     const userExists = await authUserExists();
     if (!userExists) {
       await register(createUser);
-      AsyncStorage.setItem("user", JSON.stringify(createUser));
+      await AsyncStorage.setItem("user", JSON.stringify(createUser));
       setUserInfo(createUser);
     }
   } catch (error) {
@@ -129,22 +130,24 @@ export const loginUserGoogleId = async (token, setUserInfo) => {
 
     const user = await response.json();
     const getUser = {
+      id: user.userId,
       email: user.email,
       username: user.name,
       password: user.id,
       googleId: user.id,
       token,
     };
-
+    
     const userExists = await authUserExists();
     if (!userExists) {
-      AsyncStorage.setItem("user", JSON.stringify(getUser));
-      setUserInfo(getUser);
-      await login(getUser);
+      let data = await login(getUser);
+      AsyncStorage.setItem("user", JSON.stringify(data));
+      setUserInfo(data);
     } else {
-      AsyncStorage.setItem("user", JSON.stringify(getUser));
-      setUserInfo(getUser);
-      await register(getUser);
+     let data = await register(getUser);
+      console.log("test2: " +  data.userId)
+      AsyncStorage.setItem("user", JSON.stringify(data));
+      setUserInfo(data);
     }
   } catch (error) {
   }
@@ -206,7 +209,7 @@ export const getUserInfo = async () => {
 export const storeUserInfoInStorage = async (userInfo) => {
   try {
     const user = {
-      id: userInfo.id,
+      id: userInfo.userId,
       email: userInfo.email,
       username: userInfo.username,
       password: userInfo.password,

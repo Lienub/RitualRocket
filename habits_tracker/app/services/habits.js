@@ -20,3 +20,24 @@ export const getHabitsByCategory = async (categoryId) => {
   }
   return await response.json();
 };
+
+export const createTask = async (taskData) => {
+    try {
+      const apiUrl = useApiUrl("/tasks");
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(taskData),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw errorData || "Network response was not ok";
+      }
+      return await response.json();
+    } catch (error) {
+      console.error("Error creating task:", error);
+      throw error;
+    }
+  };

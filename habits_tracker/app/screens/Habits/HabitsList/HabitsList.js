@@ -21,14 +21,13 @@ export default function HabitsListScreen({ navigation, route }) {
         <Appbar.Content title={categoryTitle} titleStyle={styles.title} />
       </Appbar.Header>
 
-      {/* Contenu de l'écran */}
       <FlatList
         style={styles.habitList}
         data={habits}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <TouchableOpacity 
-            onPress={() => console.log("Habit selected:", item)} 
+            onPress={() => navigation.navigate("TaskForm", { habitId: item.id, categoryId, habitTitle: item.name})}
             style={styles.habitBlock}
           >
             <Text style={styles.habitName}>{item.name}</Text>
