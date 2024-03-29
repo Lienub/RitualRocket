@@ -16,4 +16,27 @@ export default StyleSheet.create({
     marginTop: 80,
     width: "100%",
   },
+  taskList: {
+    marginTop: 20,
+  },
+  taskItem: {
+    backgroundColor: "#f0f0f0",
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 10,
+  },
+  taskName: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 5,
+  },
+  taskDescription: {
+    fontSize: 16,
+  },
+  noTasks: {
+    fontSize: 18,
+    color: "gray",
+    textAlign: "center",
+    marginTop: 20,
+  },
 });
