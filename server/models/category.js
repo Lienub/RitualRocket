@@ -16,4 +16,8 @@ const Category = sequelize.define('Category', {
   },
 });
 
+Category.associate = (db) => {
+  Category.belongsToMany(db.Habit, { through: 'HabitCategory' });
+};
+
 module.exports = Category;

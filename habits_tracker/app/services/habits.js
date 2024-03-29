@@ -41,3 +41,25 @@ export const createTask = async (taskData) => {
       throw error;
     }
   };
+
+export const createHabit = async (habitData) => {
+    try {
+      const apiUrl = useApiUrl("/habits");
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(habitData),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw errorData || "Network response was not ok";
+      }
+      return await response.json();
+    } catch (error) {
+      console.error("Error creating habit:", error);
+      throw error;
+    }
+  };
+  

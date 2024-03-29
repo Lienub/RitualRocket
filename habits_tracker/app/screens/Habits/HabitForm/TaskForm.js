@@ -14,7 +14,7 @@ import ColorPicker, {
 
 import Icon from "react-native-vector-icons/FontAwesome";
 import { getUserInfo } from "../../../services/users";
-import { createTask } from "../../../services/habits";
+import { createTask, createHabit } from "../../../services/habits";
 import styles from "./styles";
 
 export default function TaskFormScreen({ navigation, route }) {
@@ -75,35 +75,38 @@ export default function TaskFormScreen({ navigation, route }) {
     fetchUserInfo();
   }, []);
 
-  const handleSubmit = () => {
-    const taskData = {
-      name,
-      description,
-      iconType,
-      color,
-      repeat,
-      repeatDays: "",
-      repeatWeeks: "",
-      repeatMonths: "",
-      endDate,
-      reminder,
-      sound,
-      is_completed: isCompleted,
-      habitId,
-      categoryId,
-      userId: user.userId,
-    };
-    console.log(taskData);
-    createTask(taskData)
-      .then((response) => {
-        console.log("Task created successfully:", response);
-        navigation.goBack();
-      })
-      .catch((error) => {
-        console.error("Error creating task:", error);
-      });
+  const handleSubmit = async () => {
+    try {
+      const taskData = {
+        name,
+        description,
+        iconType,
+        color,
+        repeat,
+        repeatDays: "",
+        repeatWeeks: "",
+        repeatMonths: "",
+        endDate,
+        reminder,
+        sound,
+        is_completed: isCompleted,
+        habitId,
+        categoryId,
+        userId: user.userId,
+      };
+  
+      if (habitTitle !== name) {
+        const habitResponse = await createHabit({ name, description, categoryId, userId: user.userId });
+        taskData.habitId = habitResponse.id;
+      }
+  
+      const taskResponse = await createTask(taskData);
+      navigation.goBack();
+    } catch (error) {
+      console.error("Error creating task:", error);
+    }
   };
-
+  
   return (
     <ScrollView style={styles.container}>
       <Appbar.Header style={styles.appbar}>
