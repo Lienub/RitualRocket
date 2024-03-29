@@ -42,6 +42,9 @@ export default function HomeScreen({ navigation }) {
   }, [user]);
 
   useEffect(() => {
+  }, [tasks, setTasks]);
+
+  useEffect(() => {
     const filteredTasks = tasks.filter((task) => {
       const endDate = new Date(task.endDate).toISOString().split("T")[0];
       const repeatDaysArray = task.repeatDays
@@ -118,7 +121,7 @@ export default function HomeScreen({ navigation }) {
                   width: "90%",
                   alignSelf: "center",
                 }}
-                onPress={() => console.log("Task clicked:", task)}
+                onPress={() => navigation.navigate("HabitDetail", { task })}
               >
                 <Icon name={task.iconType} size={50} color={task.color} />
                 <ListItem.Content>

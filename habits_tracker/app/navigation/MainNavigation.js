@@ -4,6 +4,7 @@ import HomeScreen from "../screens/Home/HomeScreen";
 import CategoryListScreen from "../screens/Habits/CategoryList/CategoryList";
 import HabitsListScreen from "../screens/Habits/HabitsList/HabitsList";
 import TaskFormScreen from "../screens/Habits/HabitForm/TaskForm";
+import HabitDetailScreen from "../screens/HabitDetail/HabitDetail";
 
 const Stack = createNativeStackNavigator();
 
@@ -36,6 +37,13 @@ export default function MainNavigation() {
         <Stack.Screen
           name="TaskForm"
           component={TaskFormScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="HabitDetail"
+          component={HabitDetailScreen}
           options={{
             headerShown: false,
           }}
