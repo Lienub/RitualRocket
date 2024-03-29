@@ -33,7 +33,7 @@ module.exports = [
     func: controller.updateHabitById,
   },
   {
-    url: "/categories/:category/habits",
+    url: "/categories/:categoryId/habits",
     method: "get",
     func: controller.getAllHabitsByCategory,
   }

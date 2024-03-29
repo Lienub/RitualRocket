@@ -1,9 +1,9 @@
-const { Habit } = require('../models');
+const { Habit, Category } = require('../models');
 
 const createHabit = async (req, res) => {
   try {
-    const { name, description } = req.body;
-    const habit = await Habit.create({ name, description });
+    const { name, description, categoryId } = req.body;
+    const habit = await Habit.create({ name, description, categoryId });
     res.status(201).json(habit);
   } catch (error) {
     console.error(error);
@@ -13,8 +13,8 @@ const createHabit = async (req, res) => {
 
 const createHabitByUserId = async (req, res) => {
   try {
-    const { name, description, userId } = req.body;
-    const habit = await Habit.create({ name, description, userId });
+    const { name, description, userId, categoryId } = req.body;
+    const habit = await Habit.create({ name, description, userId, categoryId });
     res.status(201).json(habit);
   } catch (error) {
     console.error(error);
@@ -47,7 +47,10 @@ const updateHabitById = async (req, res) => {
 const getAllHabits = async (req, res) => {
   try {
     const userId = req.params.userId;
-    const habits = await Habit.findAll({ where: { userId } });
+    const habits = await Habit.findAll({ 
+      where: { userId },
+      include: [{ model: Category }]
+    });
     res.status(200).json(habits);
   } catch (error) {
     console.error(error);
@@ -57,8 +60,13 @@ const getAllHabits = async (req, res) => {
 
 const getAllHabitsByCategory = async (req, res) => {
   try {
-    const category = req.params.category;
-    const habits = await Habit.findAll({ where: { category } });
+    const categoryId = req.params.categoryId;
+    const habits = await Habit.findAll({
+      include: [{
+        model: Category,
+        where: { id: categoryId }
+      }]
+    });
     res.status(200).json(habits);
   } catch (error) {
     console.error(error);
@@ -68,7 +76,10 @@ const getAllHabitsByCategory = async (req, res) => {
 
 const getAllHabitsByUserId = async (req, res) => {
   try {
-    const habits = await Habit.findAll({ where: { userId: null } });
+    const habits = await Habit.findAll({ 
+      where: { userId: null },
+      include: [{ model: Category }]
+    });
     res.status(200).json(habits);
   } catch (error) {
     console.error(error);
@@ -76,4 +87,4 @@ const getAllHabitsByUserId = async (req, res) => {
   }
 }
 
-module.exports = { createHabit, createHabitByUserId, removeHabitById, updateHabitById, getAllHabits, getAllHabitsByUserId, getAllHabitsByCategory};
+module.exports = { createHabit, createHabitByUserId, removeHabitById, updateHabitById, getAllHabits, getAllHabitsByUserId, getAllHabitsByCategory };
