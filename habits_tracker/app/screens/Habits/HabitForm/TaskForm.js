@@ -4,6 +4,8 @@ import { TextInput, Button, Switch } from "react-native-paper";
 import ModalSelector from "react-native-modal-selector";
 import { Appbar } from "react-native-paper";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
+import { DayPicker } from "react-native-picker-weekday";
+
 import ColorPicker, {
   Panel1,
   Swatches,
@@ -16,6 +18,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { getUserInfo } from "../../../services/users";
 import { createTask, createHabit } from "../../../services/habits";
 import styles from "./styles";
+import { on } from "events";
 
 export default function TaskFormScreen({ navigation, route }) {
   const iconNames = [
@@ -45,6 +48,8 @@ export default function TaskFormScreen({ navigation, route }) {
   const [selectedIcon, setSelectedIcon] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [showModalColor, setShowModalColor] = useState(false);
+  const [repeatDays, setRepeatDays] = useState("");
+  const [selectedDays, setSelectedDays] = useState([-1]);
 
   const handleIconSelection = (iconName) => {
     setSelectedIcon(iconName);
@@ -83,7 +88,13 @@ export default function TaskFormScreen({ navigation, route }) {
         iconType,
         color,
         repeat,
-        repeatDays: "",
+        repeatDays: selectedDays
+        .filter(dayIndex => dayIndex !== -1)
+        .map(dayIndex => {
+          const daysOfWeek = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+          return daysOfWeek[dayIndex];
+        })
+        .join(","),
         repeatWeeks: "",
         repeatMonths: "",
         endDate,
@@ -94,19 +105,24 @@ export default function TaskFormScreen({ navigation, route }) {
         categoryId,
         userId: user.userId,
       };
-  
+
       if (habitTitle !== name) {
-        const habitResponse = await createHabit({ name, description, categoryId, userId: user.userId });
+        const habitResponse = await createHabit({
+          name,
+          description,
+          categoryId,
+          userId: user.userId,
+        });
         taskData.habitId = habitResponse.id;
       }
-  
+
       const taskResponse = await createTask(taskData);
       navigation.goBack();
     } catch (error) {
       console.error("Error creating task:", error);
     }
   };
-  
+
   return (
     <ScrollView style={styles.container}>
       <Appbar.Header style={styles.appbar}>
@@ -238,6 +254,13 @@ export default function TaskFormScreen({ navigation, route }) {
             onChange={(event, date) => onChangeEndDate(date)}
           />
         </View>
+        <DayPicker
+          weekdays={selectedDays}
+          setWeekdays={setSelectedDays}
+          activeColor="violet"
+          textColor="white"
+          inactiveColor="grey"
+        />
 
         <Modal
           visible={showModalColor}
