@@ -66,7 +66,7 @@ export default StyleSheet.create({
     marginTop: 20,
   },
   statsContainer: {
-    flexDirection: "row",
+    flexDirection: "column",
     justifyContent: "space-around",
     marginTop: 20,
     backgroundColor: "#2D2D2D",
@@ -100,5 +100,37 @@ export default StyleSheet.create({
     fontSize: 40,
     color: "#fff",
     fontWeight: "500",
-  }
+  },
+  blockStats: {
+    flexDirection: "column",
+    justifyContent: "space-around",
+    marginTop: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 20,
+  },
+  itemInfo: {
+    backgroundColor: "white",
+    padding:10,
+    borderRadius: 20,
+    borderBottomWidth: 1,
+    borderRightWidth: 1,
+    borderLeftWidth: 0.2,
+    borderTopWidth: 0.2,
+  },
+  statsTitle: {
+    color: "#000",
+    fontSize: 14,
+    textAlign: "center",
+    fontWeight: "bold",
+  },
+  statsValue: {
+    color: "#000",
+    fontSize: 14,
+    width: 100,
+    textAlign: "center",
+    fontWeight: "400",
+    marginTop: 5,
+    justifyContent: "center",
+  },
 });

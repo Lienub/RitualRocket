@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Text, View, ScrollView, Dimensions } from "react-native";
+import {
+  Text,
+  View,
+  ScrollView,
+  Dimensions,
+  ProgressBarAndroid,
+} from "react-native";
 import { Appbar } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
 import { Icon } from "react-native-elements";
@@ -105,8 +111,12 @@ export default function HabitDetailScreen({ navigation, route }) {
       <ScrollView>
         <View style={styles.infoContainer}>
           <View style={styles.blockFollowing}>
-            <View style={{marginLeft: 6}}>
-              <Text style={{ fontWeight: "bold", fontSize: 15, color: "black" }}>Votre série </Text>
+            <View style={{ marginLeft: 6 }}>
+              <Text
+                style={{ fontWeight: "bold", fontSize: 15, color: "black" }}
+              >
+                Votre série{" "}
+              </Text>
               <Text style={styles.followingText}>
                 {daysElapsed === 0
                   ? "Vous n'avez pas encore commencé cette habitude."
@@ -114,7 +124,7 @@ export default function HabitDetailScreen({ navigation, route }) {
               </Text>
             </View>
             <Text style={styles.followingEmojy}>
-            {daysElapsed === 0 ? "🚫" : "🔥"}
+              {daysElapsed === 0 ? "🚫" : "🔥"}
             </Text>
           </View>
           <Icon
@@ -127,10 +137,44 @@ export default function HabitDetailScreen({ navigation, route }) {
           <Text style={styles.description}>
             {task.description == "" ? "Pas description" : task.description}
           </Text>
-          <Text style={styles.repeatDays}>
-            {task.repeatDays == "" ? "" : "Tous les " + repeatDays.join(", ")}
-            {task.repeat == "none" && "Répéter une seule fois"}
-          </Text>
+          <View style={styles.blockStats}>
+            <View style={styles.itemInfo}>
+              <Text style={styles.statsTitle}>Objectif défini</Text>
+              <ProgressBarAndroid
+                styleAttr="Horizontal"
+                indeterminate={false}
+                progress={20 / 100} 
+                color="#007AFF" 
+              />
+            </View>
+            <View
+              style={{
+                marginTop: 20,
+                flexDirection: "row",
+                justifyContent: "space-around",
+              }}
+            >
+              <View style={styles.itemInfo}>
+                <Text style={styles.statsTitle}>Répétition</Text>
+                <View style={{ flexDirection: "row" }}>
+                  <Ionicons name="calendar" size={30} color="black" />
+                  <Text style={styles.statsValue}>
+                    {task.repeatDays == ""
+                      ? ""
+                      : repeatDays.join(", ")}
+                    {task.repeat == "none" && "une seule fois"}
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.itemInfo}>
+                <Text style={styles.statsTitle}>Rappel</Text>
+                <View style={{ flexDirection: "row" }}>
+                  <Ionicons name="timer" size={30} color="black" />
+                  <Text style={styles.statsValue}>{task.rappelTime}</Text>
+                </View>
+              </View>
+            </View>
+          </View>
         </View>
         <View style={styles.statsContainer}>
           <BarChart

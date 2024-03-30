@@ -6,6 +6,7 @@ import { Appbar } from "react-native-paper";
 import { Calendar } from "react-native-calendars";
 import { DayPicker } from "react-native-picker-weekday";
 import { iconNames } from "../../../utils/constants/icons";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 import ColorPicker, {
   Panel1,
@@ -40,6 +41,8 @@ export default function TaskFormScreen({ navigation, route }) {
   const [repeatDays, setRepeatDays] = useState("");
   const [selectedDays, setSelectedDays] = useState([-1]);
   const [selectedInput, setSelectedInput] = useState(null);
+  const [rappelTime, setRappelTime] = useState(new Date().toISOString().split("T")[1].split(".")[0]);
+  const [showRappel, setShowRappel] = useState(false);
 
   const handleIconSelection = (iconName) => {
     setSelectedIcon(iconName);
@@ -62,14 +65,19 @@ export default function TaskFormScreen({ navigation, route }) {
   const handleEndDateChange = (text) => {
     setEndDate(text);
   };
+  const handleRappelChange = (event, selectedTime) => {
+    if (selectedTime !== undefined && selectedTime !== null) {
+      let time = selectedTime.toISOString().split("T")[1].split(".")[0];
+      if(rappelTime == time) { return;}
+      setRappelTime(time);
+      setShowRappel(false);
+      return;
+    }
+    setShowRappel(true);
+  };
 
   const handleShowCalendar = (mode) => {
     setSelectedInput(mode);
-    setShowCalendar(true);
-  };
-
-  const handleInputPress = (input) => {
-    setSelectedInput(input);
     setShowCalendar(true);
   };
 
@@ -87,7 +95,9 @@ export default function TaskFormScreen({ navigation, route }) {
       try {
         const userInfo = await getUserInfo();
         setUser(userInfo);
-      } catch (error) {}
+      } catch (error) {
+        console.error("Error fetching user info:", error);
+      }
     };
 
     fetchUserInfo();
@@ -95,6 +105,7 @@ export default function TaskFormScreen({ navigation, route }) {
 
   const handleSubmit = async () => {
     try {
+      console.log("rappelTime", rappelTime);
       const taskData = {
         name,
         description,
@@ -125,6 +136,7 @@ export default function TaskFormScreen({ navigation, route }) {
         categoryId,
         userId: user.userId,
         startDate,
+        rappelTime,
       };
 
       if (habitTitle !== name) {
@@ -143,7 +155,6 @@ export default function TaskFormScreen({ navigation, route }) {
       console.error("Error creating task:", error);
     }
   };
-
   return (
     <ScrollView style={styles.container}>
       <Appbar.Header style={styles.appbar}>
@@ -264,7 +275,9 @@ export default function TaskFormScreen({ navigation, route }) {
         />
         <View style={{ flexDirection: "column" }}>
           <View>
-            <Text style={{ color: "white", fontSize: 20, marginLeft: 10 }}>Date de début</Text>
+            <Text style={{ color: "white", fontSize: 20, marginLeft: 10 }}>
+              Date de début
+            </Text>
             <TextInput
               style={styles.input}
               placeholder="Date de début"
@@ -276,7 +289,9 @@ export default function TaskFormScreen({ navigation, route }) {
           </View>
 
           <View>
-            <Text style={{ color: "white", fontSize: 20, marginLeft: 10  }}>Date de fin</Text>
+            <Text style={{ color: "white", fontSize: 20, marginLeft: 10 }}>
+              Date de fin
+            </Text>
             <TextInput
               style={styles.input}
               placeholder="Date de fin"
@@ -285,6 +300,27 @@ export default function TaskFormScreen({ navigation, route }) {
               textColor="#fff"
               onFocus={() => handleShowCalendar("endDate")}
             />
+          </View>
+          <View>
+            <Text style={{ color: "white", fontSize: 20, marginLeft: 10 }}>
+              Rappel
+            </Text>
+            <TouchableOpacity
+              style={{alignSelf: "flex-start", backgroundColor: "#F1A44A", padding: 10, borderRadius: 10, margin: 10, width: 100, alignItems: "center"}}
+              textColor="#fff"
+              onPress={handleRappelChange}
+            >
+              <Text style={{ color: "white" }}>{rappelTime}</Text>
+            </TouchableOpacity>
+            {
+              showRappel && (
+                <DateTimePicker
+                  value={new Date()}
+                  mode="time"
+                  onChange={handleRappelChange}
+                />
+              )
+            }
           </View>
           {showCalendar && (
             <Calendar

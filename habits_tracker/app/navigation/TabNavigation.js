@@ -28,7 +28,7 @@ export default function TabNavigation() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="add" size={40} color={color} style={{fontWeight: 'bold'}} />
           ),
-          tabBarLabel: () => null, // Masquer le texte
+          tabBarLabel: () => null,
         }}
       />
       <Tab.Screen
