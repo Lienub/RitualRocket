@@ -21,9 +21,10 @@ export default StyleSheet.create({
   },
   title: {
     color: "#fff",
-    fontSize: 20,
+    fontSize: 30,
     fontWeight: "500",
-    alignSelf: "center",
+    alignSelf: "flex-start",
+    marginLeft: 30,
     marginTop: 20,
   },
   taskItem: {

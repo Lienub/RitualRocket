@@ -4,7 +4,6 @@ export default StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#2D2D2D",
-    
   },
   taskIcon: {
     marginRight: 4,
@@ -40,7 +39,6 @@ export default StyleSheet.create({
     fontWeight: "bold",
     color: "#fff",
     textAlign: "center",
-    marginTop: 20,
   },
   description: {
     fontSize: 20,
@@ -78,6 +76,29 @@ export default StyleSheet.create({
     backgroundColor: "#404040",
     borderEndStartRadius: 80,
     borderEndEndRadius: 80,
-    padding: 40,
+    padding: 10,
   },
+  blockFollowing: {
+    color: "#fff",
+    justifyContent: "center",
+    paddingLeft: 20,
+    paddingRight: 20,
+    paddingTop: 10,
+    paddingBottom: 10,
+    backgroundColor: "#fcb065",
+    borderRadius: 20,
+    flexDirection: "row",
+    borderWidth: 2,
+    borderColor: "#db7a1a",
+  },
+  followingText: {
+    color: "black",
+    fontSize: 15,
+    fontWeight: "400",
+  },
+  followingEmojy: {
+    fontSize: 40,
+    color: "#fff",
+    fontWeight: "500",
+  }
 });

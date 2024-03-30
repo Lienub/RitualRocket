@@ -102,13 +102,21 @@ export default function HomeScreen({ navigation }) {
           style={{ marginLeft: "auto" }}
         />
         <Appbar.Content
-          title={new Date(selectedDate).toLocaleString("fr-FR", {
-            weekday: "long",
-          })}
+          title={"Bienvenue " + user.username}
           color="#fff"
         />
       </Appbar.Header>
       <View style={styles.block}>
+        <Text style={styles.title}>
+          {
+            "Nous sommes le " + new Date(selectedDate).toLocaleDateString("fr-FR", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })
+          }
+        </Text>
         <CalendarStrip
           scrollable={true}
           scrollerPaging={true}
@@ -137,6 +145,7 @@ export default function HomeScreen({ navigation }) {
           }}
         />
         <ScrollView style={styles.taskList}>
+          <Text style={styles.title}>Consultez vos habitudes du jour!</Text>
           {filteredTasks.length > 0 ? (
             filteredTasks.map((task) => (
               <ListItem

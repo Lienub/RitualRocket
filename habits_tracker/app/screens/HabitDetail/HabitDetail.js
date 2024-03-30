@@ -12,6 +12,7 @@ export default function HabitDetailScreen({ navigation, route }) {
   const [chartDays, setChartDays] = useState([]);
   const [timeSpent, setTimeSpent] = useState({});
   const [repeatDays, setRepeatDays] = useState([]);
+  const [daysElapsed, setDaysElapsed] = useState(0);
 
   // Récupérer les timers de la tâche pour la semaine en cours
   useEffect(() => {
@@ -73,6 +74,13 @@ export default function HabitDetailScreen({ navigation, route }) {
           "Samedi",
         ];
         setChartDays(daysOfWeek);
+
+        const startDate = new Date(task.startDate);
+        const elapsedMilliseconds = currentDate - startDate;
+        const elapsedDays = Math.floor(
+          elapsedMilliseconds / (1000 * 60 * 60 * 24)
+        );
+        setDaysElapsed(elapsedDays);
       } catch (error) {
         console.error("Error fetching timers:", error);
       }
@@ -96,6 +104,19 @@ export default function HabitDetailScreen({ navigation, route }) {
       </Appbar.Header>
       <ScrollView>
         <View style={styles.infoContainer}>
+          <View style={styles.blockFollowing}>
+            <View style={{marginLeft: 6}}>
+              <Text style={{ fontWeight: "bold", fontSize: 15, color: "black" }}>Votre série </Text>
+              <Text style={styles.followingText}>
+                {daysElapsed === 0
+                  ? "Vous n'avez pas encore commencé cette habitude."
+                  : `Vous suivez cette habitude depuis ${daysElapsed} jours.`}
+              </Text>
+            </View>
+            <Text style={styles.followingEmojy}>
+            {daysElapsed === 0 ? "🚫" : "🔥"}
+            </Text>
+          </View>
           <Icon
             name={task.iconType}
             size={100}

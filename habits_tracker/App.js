@@ -27,51 +27,15 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
         {!userExists ? (
           <>
-            <Stack.Screen
-              name="Signin"
-              component={SigninScreen}
-              options={{
-                headerShown: false,
-                gestureEnabled: false,
-              }}
-            />
-            <Stack.Screen
-              name="Signup"
-              component={SignupScreen}
-              options={{
-                headerShown: false,
-                gestureEnabled: false,
-              }}
-            />
-            <Stack.Screen
-              name="ResetPassword"
-              component={ResetPasswordScreen}
-              options={{
-                headerShown: false,
-                gestureEnabled: false,
-              }}
-            />
-            <Stack.Screen
-              name="MainNavigation"
-              component={MainNavigation}
-              options={{
-                headerShown: false,
-                gestureEnabled: false,
-              }}
-            />
+            <Stack.Screen name="Signin" component={SigninScreen} />
+            <Stack.Screen name="Signup" component={SignupScreen} />
+            <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
           </>
         ) : (
-          <Stack.Screen
-            name="MainNavigation"
-            component={MainNavigation}
-            options={{
-              headerShown: false,
-              gestureEnabled: false,
-            }}
-          />
+          <Stack.Screen name="MainNavigation" component={MainNavigation} />
         )}
       </Stack.Navigator>
     </NavigationContainer>
