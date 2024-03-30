@@ -11,9 +11,31 @@ export default function HabitDetailScreen({ navigation, route }) {
   const { task, userId } = route.params;
   const [chartDays, setChartDays] = useState([]);
   const [timeSpent, setTimeSpent] = useState({});
+  const [repeatDays, setRepeatDays] = useState([]);
 
   // Récupérer les timers de la tâche pour la semaine en cours
   useEffect(() => {
+    const days = task.repeatDays.split(",").map((day) => {
+      switch (day) {
+        case "sunday":
+          return "Dimanche";
+        case "monday":
+          return "Lundi";
+        case "tuesday":
+          return "Mardi";
+        case "wednesday":
+          return "Mercredi";
+        case "thursday":
+          return "Jeudi";
+        case "friday":
+          return "Vendredi";
+        case "saturday":
+          return "Samedi";
+        default:
+          return "";
+      }
+    });
+    setRepeatDays(days);
     const fetchDataAndComputeTimeSpent = async () => {
       try {
         const timers = await getTimersByTaskId(task.id, userId);
@@ -21,13 +43,19 @@ export default function HabitDetailScreen({ navigation, route }) {
         const currentDate = new Date();
 
         const firstDayOfWeek = new Date(currentDate);
-        firstDayOfWeek.setDate(firstDayOfWeek.getDate() - firstDayOfWeek.getDay());
+        firstDayOfWeek.setDate(
+          firstDayOfWeek.getDate() - firstDayOfWeek.getDay()
+        );
 
         const timeSpentForWeek = [0, 0, 0, 0, 0, 0, 0]; // Dimanche à Samedi
 
-        timers.forEach(timer => {
+        timers.forEach((timer) => {
           const timerDate = new Date(timer.date);
-          if (timerDate >= firstDayOfWeek && timerDate < new Date(currentDate.getTime() + (7 * 24 * 60 * 60 * 1000))) {
+          if (
+            timerDate >= firstDayOfWeek &&
+            timerDate <
+              new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000)
+          ) {
             const dayOfWeek = timerDate.getDay();
 
             timeSpentForWeek[dayOfWeek] += timer.durationSeconds;
@@ -79,7 +107,8 @@ export default function HabitDetailScreen({ navigation, route }) {
             {task.description == "" ? "Pas description" : task.description}
           </Text>
           <Text style={styles.repeatDays}>
-            {task.repeatDays == "" ? "" : chartDays.join(", ")}
+            {task.repeatDays == "" ? "" : "Tous les " + repeatDays.join(", ")}
+            {task.repeat == "none" && "Répéter une seule fois"}
           </Text>
         </View>
         <View style={styles.statsContainer}>
@@ -88,7 +117,7 @@ export default function HabitDetailScreen({ navigation, route }) {
               labels: chartDays,
               datasets: [
                 {
-                  data: Object.values(timeSpent).map(seconds => seconds / 60),
+                  data: Object.values(timeSpent).map((seconds) => seconds / 60),
                 },
               ],
             }}
