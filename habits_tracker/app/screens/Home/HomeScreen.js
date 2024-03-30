@@ -18,12 +18,12 @@ export default function HomeScreen({ navigation }) {
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split("T")[0]
   );
-  const [closeModal, setCloseModal] = useState(true);
+  const [closeModal, setCloseModal] = useState(false);
   const [timer, setTimer] = useState(0);
- 
+
   const onChangeModalTimer = (task) => {
     setSelectedTask(task);
-    setCloseModal(true);
+    setCloseModal(!closeModal);
   };
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -41,11 +41,9 @@ export default function HomeScreen({ navigation }) {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const tasks = await getTasksByUserId(user.userId)
-        .then((tasks) => {
-        setTasks(tasks);
-        }
-        );
+        const tasks = await getTasksByUserId(user.userId).then((tasks) => {
+          setTasks(tasks);
+        });
       } catch (error) {
         console.error("Error fetching tasks:", error);
       }
@@ -78,6 +76,19 @@ export default function HomeScreen({ navigation }) {
     setFilteredTasks(filteredTasks);
   }, [selectedDate, tasks]);
 
+  useEffect(() => {
+    if (timer > 0 && closeModal === true) {
+      setTimer(0);
+      let seconds = timer;
+      const createTimerData = {
+        taskId: selectedTask.id,
+        userId: user.userId,
+        durationSeconds: seconds,
+      };
+      createTimer(createTimerData);
+    }
+  }, [closeModal, setCloseModal]);
+
   return (
     <View style={styles.container}>
       <Appbar.Header style={styles.appbar}>
@@ -105,7 +116,7 @@ export default function HomeScreen({ navigation }) {
             duration: 300,
           }}
           style={styles.calendarStrip}
-          calendarHeaderStyle={{ color:"#fff", fontSize: 20 }}
+          calendarHeaderStyle={{ color: "#fff", fontSize: 20 }}
           dateNumberStyle={{ color: "white", fontSize: 20 }}
           dateNameStyle={{ color: "white", fontSize: 10 }}
           highlightDateNumberStyle={{
@@ -179,7 +190,7 @@ export default function HomeScreen({ navigation }) {
         </ScrollView>
         {closeModal === false && (
           <TimerView
-            visible={!closeModal} // Correction ici
+            visible={!closeModal}
             setCloseModal={setCloseModal}
             setTimer={setTimer}
             task={selectedTask}

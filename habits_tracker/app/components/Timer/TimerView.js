@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -13,6 +13,15 @@ const TimerView = ({ setTimer, task, visible, setCloseModal }) => {
   const [stopwatchStart, setStopwatchStart] = useState(false);
   const [resetStopwatch, setResetStopwatch] = useState(false);
   const [seconds, setSeconds] = useState(0);
+
+  useEffect(() => {
+    // Effect to update seconds when time changes
+    const interval = setInterval(() => {
+        setSeconds((seconds) => seconds + 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const onTimeChange = () => {
     let floorSeconds = Math.floor(seconds);
@@ -59,14 +68,7 @@ const TimerView = ({ setTimer, task, visible, setCloseModal }) => {
             reset={resetStopwatch}
             options={options}
             getTime={(time) => {
-              const timeArray = time.split(":");
-              const hours = parseInt(timeArray[0]);
-              const minutes = parseInt(timeArray[1]);
-              const seconds = parseInt(timeArray[2]);
-              const milliseconds = parseInt(timeArray[3]);
-              const totalTimeInSeconds =
-                hours * 3600 + minutes * 60 + seconds + milliseconds / 1000;
-              setSeconds(totalTimeInSeconds);
+              // Remove this logic
             }}
           />
 
