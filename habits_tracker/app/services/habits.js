@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useApiUrl } from "./api";
+import { duration } from "moment-timezone";
 
 export const getCategories = async () => {
   const apiUrl = useApiUrl("/categories");
@@ -83,6 +84,27 @@ export const getTasksByUserId = async (userId) => {
     return await response.json();
   } catch (error) {
     console.error("Error fetching tasks by user ID:", error);
+    throw error;
+  }
+};
+
+export const createTimer = async (timerData) => {
+  try {
+    const apiUrl = useApiUrl("/timers");
+    const response = await fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(timerData),
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw errorData || "Network response was not ok";
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error creating timer:", error);
     throw error;
   }
 };

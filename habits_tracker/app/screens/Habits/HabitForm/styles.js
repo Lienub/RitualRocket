@@ -17,7 +17,7 @@ export default StyleSheet.create({
     width: "95%",
     padding: 4,
     backgroundColor: "#303030",
-    marginTop: 20,
+    marginTop: 4,
     alignSelf: "center",
     borderRadius: 10,
     color: "#fff",
@@ -58,6 +58,7 @@ export default StyleSheet.create({
   selectElement: {
     flexDirection: "row",
     flexWrap: "wrap",
+    justifyContent: "space-around",
   },
   modalColor: {
     marginTop: 100,

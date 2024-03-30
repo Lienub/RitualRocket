@@ -39,17 +39,14 @@ const Task = sequelize.define("Task", {
     allowNull: true,
     type: DataTypes.STRING, // Ex: "1,14,31,15"
   },
+  startDate: {
+    allowNull: false,
+    defaultValue: DataTypes.NOW,
+    type: DataTypes.DATE,
+  },
   endDate: {
     allowNull: true,
     type: DataTypes.DATE,
-  },
-  reminder: {
-    allowNull: true,
-    type: DataTypes.ENUM("morning", "afternoon", "evening", "all day"),
-  },
-  sound: {
-    allowNull: true,
-    type: DataTypes.STRING,
   },
   is_completed: {
     allowNull: false,

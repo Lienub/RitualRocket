@@ -66,7 +66,6 @@ export const resetPassword = async (email, newPassword) => {
     body: JSON.stringify({ email, newPassword }),
   });
   if (!response.ok) {
-    console.log(response)
     const errorData = await response.json();
     throw errorData || "Network response was not ok";
   }
@@ -94,7 +93,7 @@ export const createUserGoogleId = async (token, setUserInfo) => {
 
     const user = await response.json();
     const createUser = {
-      id: user.userId,
+      userId: user.userId,
       email: user.email,
       username: user.name,
       password: user.id,
@@ -130,7 +129,7 @@ export const loginUserGoogleId = async (token, setUserInfo) => {
 
     const user = await response.json();
     const getUser = {
-      id: user.userId,
+      userId: user.userId,
       email: user.email,
       username: user.name,
       password: user.id,
@@ -145,7 +144,6 @@ export const loginUserGoogleId = async (token, setUserInfo) => {
       setUserInfo(data);
     } else {
      let data = await register(getUser);
-      console.log("test2: " +  data.userId)
       AsyncStorage.setItem("user", JSON.stringify(data));
       setUserInfo(data);
     }
@@ -209,7 +207,7 @@ export const getUserInfo = async () => {
 export const storeUserInfoInStorage = async (userInfo) => {
   try {
     const user = {
-      id: userInfo.userId,
+      userId: userInfo.userId,
       email: userInfo.email,
       username: userInfo.username,
       password: userInfo.password,

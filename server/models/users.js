@@ -21,8 +21,7 @@ const User = sequelize.define('User', {
   },
   googleId: {
     allowNull: true,
-    type: DataTypes.TEXT,
-    unique: true,
+    type: DataTypes.TEXT
   },
 });
 

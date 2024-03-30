@@ -53,4 +53,5 @@ export default StyleSheet.create({
     width: "100%",
     backgroundColor: "#303030",
   },
+  
 });

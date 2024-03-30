@@ -3,7 +3,7 @@ import { View, ScrollView, TouchableOpacity, Modal, Text } from "react-native";
 import { TextInput, Button, Switch } from "react-native-paper";
 import ModalSelector from "react-native-modal-selector";
 import { Appbar } from "react-native-paper";
-import RNDateTimePicker from "@react-native-community/datetimepicker";
+import { Calendar } from "react-native-calendars";
 import { DayPicker } from "react-native-picker-weekday";
 
 import ColorPicker, {
@@ -39,17 +39,19 @@ export default function TaskFormScreen({ navigation, route }) {
   const [user, setUser] = useState({});
   const [name, setName] = useState(habitTitle);
   const [description, setDescription] = useState("");
-  const [iconType, setIconType] = useState("");
-  const [color, setColor] = useState("");
+  const [iconType, setIconType] = useState("coffee");
+  const [color, setColor] = useState("red");
+  const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [showCalendar, setShowCalendar] = useState(false);
   const [reminder, setReminder] = useState(false);
-  const [sound, setSound] = useState("");
   const [isCompleted, setIsCompleted] = useState(false);
-  const [selectedIcon, setSelectedIcon] = useState(null);
+  const [selectedIcon, setSelectedIcon] = useState("coffee");
   const [modalVisible, setModalVisible] = useState(false);
   const [showModalColor, setShowModalColor] = useState(false);
   const [repeatDays, setRepeatDays] = useState("");
   const [selectedDays, setSelectedDays] = useState([-1]);
+  const [selectedInput, setSelectedInput] = useState(null);
 
   const handleIconSelection = (iconName) => {
     setSelectedIcon(iconName);
@@ -65,8 +67,31 @@ export default function TaskFormScreen({ navigation, route }) {
     setRepeat(key ?? repeat);
   };
 
-  const onChangeEndDate = (date) => {
-    setEndDate(date);
+  const handleStartDateChange = (text) => {
+    setStartDate(text);
+  };
+
+  const handleEndDateChange = (text) => {
+    setEndDate(text);
+  };
+
+  const handleShowCalendar = (mode) => {
+    setSelectedInput(mode);
+    setShowCalendar(true);
+  };
+
+  const handleInputPress = (input) => {
+    setSelectedInput(input);
+    setShowCalendar(true);
+  };
+
+  const handleDayPress = (day, mode) => {
+    if (selectedInput === "startDate") {
+      handleStartDateChange(day.dateString);
+    } else if (selectedInput === "endDate") {
+      handleEndDateChange(day.dateString);
+    }
+    setShowCalendar(false);
   };
 
   useEffect(() => {
@@ -89,21 +114,29 @@ export default function TaskFormScreen({ navigation, route }) {
         color,
         repeat,
         repeatDays: selectedDays
-        .filter(dayIndex => dayIndex !== -1)
-        .map(dayIndex => {
-          const daysOfWeek = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
-          return daysOfWeek[dayIndex];
-        })
-        .join(","),
+          .filter((dayIndex) => dayIndex !== -1)
+          .map((dayIndex) => {
+            const daysOfWeek = [
+              "sunday",
+              "monday",
+              "tuesday",
+              "wednesday",
+              "thursday",
+              "friday",
+              "saturday",
+            ];
+            return daysOfWeek[dayIndex];
+          })
+          .join(","),
         repeatWeeks: "",
         repeatMonths: "",
         endDate,
         reminder,
-        sound,
         is_completed: isCompleted,
         habitId,
         categoryId,
         userId: user.userId,
+        startDate,
       };
 
       if (habitTitle !== name) {
@@ -138,7 +171,7 @@ export default function TaskFormScreen({ navigation, route }) {
       <View style={{ marginTop: 40 }}>
         <TextInput
           style={styles.input}
-          label="Name"
+          label="Titre de l'habitude"
           value={name}
           onChangeText={(text) => setName(text)}
           textColor="#fff"
@@ -197,13 +230,12 @@ export default function TaskFormScreen({ navigation, route }) {
                 style={{
                   backgroundColor: color,
                   alignSelf: "center",
-                  padding: 15,
                   borderColor: "white",
                   borderWidth: 2,
                   borderRadius: 40,
                   margin: 10,
-                  width: 60,
-                  height: 60,
+                  width: 70,
+                  height: 70,
                 }}
               />
             ) : (
@@ -223,45 +255,78 @@ export default function TaskFormScreen({ navigation, route }) {
               </Text>
             )}
           </TouchableOpacity>
-          <ModalSelector
-            style={{
-              alignSelf: "center",
-              padding: 15,
-              margin: 10,
-              fontWeight: "bold",
-              color: "white",
-            }}
-            data={[
-              { key: "none", label: "None" },
-              { key: "daily", label: "Daily" },
-              { key: "weekly", label: "Weekly" },
-              { key: "monthly", label: "Monthly" },
-            ]}
-            selectedKey={repeat}
-            textStyle={{ color: "white" }}
-            initValue="Select Repeat"
-            selectTextStyle={{ color: "white", fontSize: 20 }}
-            onChange={(option) => onRepeatChange(option.key)}
-          />
-          <RNDateTimePicker
-            style={styles.dateTimePicker}
-            value={endDate ? new Date(endDate) : new Date()}
-            mode="date"
-            display="compact"
-            accentColor="white"
-            textColor="white"
-            dateFormat="YYYY-MM-DD"
-            onChange={(event, date) => onChangeEndDate(date)}
-          />
         </View>
-        <DayPicker
-          weekdays={selectedDays}
-          setWeekdays={setSelectedDays}
-          activeColor="violet"
-          textColor="white"
-          inactiveColor="grey"
+        <ModalSelector
+          style={{
+            alignSelf: "center",
+            padding: 15,
+            margin: 10,
+            fontWeight: "bold",
+            color: "white",
+          }}
+          data={[
+            { key: "none", label: "Répéter: 1 seule fois" },
+            { key: "daily", label: "Répéter: Tous les jours" },
+          ]}
+          selectedKey={repeat}
+          textStyle={{ color: "white" }}
+          initValue="Select Repeat"
+          selectTextStyle={{ color: "white", fontSize: 20 }}
+          onChange={(option) => onRepeatChange(option.key)}
         />
+        <View style={{ flexDirection: "column" }}>
+          <View>
+            <Text style={{ color: "white", fontSize: 20, marginLeft: 10 }}>Date de début</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Date de début"
+              value={startDate}
+              onChangeText={handleStartDateChange}
+              textColor="#fff"
+              onFocus={() => handleShowCalendar("startDate")}
+            />
+          </View>
 
+          <View>
+            <Text style={{ color: "white", fontSize: 20, marginLeft: 10  }}>Date de fin</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Date de fin"
+              value={endDate}
+              onChangeText={handleEndDateChange}
+              textColor="#fff"
+              onFocus={() => handleShowCalendar("endDate")}
+            />
+          </View>
+          {showCalendar && (
+            <Calendar
+              onDayPress={handleDayPress}
+              minDate={new Date()}
+              markingType={"period"}
+              markedDates={{
+                [startDate]: { startingDay: true, color: "blue" },
+                [endDate]: { endingDay: true, color: "blue" },
+              }}
+            />
+          )}
+        </View>
+
+        <View style={{ flexDirection: "column" }}>
+          {repeat === "daily" ? (
+            <Text style={{ color: "white", fontSize: 20 }}>
+              Répéter tous les jours
+            </Text>
+          ) : null}
+          {repeat === "daily" ? (
+            <DayPicker
+              weekdays={selectedDays}
+              setWeekdays={setSelectedDays}
+              activeColor="violet"
+              textColor="white"
+              inactiveColor="grey"
+            />
+          ) : null}
+        </View>
         <Modal
           visible={showModalColor}
           animationType="slide"

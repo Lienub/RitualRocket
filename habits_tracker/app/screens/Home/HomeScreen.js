@@ -5,16 +5,26 @@ import CalendarStrip from "react-native-calendar-strip";
 import { Appbar } from "react-native-paper";
 import { getUserInfo } from "../../services/users";
 import { getTasksByUserId } from "../../services/habits";
+import TimerView from "../../components/Timer/TimerView";
+import { createTimer } from "../../services/habits";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import styles from "./styles";
 
 export default function HomeScreen({ navigation }) {
   const [user, setUser] = useState({});
   const [tasks, setTasks] = useState([]);
   const [filteredTasks, setFilteredTasks] = useState([]);
+  const [selectedTask, setSelectedTask] = useState({});
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split("T")[0]
   );
-
+  const [closeModal, setCloseModal] = useState(true);
+  const [timer, setTimer] = useState(0);
+ 
+  const onChangeModalTimer = (task) => {
+    setSelectedTask(task);
+    setCloseModal(true);
+  };
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
@@ -31,8 +41,11 @@ export default function HomeScreen({ navigation }) {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const tasks = await getTasksByUserId(user.userId);
+        const tasks = await getTasksByUserId(user.userId)
+        .then((tasks) => {
         setTasks(tasks);
+        }
+        );
       } catch (error) {
         console.error("Error fetching tasks:", error);
       }
@@ -42,21 +55,21 @@ export default function HomeScreen({ navigation }) {
   }, [user]);
 
   useEffect(() => {
-  }, [tasks, setTasks]);
-
-  useEffect(() => {
     const filteredTasks = tasks.filter((task) => {
       const endDate = new Date(task.endDate).toISOString().split("T")[0];
+      const startDate = new Date(task.startDate).toISOString().split("T")[0];
       const repeatDaysArray = task.repeatDays
         .split(",")
         .map((day) => day.replace(/"/g, "").trim());
       const selectedDayOfWeek = new Date(selectedDate)
         .toLocaleString("en-US", { weekday: "long" })
         .toLowerCase();
+      if (task.repeat === "none" && startDate === selectedDate) {
+        return true;
+      }
       if (endDate < selectedDate) {
         return false;
       }
-
       if (repeatDaysArray.includes(selectedDayOfWeek)) {
         return true;
       }
@@ -92,7 +105,7 @@ export default function HomeScreen({ navigation }) {
             duration: 300,
           }}
           style={styles.calendarStrip}
-          calendarHeaderStyle={{ color: "transparent", display: "none" }}
+          calendarHeaderStyle={{ color:"#fff", fontSize: 20 }}
           dateNumberStyle={{ color: "white", fontSize: 20 }}
           dateNameStyle={{ color: "white", fontSize: 10 }}
           highlightDateNumberStyle={{
@@ -120,10 +133,16 @@ export default function HomeScreen({ navigation }) {
                   backgroundColor: "#363636",
                   width: "90%",
                   alignSelf: "center",
+                  marginTop: 10,
                 }}
                 onPress={() => navigation.navigate("HabitDetail", { task })}
               >
-                <Icon name={task.iconType} size={50} color={task.color} />
+                <Icon
+                  name={task.iconType === "music" ? "rocket" : task.iconType}
+                  type="material"
+                  size={50}
+                  color={task.color}
+                />
                 <ListItem.Content>
                   <ListItem.Title
                     style={{
@@ -145,12 +164,27 @@ export default function HomeScreen({ navigation }) {
                     * Fonce !
                   </ListItem.Subtitle>
                 </ListItem.Content>
+                <Icon
+                  name="timer"
+                  type="material"
+                  size={60}
+                  color={task.color}
+                  onPress={() => onChangeModalTimer(task)}
+                />
               </ListItem>
             ))
           ) : (
             <Text style={styles.noTasks}>Pas d'habitudes à cette date</Text>
           )}
         </ScrollView>
+        {closeModal === false && (
+          <TimerView
+            visible={!closeModal} // Correction ici
+            setCloseModal={setCloseModal}
+            setTimer={setTimer}
+            task={selectedTask}
+          />
+        )}
       </View>
     </View>
   );
