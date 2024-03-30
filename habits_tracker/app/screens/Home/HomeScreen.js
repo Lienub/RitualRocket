@@ -148,7 +148,7 @@ export default function HomeScreen({ navigation }) {
                   alignSelf: "center",
                   marginTop: 10,
                 }}
-                onPress={() => navigation.navigate("HabitDetail", { task })}
+                onPress={() => navigation.navigate("HabitDetail", { task, userId: user.userId })}
               >
                 <Icon
                   name={task.iconType === "music" ? "rocket" : task.iconType}

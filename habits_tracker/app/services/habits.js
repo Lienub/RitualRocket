@@ -108,3 +108,18 @@ export const createTimer = async (timerData) => {
     throw error;
   }
 };
+
+export const getTimersByTaskId = async (taskId, userId) => {
+  try {
+    const apiUrl = useApiUrl(`/timers/task/${taskId}/user/${userId}`);
+    const response = await fetch(apiUrl);
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw errorData || "Network response was not ok";
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching timers by task ID:", error);
+    throw error;
+  }
+};

@@ -18,9 +18,9 @@ module.exports = [
     func: controller.getTimersByUserId,
   },
   {
-    url: "/timers/task/:taskId",
+    url: "/timers/task/:taskId/user/:userId",
     method: "get",
-    func: controller.getTimersByTaskId,
+    func: controller.getTimersByTaskIdUserId,
   },
   {
     url: "/timers/:timerId",

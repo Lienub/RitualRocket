@@ -40,10 +40,11 @@ const getTimersByUserId = async (req, res) => {
   }
 };
 
-const getTimersByTaskId = async (req, res) => {
+const getTimersByTaskIdUserId = async (req, res) => {
   try {
     const taskId = req.params.taskId;
-    const timers = await Timer.findAll({ where: { taskId } });
+    const userId = req.params.userId;
+    const timers = await Timer.findAll({ where: { taskId, userId } });
     res.status(200).json(timers);
   } catch (error) {
     console.error(error);
@@ -66,6 +67,6 @@ module.exports = {
   createTimer,
   getAllTimers,
   getTimersByUserId,
-  getTimersByTaskId,
+  getTimersByTaskIdUserId,
   deleteTimer,
 };
