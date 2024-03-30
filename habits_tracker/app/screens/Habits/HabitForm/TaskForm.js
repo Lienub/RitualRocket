@@ -5,6 +5,7 @@ import ModalSelector from "react-native-modal-selector";
 import { Appbar } from "react-native-paper";
 import { Calendar } from "react-native-calendars";
 import { DayPicker } from "react-native-picker-weekday";
+import { iconNames } from "../../../utils/constants/icons";
 
 import ColorPicker, {
   Panel1,
@@ -21,19 +22,6 @@ import styles from "./styles";
 import { on } from "events";
 
 export default function TaskFormScreen({ navigation, route }) {
-  const iconNames = [
-    "coffee",
-    "star",
-    "heart",
-    "rocket",
-    "user",
-    "bell",
-    "camera",
-    "globe",
-    "music",
-    "home",
-  ];
-
   const { habitId, categoryId, habitTitle } = route.params;
   const [repeat, setRepeat] = useState("none");
   const [user, setUser] = useState({});
