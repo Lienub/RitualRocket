@@ -56,6 +56,15 @@ const Task = sequelize.define("Task", {
     allowNull: true,
     type: DataTypes.DATE,
   },
+  rappelTime: {
+    allowNull: true,
+    type: DataTypes.STRING,
+  },
+  totalTime: {
+    allowNull: true,
+    defaultValue: 0,
+    type: DataTypes.BIGINT,
+  },
 });
 
 Task.associate = (db) => {

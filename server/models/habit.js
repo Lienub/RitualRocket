@@ -13,7 +13,7 @@ const Habit = sequelize.define('Habit', {
   },
   description: {
     type: DataTypes.STRING,
-  },
+  }
 });
 
 Habit.associate = (db) => {
