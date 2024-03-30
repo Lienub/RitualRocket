@@ -7,8 +7,6 @@ import { getUserInfo } from "../../services/users";
 import { getTasksByUserId } from "../../services/habits";
 import TimerView from "../../components/Timer/TimerView";
 import { createTimer } from "../../services/habits";
-import { PanGestureHandler, State } from "react-native-gesture-handler";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import styles from "./styles";
 
 export default function HomeScreen({ navigation }) {
@@ -20,7 +18,7 @@ export default function HomeScreen({ navigation }) {
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split("T")[0]
   );
-  const [closeModal, setCloseModal] = useState(false);
+  const [closeModal, setCloseModal] = useState(true);
 
   const onChangeModalTimer = (task) => {
     setSelectedTask(task);
@@ -92,6 +90,7 @@ export default function HomeScreen({ navigation }) {
   
   }, [closeModal, setCloseModal, timer, setTimer]);
 
+
   return (
     <View style={styles.container}>
       <Appbar.Header style={styles.appbar}>
@@ -140,7 +139,7 @@ export default function HomeScreen({ navigation }) {
         <ScrollView style={styles.taskList}>
           {filteredTasks.length > 0 ? (
             filteredTasks.map((task) => (
-              <ListItem.Swipeable
+              <ListItem
                 key={task.id}
                 containerStyle={{
                   borderRadius: 20,
@@ -150,14 +149,6 @@ export default function HomeScreen({ navigation }) {
                   marginTop: 10,
                 }}
                 onPress={() => navigation.navigate("HabitDetail", { task })}
-                rightContent={(reset) => (
-                  <Button
-                    title="Delete"
-                    onPress={() => reset()}
-                    icon={{ name: 'delete', color: 'white' }}
-                    buttonStyle={{ minHeight: '100%', backgroundColor: 'red' }}
-                  />
-                )}
               >
                 <Icon
                   name={task.iconType === "music" ? "rocket" : task.iconType}
@@ -193,7 +184,7 @@ export default function HomeScreen({ navigation }) {
                   color={task.color}
                   onPress={() => onChangeModalTimer(task)}
                 />
-              </ListItem.Swipeable>
+              </ListItem>
             ))
           ) : (
             <Text style={styles.noTasks}>Pas d'habitudes à cette date</Text>
