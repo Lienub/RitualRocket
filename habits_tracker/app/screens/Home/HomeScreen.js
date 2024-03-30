@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, ScrollView } from "react-native";
+import { View, Text, ScrollView, Button } from "react-native";
 import { ListItem, Icon } from "react-native-elements";
 import CalendarStrip from "react-native-calendar-strip";
 import { Appbar } from "react-native-paper";
@@ -7,10 +7,12 @@ import { getUserInfo } from "../../services/users";
 import { getTasksByUserId } from "../../services/habits";
 import TimerView from "../../components/Timer/TimerView";
 import { createTimer } from "../../services/habits";
+import { PanGestureHandler, State } from "react-native-gesture-handler";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import styles from "./styles";
 
 export default function HomeScreen({ navigation }) {
+  const [timer, setTimer] = useState(0);
   const [user, setUser] = useState({});
   const [tasks, setTasks] = useState([]);
   const [filteredTasks, setFilteredTasks] = useState([]);
@@ -19,7 +21,6 @@ export default function HomeScreen({ navigation }) {
     new Date().toISOString().split("T")[0]
   );
   const [closeModal, setCloseModal] = useState(false);
-  const [timer, setTimer] = useState(0);
 
   const onChangeModalTimer = (task) => {
     setSelectedTask(task);
@@ -87,7 +88,9 @@ export default function HomeScreen({ navigation }) {
       };
       createTimer(createTimerData);
     }
-  }, [closeModal, setCloseModal]);
+
+  
+  }, [closeModal, setCloseModal, timer, setTimer]);
 
   return (
     <View style={styles.container}>
@@ -137,7 +140,7 @@ export default function HomeScreen({ navigation }) {
         <ScrollView style={styles.taskList}>
           {filteredTasks.length > 0 ? (
             filteredTasks.map((task) => (
-              <ListItem
+              <ListItem.Swipeable
                 key={task.id}
                 containerStyle={{
                   borderRadius: 20,
@@ -147,6 +150,14 @@ export default function HomeScreen({ navigation }) {
                   marginTop: 10,
                 }}
                 onPress={() => navigation.navigate("HabitDetail", { task })}
+                rightContent={(reset) => (
+                  <Button
+                    title="Delete"
+                    onPress={() => reset()}
+                    icon={{ name: 'delete', color: 'white' }}
+                    buttonStyle={{ minHeight: '100%', backgroundColor: 'red' }}
+                  />
+                )}
               >
                 <Icon
                   name={task.iconType === "music" ? "rocket" : task.iconType}
@@ -182,7 +193,7 @@ export default function HomeScreen({ navigation }) {
                   color={task.color}
                   onPress={() => onChangeModalTimer(task)}
                 />
-              </ListItem>
+              </ListItem.Swipeable>
             ))
           ) : (
             <Text style={styles.noTasks}>Pas d'habitudes à cette date</Text>

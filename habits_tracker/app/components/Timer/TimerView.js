@@ -14,18 +14,7 @@ const TimerView = ({ setTimer, task, visible, setCloseModal }) => {
   const [resetStopwatch, setResetStopwatch] = useState(false);
   const [seconds, setSeconds] = useState(0);
 
-  useEffect(() => {
-    // Effect to update seconds when time changes
-    const interval = setInterval(() => {
-        setSeconds((seconds) => seconds + 1);
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
   const onTimeChange = () => {
-    let floorSeconds = Math.floor(seconds);
-    setTimer(floorSeconds);
     setSeconds(0);
     setCloseModal(true);
   };
@@ -55,7 +44,7 @@ const TimerView = ({ setTimer, task, visible, setCloseModal }) => {
     <Modal
       animationType="slide"
       transparent={true}
-      visible={visible} // Utilisez la variable d'état visible ici
+      visible={visible}
       onRequestClose={visible}
     >
       <View style={styles.centeredView}>
@@ -68,7 +57,9 @@ const TimerView = ({ setTimer, task, visible, setCloseModal }) => {
             reset={resetStopwatch}
             options={options}
             getTime={(time) => {
-              // Remove this logic
+              let seconds = time.split(":");
+                let totalSeconds = parseInt(seconds[1]) * 60 + parseInt(seconds[2]);
+                setTimer(totalSeconds);
             }}
           />
 
