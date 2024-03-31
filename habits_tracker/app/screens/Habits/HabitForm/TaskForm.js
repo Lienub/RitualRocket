@@ -105,7 +105,6 @@ export default function TaskFormScreen({ navigation, route }) {
 
   const handleSubmit = async () => {
     try {
-      console.log("rappelTime", rappelTime);
       const taskData = {
         name,
         description,

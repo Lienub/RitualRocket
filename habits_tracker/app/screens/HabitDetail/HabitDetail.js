@@ -83,7 +83,7 @@ export default function HabitDetailScreen({ navigation, route }) {
 
         const startDate = new Date(task.startDate);
         const elapsedMilliseconds = currentDate - startDate;
-        const elapsedDays = Math.floor(
+        const elapsedDays = Math.ceil(
           elapsedMilliseconds / (1000 * 60 * 60 * 24)
         );
         setDaysElapsed(elapsedDays);
@@ -177,6 +177,7 @@ export default function HabitDetailScreen({ navigation, route }) {
           </View>
         </View>
         <View style={styles.statsContainer}>
+          <Text style={{...styles.title, marginBottom: 20, marginStart: 10}}>Temps passé cette semaine</Text>
           <BarChart
             data={{
               labels: chartDays,
