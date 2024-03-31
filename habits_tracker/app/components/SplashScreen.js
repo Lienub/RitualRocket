@@ -2,25 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Animated } from 'react-native';
 import LottieView from 'lottie-react-native';
 
-const SplashScreen = ({ navigation }) => {
-    const [assetsLoaded, setAssetsLoaded] = useState(false);
+const SplashScreen = ({ navigation, assetsLoaded }) => {
     const opacity = useRef(new Animated.Value(1)).current;
-    useEffect(() => {
-        // Loading of assets
-        const loadAssets = async () => {
-          // Simulating asset loading for 3 seconds (the duration of the animation)
-          await new Promise(resolve => setTimeout(resolve, 3800));
-
-          /* 
-            PUT HERE THE ASSETS THAT HAVE TO BE LOADED
-          */
-
-
-          setAssetsLoaded(true);
-        };
-    
-        loadAssets();
-      }, []);
 
     useEffect(() => {
         if (!assetsLoaded) {
@@ -33,7 +16,7 @@ const SplashScreen = ({ navigation }) => {
             duration: 1000,
             useNativeDriver: true,
           }).start(() => {
-            navigation.jumpTo('MainTest');
+            navigation.replace('MainTest');
           });
         };
         animate();
