@@ -16,7 +16,7 @@ export const register = async (userData) => {
     },
     body: JSON.stringify(userData),
   });
-  
+
   if (!response.ok) {
     const errorData = await response.json();
     throw errorData || "Network response was not ok";
@@ -27,8 +27,8 @@ export const register = async (userData) => {
 
 /**
  * Logins the user
- * @param {*} userData 
- * @returns 
+ * @param {*} userData
+ * @returns
  */
 export const login = async (userData) => {
   const apiUrl = useApiUrl("/auth/login");
@@ -74,81 +74,27 @@ export const resetPassword = async (email, newPassword) => {
   return responseData.message;
 };
 
-
 /**
  * Retrieves user information from the Google API.
  * @param {string} token - Access token obtained from Google authentication.
  * @param {Function} setUserInfo - Function to set user information in state.
  * @returns {Promise<void>}
  */
-export const createUserGoogleId = async (token, setUserInfo) => {
-  try {
-    const response = await fetch("https://www.googleapis.com/userinfo/v2/me", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch user data from Google API");
-    }
-
-    const user = await response.json();
-    const createUser = {
-      userId: user.userId,
-      email: user.email,
-      username: user.name,
-      password: user.id,
-      googleId: user.id,
-      token,
-    };
-    
-    // Check if user exists in AsyncStorage before registering
-    const userExists = await authUserExists();
-    if (!userExists) {
-      await register(createUser);
-      await AsyncStorage.setItem("user", JSON.stringify(createUser));
-      setUserInfo(createUser);
-    }
-  } catch (error) {
-  }
+export const createUserGoogleId = async (userFromGoogle, setUserInfo) => {
+  let data = await register(userFromGoogle);
+  AsyncStorage.setItem("user", JSON.stringify(data));
+  setUserInfo(data);
 };
 
 /**
  * Retrieves user information from the Google API and logs the user in.
- * @param {*} token 
- * @param {*} setUserInfo 
+ * @param {*} token
+ * @param {*} setUserInfo
  */
-export const loginUserGoogleId = async (token, setUserInfo) => {
-  try {
-    const response = await fetch("https://www.googleapis.com/userinfo/v2/me", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch user data from Google API");
-    }
-
-    const user = await response.json();
-    const getUser = {
-      userId: user.userId,
-      email: user.email,
-      username: user.name,
-      password: user.id,
-      googleId: user.id,
-      token,
-    };
-    
-    const userExists = await authUserExists();
-    if (!userExists) {
-      let data = await login(getUser);
-      AsyncStorage.setItem("user", JSON.stringify(data));
-      setUserInfo(data);
-    } else {
-     let data = await register(getUser);
-      AsyncStorage.setItem("user", JSON.stringify(data));
-      setUserInfo(data);
-    }
-  } catch (error) {
-  }
+export const loginUserGoogleId = async (userFromGoogle, setUserInfo) => {
+  let data = await login(userFromGoogle);
+  AsyncStorage.setItem("user", JSON.stringify(data));
+  setUserInfo(data);
 };
 
 /**
@@ -158,24 +104,73 @@ export const loginUserGoogleId = async (token, setUserInfo) => {
  * @param {string} type - Type of action (register or login).
  * @param {Object} navigation - Navigation object.
  */
-export const signInWithGoogle = async (setUserInfo, response, type, navigation) => {
+
+const fetchUserFromGoogle = async (token) => {
   try {
-    switch (type) {
-      case "register": // Verify if user is in register page
-        await createUserGoogleId(response.authentication.accessToken, setUserInfo);
-        navigation.navigate('MainNavigation')
-        break;
-      case "login": // Verify if user is in login page
-        await loginUserGoogleId(response.authentication.accessToken, setUserInfo);
-        navigation.navigate('MainNavigation')
-        break;
-      default:
-        break;
+    const response = await fetch("https://www.googleapis.com/userinfo/v2/me", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch user data from Google API");
     }
+
+    return await response.json();
   } catch (error) {
+    console.error("Error fetching user from Google:", error);
+    throw error;
   }
 };
 
+export const signInWithGoogle = async (
+  setUserInfo,
+  response,
+  type,
+  navigation
+) => {
+  try {
+    const userFromGoogle = await fetchUserFromGoogle(
+      response.authentication.accessToken
+    );
+
+    const userExistsInDatabase = await checkUserExistsInDatabase(
+      userFromGoogle.id
+    );
+
+    if (userExistsInDatabase && userExistsInDatabase.userId) {
+      await loginUserGoogleId(userFromGoogle, setUserInfo);
+    } else {
+      await createUserGoogleId(userFromGoogle, setUserInfo);
+    }
+
+    navigation.navigate("MainNavigation");
+  } catch (error) {
+    console.error("Error signing in with Google:", error);
+  }
+};
+
+const checkUserExistsInDatabase = async (googleId) => {
+  const apiUrl = useApiUrl("/auth/google-login");
+  try {
+    const response = await fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ googleId }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw errorData || "Network response was not ok";
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error checking user existence:", error);
+    throw error;
+  }
+};
 /**
  * Checks if the user is authenticated via Google.
  * @returns {Promise<boolean>} - A promise that resolves to true if the user is authenticated, false otherwise.
@@ -184,8 +179,7 @@ export const authUserExists = async () => {
   try {
     const user = await AsyncStorage.getItem("user");
     return !!user;
-  } catch (error) {
-  }
+  } catch (error) {}
 };
 
 /**
@@ -196,8 +190,7 @@ export const getUserInfo = async () => {
   try {
     const user = await AsyncStorage.getItem("user");
     return JSON.parse(user);
-  } catch (error) {
-  }
+  } catch (error) {}
 };
 
 /**
@@ -215,6 +208,5 @@ export const storeUserInfoInStorage = async (userInfo) => {
       token: userInfo.token,
     };
     AsyncStorage.setItem("user", JSON.stringify(user));
-  } catch (error) {
-  }
-}
+  } catch (error) {}
+};

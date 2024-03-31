@@ -8,7 +8,7 @@ import { getTasksByUserId } from "../../services/habits";
 import TimerView from "../../components/Timer/TimerView";
 import { createTimer } from "../../services/habits";
 import styles from "./styles";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function HomeScreen({ navigation }) {
   const [timer, setTimer] = useState(0);
   const [user, setUser] = useState({});
@@ -18,6 +18,7 @@ export default function HomeScreen({ navigation }) {
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split("T")[0]
   );
+
   const [closeModal, setCloseModal] = useState(true);
 
   const onChangeModalTimer = (task) => {

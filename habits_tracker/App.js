@@ -33,6 +33,7 @@ export default function App() {
             <Stack.Screen name="Signin" component={SigninScreen} />
             <Stack.Screen name="Signup" component={SignupScreen} />
             <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
+            <Stack.Screen name="MainNavigation" component={MainNavigation} />
           </>
         ) : (
           <Stack.Screen name="MainNavigation" component={MainNavigation} />
