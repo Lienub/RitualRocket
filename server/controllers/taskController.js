@@ -73,8 +73,8 @@ const updateTask = async (req, res) => {
 
 const deleteTask = async (req, res) => {
   try {
-    const taskId = req.params.taskId;
-    await Task.destroy({ where: { id: taskId } });
+    const taskId = req.params.id;
+    await Task.destroy({ where: { id } });
     res.status(204).end();
   } catch (error) {
     console.error(error);
