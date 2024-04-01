@@ -114,7 +114,6 @@ const fetchUserFromGoogle = async (token) => {
     if (!response.ok) {
       throw new Error("Failed to fetch user data from Google API");
     }
-
     return await response.json();
   } catch (error) {
     console.error("Error fetching user from Google:", error);
@@ -137,10 +136,18 @@ export const signInWithGoogle = async (
       userFromGoogle.id
     );
 
-    if (userExistsInDatabase && userExistsInDatabase.userId) {
-      await loginUserGoogleId(userFromGoogle, setUserInfo);
+    const user = {
+      email: userFromGoogle.email,
+      username: userFromGoogle.name,
+      googleId: userFromGoogle.id,
+      password: userFromGoogle.id,
+      token: response.authentication.accessToken,
+    };
+
+    if (userExistsInDatabase && userExistsInDatabase.id) {
+      await loginUserGoogleId(user, setUserInfo);
     } else {
-      await createUserGoogleId(userFromGoogle, setUserInfo);
+      await createUserGoogleId(user, setUserInfo);
     }
 
     navigation.navigate("MainNavigation");
@@ -150,7 +157,7 @@ export const signInWithGoogle = async (
 };
 
 const checkUserExistsInDatabase = async (googleId) => {
-  const apiUrl = useApiUrl("/auth/google-login");
+  const apiUrl = useApiUrl("/auth/verify-google-id");
   try {
     const response = await fetch(apiUrl, {
       method: "POST",
