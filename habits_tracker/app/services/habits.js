@@ -123,3 +123,20 @@ export const getTimersByTaskId = async (taskId, userId) => {
     throw error;
   }
 };
+
+export const removeTask = async (taskId) => {
+  try {
+    const apiUrl = useApiUrl(`/tasks/${taskId}`);
+    const response = await fetch(apiUrl, {
+      method: "DELETE",
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw errorData || "Network response was not ok";
+    }
+    return null;
+  } catch (error) {
+    console.error("Error removing task:", error);
+    throw error;
+  }
+}

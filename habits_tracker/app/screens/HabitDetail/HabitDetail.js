@@ -11,7 +11,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Icon } from "react-native-elements";
 import styles from "./styles";
 import { BarChart } from "react-native-chart-kit";
-import { getTimersByTaskId } from "../../services/habits";
+import { getTimersByTaskId, removeTask } from "../../services/habits";
 
 export default function HabitDetailScreen({ navigation, route }) {
   const { task, userId } = route.params;
@@ -19,7 +19,14 @@ export default function HabitDetailScreen({ navigation, route }) {
   const [timeSpent, setTimeSpent] = useState({});
   const [repeatDays, setRepeatDays] = useState([]);
   const [daysElapsed, setDaysElapsed] = useState(0);
-
+  const removeTaskByTaskId = async (taskId) => {
+    try {
+      await removeTask(taskId);
+      navigation.goBack();
+    } catch (error) {
+      console.error("Error removing task:", error);
+    }
+  };
   // Récupérer les timers de la tâche pour la semaine en cours
   useEffect(() => {
     const days = task.repeatDays.split(",").map((day) => {
@@ -105,7 +112,7 @@ export default function HabitDetailScreen({ navigation, route }) {
         <Appbar.Content title={task.name} titleStyle={styles.title} />
         <Appbar.Action
           icon={() => <Ionicons name="trash" size={30} color="#fff" />}
-          onPress={() => console.log("Delete: " + task.id)}
+          onPress={() => removeTaskByTaskId(task.id)}
         />
       </Appbar.Header>
       <ScrollView>
