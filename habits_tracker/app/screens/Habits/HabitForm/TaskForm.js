@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { View, ScrollView, TouchableOpacity, Modal, Text } from "react-native";
+import React, { useState, useEffect, useMemo } from "react";
+import { View, ScrollView, TouchableOpacity, Modal, Text, Animated, Keyboard, TouchableWithoutFeedback, ActivityIndicator, FlatList, Alert, useColorScheme } from "react-native";
 import { TextInput, Button, Switch } from "react-native-paper";
 import ModalSelector from "react-native-modal-selector";
 import { Appbar } from "react-native-paper";
@@ -7,6 +7,8 @@ import { Calendar } from "react-native-calendars";
 import { DayPicker } from "react-native-picker-weekday";
 import { iconNames } from "../../../utils/constants/icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { NiceModal, NiceTextInput, StyleContainer } from "../../../components/index"
+import { COLORS } from "../../../utils/constants/colors";
 
 import ColorPicker, {
   Panel1,
@@ -14,13 +16,17 @@ import ColorPicker, {
   Preview,
   OpacitySlider,
   HueSlider,
+  useColorPickerContext,
+  colorKit,
 } from "reanimated-color-picker";
 
-import Icon from "react-native-vector-icons/FontAwesome";
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import { getUserInfo } from "../../../services/users";
 import { createTask, createHabit } from "../../../services/habits";
-import styles from "./styles";
+import { getStyles } from "./styles";
 import { on } from "events";
+import { SafeAreaView } from "react-native";
+import { useSharedValue } from "react-native-reanimated";
 
 export default function TaskFormScreen({ navigation, route }) {
   const { habitId, categoryId, habitTitle } = route.params;
@@ -29,7 +35,6 @@ export default function TaskFormScreen({ navigation, route }) {
   const [name, setName] = useState(habitTitle);
   const [description, setDescription] = useState("");
   const [iconType, setIconType] = useState("coffee");
-  const [color, setColor] = useState("red");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [showCalendar, setShowCalendar] = useState(false);
@@ -43,14 +48,79 @@ export default function TaskFormScreen({ navigation, route }) {
   const [selectedInput, setSelectedInput] = useState(null);
   const [rappelTime, setRappelTime] = useState(new Date().toISOString().split("T")[1].split(".")[0]);
   const [showRappel, setShowRappel] = useState(false);
+  const [searchIcon, setSearchIcon] = useState("");
+  const [loadingIcons, setLoadingIcons] = useState(true);
+  const [originalIcons, setOriginalIcons] = useState([]);
+  const [icons, setIcons] = useState([]);
+  const scheme = useColorScheme();
+  const styles = useMemo(() => getStyles(scheme));
+
+  const customSwatches = new Array(6).fill('#fff').map(() => colorKit.randomRgbColor().hex());
+  const selectedColor = useSharedValue(customSwatches[0]);
+  const [color, setColor] = useState(customSwatches[0]);
+
+  const onColorSelect = (color) => {
+    'worklet';
+    selectedColor.value = color.hex;
+    
+  };
+
+
+  // Generate icon components on component mount
+  useEffect(() => {
+    const initIcons = async () => {
+      try {
+        const iconComponents = await generateIconComponents(iconNames);
+        setIcons(iconComponents);
+        setOriginalIcons(iconComponents); // Save the original list of icons
+      } catch (error) {
+        console.error("Error generating icons:", error);
+      } finally {
+        setLoadingIcons(false);
+      }
+    };
+
+    initIcons();
+  }, []);
+
+  // Generate icon components
+  const generateIconComponents = async (iconNames) => {
+    /* 
+      Map the icon names to an object with a key and the icon component
+      The key is the icon name and the icon component is a TouchableOpacity
+      that displays the icon and calls the handleIconSelection function
+      when pressed
+
+      We use a key to identify the icon component in the FlatList, so we can
+      optimize the rendering of the list
+    */
+    return iconNames.map((iconName) => ({
+      key: iconName,
+      iconComponent: (
+        <TouchableOpacity
+          key={iconName}
+          onPress={() => handleIconSelection(iconName)}
+          onLongPress={() => Alert.alert("Nom de l'icone", iconName)}
+          style={styles.btnSelectIcon}
+        >
+          <Icon
+            name={iconName}
+            size={60}
+            style={{ margin: 10 }}
+            color={styles.iconButton.borderColor}
+          />
+        </TouchableOpacity>
+      )
+    }));
+  };
 
   const handleIconSelection = (iconName) => {
     setSelectedIcon(iconName);
     setIconType(iconName);
     setModalVisible(false);
   };
-  const onColorChange = ({ hex }) => {
-    setColor(hex);
+  const onColorChange = () => {
+    setColor(selectedColor.value);
     setShowModalColor(false);
   };
 
@@ -68,7 +138,7 @@ export default function TaskFormScreen({ navigation, route }) {
   const handleRappelChange = (event, selectedTime) => {
     if (selectedTime !== undefined && selectedTime !== null) {
       let time = selectedTime.toISOString().split("T")[1].split(".")[0];
-      if(rappelTime == time) { return;}
+      if (rappelTime == time) { return; }
       setRappelTime(time);
       setShowRappel(false);
       return;
@@ -79,6 +149,21 @@ export default function TaskFormScreen({ navigation, route }) {
   const handleShowCalendar = (mode) => {
     setSelectedInput(mode);
     setShowCalendar(true);
+  };
+
+  const handleIconSearch = (text) => {
+    setSearchIcon(text.toLowerCase());
+    // Filter the original icons based on the search text
+    const filteredIcons = originalIcons.filter((icon) =>
+      icon.key.toLowerCase().includes(text.toLowerCase())
+    );
+    // Update the displayed icons based on the filtered result
+    setIcons(filteredIcons);
+  };
+
+  const resetIconList = () => {
+    setSearchIcon("");
+    setIcons(originalIcons);
   };
 
   const handleDayPress = (day, mode) => {
@@ -149,14 +234,224 @@ export default function TaskFormScreen({ navigation, route }) {
         taskData.habitId = habitResponse.id;
       }
 
+      console.log("taskData", taskData);
+
       const taskResponse = await createTask(taskData);
       navigation.goBack();
     } catch (error) {
       console.error("Error creating task:", error);
     }
   };
+
+  if (loadingIcons) {
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator size="large" color="#F1A44A" />
+      </View>
+    );
+  }
+
   return (
-    <ScrollView style={styles.container}>
+    /* 
+      TouchableWithoutFeedback is used to dismiss the keyboard 
+      when the user taps outside of the input fields or modals
+    */
+
+    <TouchableWithoutFeedback onPress={() => {
+      Keyboard.dismiss();
+      setShowCalendar(false);
+      setShowModalColor(false);
+      setModalVisible(false);
+    }}>
+      {/* The main container */}
+      <View style={styles.container}>
+        {/* Modals Section */}
+        {/* Icon selection modal */}
+        <NiceModal
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <Text style={styles.modalTitle}>Sélectionnez une icône</Text>
+          {/* Search bar */}
+          <NiceTextInput
+            label="Rechercher"
+            onChangeText={(text) => handleIconSearch(text)}
+          />
+          {/* List for the icons */}
+          <FlatList
+            style={styles.modalSelectIcons}
+            data={icons}
+            renderItem={({ item }) => item.iconComponent}
+            keyExtractor={(item) => item.key}
+            horizontal={true}
+          />
+          <TouchableOpacity
+            onPress={() => setModalVisible(false)}
+            style={styles.btnSelectIcon}
+          >
+            <Icon
+              name="close"
+              size={30}
+              color={styles.btnSelectIcon.color}
+              style={{ alignSelf: "flex-end", padding: 4 }}
+            />
+          </TouchableOpacity>
+        </NiceModal>
+        {/* Color selection modal */}
+        <NiceModal
+          visible={showModalColor}
+          onRequestClose={() => {
+            setShowModalColor(false);
+          }}
+        >
+          <ColorPicker
+            style={styles.colorPicker}
+            value={selectedColor.value}
+            onChange={onColorSelect}
+          >
+            <Panel1 />
+            <HueSlider />
+            <Swatches />
+          </ColorPicker>
+          <TouchableOpacity
+            onPress={() => onColorChange()}
+            style={styles.btnSelectIcon}
+          >
+            <Icon
+              name="done"
+              size={30}
+              color={styles.btnSelectIcon.color}
+              style={{ alignSelf: "flex-end", padding: 4 }}
+            />
+          </TouchableOpacity>
+        </NiceModal>
+        {/* Appbar */}
+        <Appbar.Header style={styles.appbar}>
+          <Appbar.BackAction onPress={() => navigation.goBack()} color={styles.appbarBackaction.color} />
+          <Appbar.Content title={"Habitude"} titleStyle={styles.appbarTitle} />
+          <Appbar.Content
+            onPress={handleSubmit}
+            color="#fff"
+            titleStyle={styles.saveBtn}
+            title="Sauvegarder"
+          />
+        </Appbar.Header>
+        <Text style={styles.title}>Créez une nouvelle habitude !</Text>
+        {/* Title and description inputs */}
+        <StyleContainer
+          label="Quelques informations concernant cette habitude"
+        >
+          <NiceTextInput
+            label="Titre de l'habitude"
+            value={name}
+            onChangeText={(text) => setName(text)}
+          />
+          <NiceTextInput
+            label="Description"
+            value={description}
+            onChangeText={(text) => setDescription(text)}
+            multiline
+          />
+        </StyleContainer>
+        {/* Icon and color selection */}
+        <StyleContainer
+          label="Personnalisez l'icône et la couleur de votre habitude"
+          row
+        >
+          <TouchableOpacity
+            onPress={() => setModalVisible(true)}
+            style={styles.selectElement}
+          >
+            {selectedIcon ? (
+              <Icon
+                name={selectedIcon}
+                size={40}
+                color={styles.iconButton.borderColor}
+                style={styles.iconButton}
+              />
+            ) : (
+              <Text
+                style={{
+                  alignSelf: "center",
+                  padding: 15,
+                  borderColor: "white",
+                  borderWidth: 1,
+                  margin: 10,
+                  color: "white",
+                  fontSize: 20,
+                  fontWeight: "bold",
+                }}
+              >
+                Select Icon
+              </Text>
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setShowModalColor(true)}
+            style={styles.selectElement}
+          >
+            {color ? (
+              <View
+                style={{
+                  backgroundColor: color,
+                  alignSelf: "center",
+                  borderColor: "white",
+                  borderWidth: 2,
+                  borderRadius: 40,
+                  margin: 10,
+                  width: 70,
+                  height: 70,
+                }}
+              />
+            ) : (
+              <Text
+                style={{
+                  alignSelf: "center",
+                  padding: 15,
+                  borderColor: "white",
+                  borderWidth: 1,
+                  margin: 10,
+                  color: "white",
+                  fontSize: 20,
+                  fontWeight: "bold",
+                }}
+              >
+                Select Color
+              </Text>
+            )}
+          </TouchableOpacity>
+        </StyleContainer>
+        {/* Date, Time & stuff */}
+        <StyleContainer
+          label="Gestion du temps"
+        >
+        </StyleContainer>
+      </View>
+    </TouchableWithoutFeedback>
+  );
+}
+
+{ /*
+ <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+    <View 
+      onPress={() => Keyboard.dismiss()}
+      style={ styles.container }
+    >
+      {showCalendar && (
+          <View
+            style={{
+              position: "absolute",
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
+              top: 0,
+              bottom: 0,
+              left: 0,
+              right: 0,
+              zIndex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          /> 
+        )}
       <Appbar.Header style={styles.appbar}>
         <Appbar.BackAction onPress={() => navigation.goBack()} color="#fff" />
         <Appbar.Content title={"Habitude"} titleStyle={styles.title} />
@@ -167,6 +462,40 @@ export default function TaskFormScreen({ navigation, route }) {
           title="Sauvegarder"
         />
       </Appbar.Header>
+        {showCalendar && (
+          <View
+          style={{
+            position: "absolute",
+            display: "flex",
+            flexDirection: "row",
+            zIndex: 2,
+            justifyContent: "center",
+            alignItems: "center",
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            margin: 20,
+          }}
+        >
+          <TouchableOpacity onPress={() => setShowCalendar(false)} style={{ position: "absolute", top: "20%", right: 10 }}>
+            <Icon name="close" size={30} color={"white"} />
+          </TouchableOpacity>
+          <View style={{ width: "80%", height: 300 }}>
+            <Calendar
+              style={ styles.calendar }
+              onDayPress={handleDayPress}
+              minDate={new Date().toISOString().split("T")[0]}
+              markingType={"period"}
+              markedDates={{
+                [startDate]: { startingDay: true, color: "blue" },
+                [endDate]: { endingDay: true, color: "blue" },
+              }}
+            />
+          </View>
+        </View>
+        )}
+
       <View style={{ marginTop: 40 }}>
         <TextInput
           style={styles.input}
@@ -278,13 +607,16 @@ export default function TaskFormScreen({ navigation, route }) {
             <Text style={{ color: "white", fontSize: 20, marginLeft: 10 }}>
               Date de début
             </Text>
+
             <TextInput
               style={styles.input}
               placeholder="Date de début"
               value={startDate}
               onChangeText={handleStartDateChange}
               textColor="#fff"
-              onFocus={() => handleShowCalendar("startDate")}
+              inputMode="none"
+              pointerEvents="box-only"
+              onPressIn={() => handleShowCalendar("startDate")}
             />
           </View>
 
@@ -298,7 +630,9 @@ export default function TaskFormScreen({ navigation, route }) {
               value={endDate}
               onChangeText={handleEndDateChange}
               textColor="#fff"
-              onFocus={() => handleShowCalendar("endDate")}
+              inputMode="none"
+              pointerEvents="box-only"
+              onPressIn={() => handleShowCalendar("endDate")}
             />
           </View>
           <View>
@@ -322,17 +656,6 @@ export default function TaskFormScreen({ navigation, route }) {
               )
             }
           </View>
-          {showCalendar && (
-            <Calendar
-              onDayPress={handleDayPress}
-              minDate={new Date()}
-              markingType={"period"}
-              markedDates={{
-                [startDate]: { startingDay: true, color: "blue" },
-                [endDate]: { endingDay: true, color: "blue" },
-              }}
-            />
-          )}
         </View>
 
         <View style={{ flexDirection: "column" }}>
@@ -418,6 +741,6 @@ export default function TaskFormScreen({ navigation, route }) {
           </View>
         </Modal>
       </View>
-    </ScrollView>
-  );
-}
+    </View>
+    </TouchableWithoutFeedback>
+*/}
