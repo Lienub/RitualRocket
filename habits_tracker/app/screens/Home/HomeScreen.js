@@ -90,6 +90,8 @@ export default function HomeScreen({ navigation }) {
   
   }, [closeModal, setCloseModal, timer, setTimer]);
 
+  // console.log("filteredTasks", filteredTasks);
+  // console.log("tasks", tasks);
 
   return (
     <View style={styles.container}>
