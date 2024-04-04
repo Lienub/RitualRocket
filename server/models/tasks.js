@@ -1,8 +1,5 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../database/connection");
-const User = require("./users");
-const Habit = require("./habit");
-const Category = require("./category");
 
 const Task = sequelize.define("Task", {
   id: {
@@ -42,17 +39,14 @@ const Task = sequelize.define("Task", {
     allowNull: true,
     type: DataTypes.STRING, // Ex: "1,14,31,15"
   },
+  startDate: {
+    allowNull: false,
+    defaultValue: DataTypes.NOW,
+    type: DataTypes.DATE,
+  },
   endDate: {
     allowNull: true,
     type: DataTypes.DATE,
-  },
-  reminder: {
-    allowNull: true,
-    type: DataTypes.ENUM("morning", "afternoon", "evening", "all day"),
-  },
-  sound: {
-    allowNull: true,
-    type: DataTypes.STRING,
   },
   is_completed: {
     allowNull: false,
@@ -62,36 +56,21 @@ const Task = sequelize.define("Task", {
     allowNull: true,
     type: DataTypes.DATE,
   },
-  habitId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: Habit,
-      key: "id",
-    },
+  rappelTime: {
+    allowNull: true,
+    type: DataTypes.STRING,
   },
-  categoryId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: Category,
-      key: "id",
-    },
-  },
-  userId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: User,
-      key: "id",
-    },
+  totalTime: {
+    allowNull: true,
+    defaultValue: 0,
+    type: DataTypes.BIGINT,
   },
 });
 
 Task.associate = (db) => {
-  Task.belongsTo(User, { foreignKey: "userId" });
-  Task.belongsTo(Habit, { foreignKey: "habitId" });
-  Task.belongsTo(Category, { foreignKey: "categoryId" });
-};
+  Task.belongsTo(db.Habit);
+  Task.belongsTo(db.User);
+  Task.belongsTo(db.Category);
+}
 
 module.exports = Task;

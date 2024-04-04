@@ -1,19 +1,37 @@
-const { Tasks } = require("../models");
+const { Task } = require("../models");
 
 const createTask = async (req, res) => {
   try {
-    const { name, description, habitId, categoryId } = req.body;
-    const task = await Tasks.create({ name, description, habitId, categoryId });
+    const { name, description, iconType, color, repeat, repeatDays, repeatWeeks, repeatMonths, endDate, reminder, sound, is_completed, rappelTime, completedDate, habitId, userId, categoryId } = req.body;
+    const task = await Task.create({ 
+      name, 
+      description, 
+      iconType, 
+      color, 
+      repeat, 
+      repeatDays, 
+      repeatWeeks, 
+      repeatMonths, 
+      endDate, 
+      reminder, 
+      sound, 
+      is_completed, 
+      completedDate, 
+      HabitId: habitId, 
+      UserId: userId, 
+      CategoryId: categoryId,
+      rappelTime
+    });
     res.status(201).json(task);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 
 const getAllTasks = async (req, res) => {
   try {
-    const tasks = await Tasks.findAll();
+    const tasks = await Task.findAll();
     res.status(200).json(tasks);
   } catch (error) {
     console.error(error);
@@ -24,7 +42,7 @@ const getAllTasks = async (req, res) => {
 const getTasksByUserId = async (req, res) => {
   try {
     const userId = req.params.userId;
-    const tasks = await TasksTasks.findAll({ where: { userId } });
+    const tasks = await Task.findAll({ where: { userId } });
     res.status(200).json(tasks);
   } catch (error) {
     console.error(error);
@@ -34,7 +52,7 @@ const getTasksByUserId = async (req, res) => {
 const getTaskById = async (req, res) => {
   try {
     const taskId = req.params.taskId;
-    const task = await Tasks.findByPk(taskId);
+    const task = await Task.findByPk(taskId);
     res.status(200).json(task);
   } catch (error) {
     console.error(error);
@@ -44,7 +62,7 @@ const getTaskById = async (req, res) => {
 const updateTask = async (req, res) => {
   try {
     const taskId = req.params.taskId;
-    const updatedTask = await Tasks.update(req.body, { where: { id: taskId } });
+    const updatedTask = await Task.update(req.body, { where: { id: taskId } });
     res.status(200).json(updatedTask);
   } catch (error) {
     console.error(error);
@@ -55,7 +73,7 @@ const updateTask = async (req, res) => {
 const deleteTask = async (req, res) => {
   try {
     const taskId = req.params.taskId;
-    await Tasks.destroy({ where: { id: taskId } });
+    await Task.destroy({ where: { id: taskId } });
     res.status(204).end();
   } catch (error) {
     console.error(error);

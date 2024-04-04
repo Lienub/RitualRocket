@@ -14,11 +14,10 @@ const Category = sequelize.define('Category', {
   description: {
     type: DataTypes.STRING,
   },
-  userId: {
-    type: DataTypes.INTEGER,
-    allowNull: true,
-  },
 });
 
+Category.associate = (db) => {
+  Category.belongsToMany(db.Habit, { through: 'HabitCategory' });
+};
 
 module.exports = Category;

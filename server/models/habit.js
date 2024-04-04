@@ -1,6 +1,5 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../database/connection');
-const Category = require('./category'); // Importez le modèle Category
 
 const Habit = sequelize.define('Habit', {
   id: {
@@ -14,19 +13,11 @@ const Habit = sequelize.define('Habit', {
   },
   description: {
     type: DataTypes.STRING,
-  },
-  userId: {
-    type: DataTypes.INTEGER,
-    allowNull: true,
-  },
-  categoryId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: Category,
-      key: 'id',
-    },
-  },
+  }
 });
+
+Habit.associate = (db) => {
+  Habit.belongsToMany(db.Category, { through: 'HabitCategory' });
+};
 
 module.exports = Habit;

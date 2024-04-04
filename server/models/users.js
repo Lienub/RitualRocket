@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../database/connection');
 
-const Users = sequelize.define('Users', {
+const User = sequelize.define('User', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -21,9 +21,14 @@ const Users = sequelize.define('Users', {
   },
   googleId: {
     allowNull: true,
-    type: DataTypes.STRING,
-    unique: true,
+    type: DataTypes.TEXT
   },
 });
 
-module.exports = Users;
+User.associate = (db) => {
+  User.hasMany(db.Task);
+  User.hasMany(db.Category);
+  User.hasMany(db.Habit);
+};
+
+module.exports = User;

@@ -21,5 +21,10 @@ module.exports = [
     url: "/auth/google",
     method: "post",
     func: controller.getUserByGoogleId,
-  }
+  },
+  {
+    url: "/auth/verify-google-id",
+    method: "post",
+    func: controller.verifyGoogleId,
+  },
 ];
