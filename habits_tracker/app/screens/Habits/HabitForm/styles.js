@@ -1,85 +1,110 @@
 import { StyleSheet } from "react-native";
+import { COLORS } from "../../../utils/constants/colors";
 
-export default StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#404040",
-  },
-  btnSelectIcon: {
-    borderRadius: 10,
-  },
-  modalSelectIcons: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    width: "100%",
-  },
-  input: {
-    width: "95%",
-    padding: 4,
-    backgroundColor: "#303030",
-    marginTop: 4,
-    alignSelf: "center",
-    borderRadius: 10,
-    color: "#fff",
-    fontSize: 20,
-  },
-  modal: {
-    padding: 20,
-    borderRadius: 20,
-    width: "100%", 
-    height: "25%", 
-    position: 'absolute', 
-    bottom: 0,
-  },
-  btnSelectIcon: {
-    color: "#fff",
-    fontSize: 20,
-    fontWeight: "500",
-    marginBottom: 10,
-  },
-  viewModal: {
-    flexDirection: "column-reverse",
-    justifyContent: "space-between",
-    backgroundColor: "#303030",
-    position: "absolute",
-    bottom: 0,
-    width: "100%",
-    padding: 20,
-    borderTopColor: "#fff",
-    borderTopWidth: 2,
-  },
-  selectedIcon: {
-    color: "#fff",
-    fontSize: 20,
-    fontWeight: "500",
-    marginBottom: 10,
-    alignSelf: "center",
-  },
-  selectElement: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-around",
-  },
-  modalColor: {
-    marginTop: 100,
-    width: "60%",
-  },
-  dateTimePicker: {
-    fontSize: 20,
-  },
-  title: {
-    color: "#fff",
-    fontSize: 20,
-    fontWeight: "500",
-    alignSelf: "flex-start",
-  },
-  appbar: {
-    flexDirection: "row",
-    width: "100%",
-    backgroundColor: "#303030",
-  },
-  saveBtn: {
-    fontSize: 20,
-    alignSelf: "flex-end",
-  },
-});
+export const getStyles = (mode) => {
+  const colors = mode === 'dark' ? COLORS.dark : COLORS.light;
+  
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+
+    modalSelectIcons: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      width: "100%",
+    },
+    input: {
+      width: "95%",
+      padding: 4,
+      backgroundColor: colors.tertiary,
+      marginTop: 4,
+      alignSelf: "center",
+      borderRadius: 10,
+      color: colors.text,
+      fontSize: 20,
+    },
+    modal: {
+      flex:1,
+      justifyContent: "center",
+    },
+    btnSelectIcon: {
+      borderRadius: 10,
+      color: colors.primary,
+      fontSize: 20,
+      fontWeight: "500",
+      marginBottom: 10,
+    },
+    viewModal: {
+      margin: 20,
+      backgroundColor: colors.background,
+      borderRadius: 20,
+      padding: 35,
+      alignItems: 'center',
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+      elevation: 5,
+    },
+    selectedIcon: {
+      color: colors.text,
+      fontSize: 20,
+      fontWeight: "500",
+      marginBottom: 10,
+      alignSelf: "center",
+    },
+    selectElement: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      justifyContent: "space-around",
+    },
+    modalColor: {
+      marginTop: 100,
+      width: "60%",
+    },
+    dateTimePicker: {
+      fontSize: 20,
+    },
+    title: {
+      color: colors.text,
+      fontSize: 20,
+      fontWeight: "700",
+      alignSelf: "center",
+      margin: 10,
+    },
+    appbar: {
+      flexDirection: "row",
+      width: "100%",
+      backgroundColor: colors.primary,
+    },
+    appbarBackaction: {
+      color: colors.text,
+    },
+    appbarTitle: {
+      color: colors.text,
+      fontSize: 20,
+      fontWeight: "500",
+      alignSelf: "flex-start",
+    },
+    saveBtn: {
+      fontSize: 20,
+      alignSelf: "flex-end",
+    },
+    iconButton: {
+      alignSelf: "center",
+      padding: 15,
+      borderColor: colors.secondary,
+      borderWidth: 2,
+      borderRadius: 40,
+      margin: 10,
+    },
+    colorPicker:{
+      padding: 10,
+    }
+  });
+}
