@@ -162,7 +162,7 @@ const verifyGoogleId = async (req, res) => {
 const changeInformations = async (req, res) => {
   try {
     const { email, username, userId } = req.body;
-    const user = await Users.findOne({ where: { userId } });
+    const user = await Users.findByPk(userId);
     console.log(user)
     if (!user) {
       return res.status(404).json({ message: "Utilisateur non trouvé" });
