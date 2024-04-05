@@ -124,6 +124,22 @@ export const getTimersByTaskId = async (taskId, userId) => {
   }
 };
 
+export const getTimersByUserId = async (userId) => {
+  try {
+    const apiUrl = useApiUrl(`/timers/user/${userId}`);
+    const response = await fetch(apiUrl);
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw errorData || "Network response was not ok";
+    }
+    console.log(response)
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching timers by user ID:", error);
+    throw error;
+  }
+};
+
 export const removeTask = async (taskId) => {
   try {
     const apiUrl = useApiUrl(`/tasks/${taskId}`);
