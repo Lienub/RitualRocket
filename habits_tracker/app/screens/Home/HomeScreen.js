@@ -55,9 +55,7 @@ export default function HomeScreen({ navigation }) {
   useEffect(() => {
     fetchTasks();
   }, [user]);
-  useEffect(() => {
-    fetchTasks();
-  }, []);
+
 
   useEffect(() => {
     const filteredTasks = tasks.filter((task) => {
