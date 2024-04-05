@@ -28,6 +28,7 @@ export default function HomeScreen({ navigation }) {
     const updateTaskStatus = async (task, status) => {
       const taskData = {
         is_completed: status === "done",
+        completedDate: new Date().toISOString(),
       };
       try {
         await updateTask(task.id, taskData);
