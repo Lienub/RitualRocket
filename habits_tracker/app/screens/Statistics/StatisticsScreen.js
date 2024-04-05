@@ -4,15 +4,15 @@ import { Appbar } from "react-native-paper";
 import { LineChart } from "react-native-chart-kit";
 import { useIsFocused } from "@react-navigation/native";
 import { getTimersByUserId } from "../../services/habits";
-import { getUserInfo } from "../../services/users";
 import styles from "./styles";
 
-export default function StatisticsScreen({ navigation }) {
+export default function StatisticsScreen({ navigation, route }) {
   const isFocused = useIsFocused();
-  const [user, setUser] = useState({});
+  const {user} = route.params;
   const [timers, setTimers] = useState([]);
   const today = new Date();
   const currentDayOfWeek = today.getDay();
+
   const startDate = new Date(today);
   startDate.setDate(startDate.getDate() - currentDayOfWeek);
 
@@ -24,7 +24,6 @@ export default function StatisticsScreen({ navigation }) {
       fetchTimers();
     }
   }, [isFocused]);
-
   const fetchTimers = async () => {
     try {
       const fetchedTimers = await getTimersByUserId(user.userId);
@@ -34,19 +33,6 @@ export default function StatisticsScreen({ navigation }) {
       console.error("Error fetching timers:", error);
     }
   };
-
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const userInfo = await getUserInfo();
-        setUser(userInfo);
-      } catch (error) {
-        console.error("Error fetching user info:", error);
-      }
-    };
-
-    fetchUserInfo();
-  }, []);
 
   const calculateMonthlyStatistics = () => {
     const stats = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -100,7 +86,15 @@ export default function StatisticsScreen({ navigation }) {
   };
 
   const lineChartDataLastDays = {
-    labels: ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"],
+    labels: [
+      "Lundi",
+      "Mardi",
+      "Mercredi",
+      "Jeudi",
+      "Vendredi",
+      "Samedi",
+      "Dimanche",
+    ],
     datasets: [
       {
         data: calculateThisWeekStatistics(),
@@ -122,91 +116,101 @@ export default function StatisticsScreen({ navigation }) {
         <Appbar.Content title={""} color="#fff" />
       </Appbar.Header>
       <ScrollView style={styles.block}>
-        <Text style={styles.title}>
-          Progressions /{"\n"}
-          Statistiques
-        </Text>
-        <View>
-          <Text
-            style={{
-              color: "white",
-              fontSize: 25,
-              marginTop: 40,
-              marginLeft: 40,
-              fontWeight: "bold",
-            }}
-          >
-            Temps passé par mois
-          </Text>
-          <LineChart
-            data={lineChartDataMonths}
-            width={Dimensions.get("window").width}
-            height={Dimensions.get("window").height / 2}
-            formatYLabel={(yValue) => yValue + "s"}
-            chartConfig={{
-              backgroundColor: "#e26a00",
-              backgroundGradientFrom: "#fb8c00",
-              backgroundGradientTo: "#ffa726",
-              decimalPlaces: 2,
-              color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-              style: {},
-            }}
-            bezier
-            style={{
-              marginVertical: 8,
-              marginTop: 20,
-              borderTopColor: "white",
-              borderTopWidth: 4,
-              borderBottomColor: "white",
-              borderBottomWidth: 4,
-            }}
-          />
-        </View>
-        <View style={{ marginTop: 0 }}>
-          <Text
-            style={{
-              color: "white",
-              fontSize: 25,
-              marginTop: 40,
-              marginLeft: 40,
-              fontWeight: "bold",
-            }}
-          >
-            Temps passé cette semaine
-          </Text>
-          <Text style={{
-              color: "white",
-              fontSize: 15,
-              textAlign: "center",
-              fontWeight: "bold",
-            }}>
-          {startDate.toLocaleDateString("fr-FR")}{" "}
-            - {endDate.toLocaleDateString("fr-FR")}
-          </Text>
-          <LineChart
-            data={lineChartDataLastDays}
-            width={Dimensions.get("window").width}
-            height={Dimensions.get("window").height / 2}
-            formatYLabel={(yValue) => yValue + "s"}
-            chartConfig={{
-              backgroundColor: "#e26a00",
-              backgroundGradientFrom: "#fb8c00",
-              backgroundGradientTo: "#ffa726",
-              decimalPlaces: 2,
-              color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-              style: {},
-            }}
-            bezier
-            style={{
-              marginVertical: 8,
-              marginTop: 20,
-              borderTopColor: "white",
-              borderTopWidth: 4,
-              borderBottomColor: "white",
-              borderBottomWidth: 4,
-            }}
-          />
-        </View>
+        {(user.username && user.username !== "") ? (
+          <>
+            <Text style={styles.title}>
+              Progressions /{"\n"}
+              Statistiques
+            </Text>
+            <View>
+              <Text
+                style={{
+                  color: "white",
+                  fontSize: 25,
+                  marginTop: 40,
+                  marginLeft: 40,
+                  fontWeight: "bold",
+                }}
+              >
+                Temps passé par mois
+              </Text>
+              <LineChart
+                data={lineChartDataMonths}
+                width={Dimensions.get("window").width}
+                height={Dimensions.get("window").height / 2}
+                formatYLabel={(yValue) => yValue + "s"}
+                chartConfig={{
+                  backgroundColor: "#e26a00",
+                  backgroundGradientFrom: "#fb8c00",
+                  backgroundGradientTo: "#ffa726",
+                  decimalPlaces: 2,
+                  color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                  style: {},
+                }}
+                bezier
+                style={{
+                  marginVertical: 8,
+                  marginTop: 20,
+                  borderTopColor: "white",
+                  borderTopWidth: 4,
+                  borderBottomColor: "white",
+                  borderBottomWidth: 4,
+                }}
+              />
+            </View>
+            <View style={{ marginTop: 0 }}>
+              <Text
+                style={{
+                  color: "white",
+                  fontSize: 25,
+                  marginTop: 40,
+                  marginLeft: 40,
+                  fontWeight: "bold",
+                }}
+              >
+                Temps passé cette semaine
+              </Text>
+              <Text
+                style={{
+                  color: "white",
+                  fontSize: 15,
+                  textAlign: "center",
+                  fontWeight: "bold",
+                }}
+              >
+                {startDate.toLocaleDateString("fr-FR")} -{" "}
+                {endDate.toLocaleDateString("fr-FR")}
+              </Text>
+              <LineChart
+                data={lineChartDataLastDays}
+                width={Dimensions.get("window").width}
+                height={Dimensions.get("window").height / 2}
+                formatYLabel={(yValue) => yValue + "s"}
+                chartConfig={{
+                  backgroundColor: "#e26a00",
+                  backgroundGradientFrom: "#fb8c00",
+                  backgroundGradientTo: "#ffa726",
+                  decimalPlaces: 2,
+                  color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                  style: {},
+                }}
+                bezier
+                style={{
+                  marginVertical: 8,
+                  marginTop: 20,
+                  borderTopColor: "white",
+                  borderTopWidth: 4,
+                  borderBottomColor: "white",
+                  borderBottomWidth: 4,
+                }}
+              />
+            </View>
+          </>
+        ) : 
+        (
+          <Text style={styles.noTasks}>Pas d'habitudes à cette date</Text>
+        )
+        }
       </ScrollView>
     </View>
   );

@@ -3,13 +3,12 @@ import { View, Text, ScrollView, Button } from "react-native";
 import { ListItem, Icon } from "react-native-elements";
 import CalendarStrip from "react-native-calendar-strip";
 import { Appbar } from "react-native-paper";
-import { getUserInfo } from "../../services/users";
 import { getTasksByUserId, updateTask } from "../../services/habits";
 import TimerView from "../../components/Timer/TimerView";
 import { createTimer } from "../../services/habits";
 import styles from "./styles";
 import { useIsFocused } from "@react-navigation/native";
-export default function HomeScreen({ navigation }) {
+export default function HomeScreen({ navigation, route }) {
   const isFocused = useIsFocused();
   useEffect(() => {
     if (isFocused) {
@@ -17,7 +16,7 @@ export default function HomeScreen({ navigation }) {
     }
   }, [isFocused]);
   const [timer, setTimer] = useState(0);
-  const [user, setUser] = useState({});
+  const { user } = route.params;
   const [tasks, setTasks] = useState([]);
   const [filteredTasks, setFilteredTasks] = useState([]);
   const [selectedTask, setSelectedTask] = useState({});
@@ -44,18 +43,7 @@ export default function HomeScreen({ navigation }) {
     setSelectedTask(task);
     setCloseModal(!closeModal);
   };
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const userInfo = await getUserInfo();
-        setUser(userInfo);
-      } catch (error) {
-        console.error("Error fetching user info:", error);
-      }
-    };
 
-    fetchUserInfo();
-  }, []);
   const fetchTasks = async () => {
     try {
       const tasks = await getTasksByUserId(user.userId).then((tasks) => {
