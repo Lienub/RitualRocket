@@ -24,18 +24,18 @@ export default function HomeScreen({ navigation, route }) {
     new Date().toISOString().split("T")[0]
   );
 
-    const updateTaskStatus = async (task, status) => {
-      const taskData = {
-        is_completed: status === "done",
-        completedDate: new Date().toISOString(),
-      };
-      try {
-        await updateTask(task.id, taskData);
-        fetchTasks();
-      } catch (error) {
-        console.error("Error updating task:", error);
-      }
+  const updateTaskStatus = async (task, status) => {
+    const taskData = {
+      is_completed: status === "done",
+      completedDate: new Date().toISOString(),
     };
+    try {
+      await updateTask(task.id, taskData);
+      fetchTasks();
+    } catch (error) {
+      console.error("Error updating task:", error);
+    }
+  };
 
   const [closeModal, setCloseModal] = useState(true);
 
@@ -152,7 +152,7 @@ export default function HomeScreen({ navigation, route }) {
               <ListItem
                 key={task.id}
                 containerStyle={{
-                  backgroundColor: "#363636",
+                  backgroundColor: task.is_completed ? "#42A445" : "#363636",
                   alignSelf: "center",
                   marginTop: 5,
                 }}
@@ -163,62 +163,72 @@ export default function HomeScreen({ navigation, route }) {
                   })
                 }
               >
-                <Icon
-                  name={task.iconType === "music" ? "rocket" : task.iconType}
-                  type="material"
-                  size={50}
-                  color={task.color}
-                />
+                {task.is_completed ? (
+                  <Icon
+                    name={"done"}
+                    type="material"
+                    size={50}
+                    color={"white"}
+                  />
+                ) : (
+                  <Icon
+                    name={task.iconType === "music" ? "rocket" : task.iconType}
+                    type="material"
+                    size={50}
+                    color={task.color}
+                  />
+                )}
                 <ListItem.Content>
                   <ListItem.Title
                     style={{
-                      color: task.color,
+                      color: task.is_completed ? "white" : task.color,
                       fontWeight: "bold",
                       fontSize: 20,
+                      textDecorationLine: task.is_completed
+                        ? "line-through"
+                        : "none",
                     }}
                   >
                     {task.name}
                   </ListItem.Title>
                   <ListItem.Subtitle
                     style={{
-                      color: task.color,
+                      color: task.is_completed ? "white" : task.color,
                       fontWeight: "400",
                       fontSize: 20,
                       marginTop: 4,
                     }}
                   >
-                    * Fonce !
+                    {(task.is_completed) ? "* Bien joué " : "* Fonce !"}
                   </ListItem.Subtitle>
                 </ListItem.Content>
                 <View>
-                  <Icon
-                    name="timer"
-                    type="material"
-                    size={40}
-                    color={task.color}
-                    onPress={() => onChangeModalTimer(task)}
-                  />
-                  {
-                    (task.is_completed) ? (
+                  {task.is_completed ? (
+                    <Icon
+                      name="close"
+                      type="material"
+                      size={60}
+                      color={"red"}
+                      onPress={() => updateTaskStatus(task, "not_done")}
+                    />
+                  ) : (
+                    <>
                       <Icon
-                        name="close"
+                        name="done"
                         type="material"
                         size={40}
-                        color={"red"}
-                        onPress={() => updateTaskStatus(task, "not_done")}
+                        color={"green"}
+                        onPress={() => updateTaskStatus(task, "done")}
                       />
-                    ) :
-                    (
                       <Icon
-                      name="done"
-                      type="material"
-                      size={40}
-                      color={"green"}
-                      onPress={() => updateTaskStatus(task, "done")}
-                    />
-                    )
-
-                  }
+                        name="timer"
+                        type="material"
+                        size={40}
+                        color={task.color}
+                        onPress={() => onChangeModalTimer(task)}
+                      />
+                    </>
+                  )}
                 </View>
               </ListItem>
             ))
