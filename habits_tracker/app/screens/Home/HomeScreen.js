@@ -4,11 +4,11 @@ import { ListItem, Icon } from "react-native-elements";
 import CalendarStrip from "react-native-calendar-strip";
 import { Appbar } from "react-native-paper";
 import { getUserInfo } from "../../services/users";
-import { getTasksByUserId } from "../../services/habits";
+import { getTasksByUserId, updateTask } from "../../services/habits";
 import TimerView from "../../components/Timer/TimerView";
 import { createTimer } from "../../services/habits";
 import styles from "./styles";
-import { useIsFocused } from '@react-navigation/native';
+import { useIsFocused } from "@react-navigation/native";
 export default function HomeScreen({ navigation }) {
   const isFocused = useIsFocused();
   useEffect(() => {
@@ -24,6 +24,18 @@ export default function HomeScreen({ navigation }) {
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split("T")[0]
   );
+
+    const updateTaskStatus = async (task) => {
+      const taskData = {
+        is_completed: true,
+      };
+      try {
+        await updateTask(task.id, taskData);
+        fetchTasks();
+      } catch (error) {
+        console.error("Error updating task:", error);
+      }
+    };
 
   const [closeModal, setCloseModal] = useState(true);
 
@@ -55,7 +67,6 @@ export default function HomeScreen({ navigation }) {
   useEffect(() => {
     fetchTasks();
   }, [user]);
-
 
   useEffect(() => {
     const filteredTasks = tasks.filter((task) => {
@@ -92,10 +103,7 @@ export default function HomeScreen({ navigation }) {
       };
       createTimer(createTimerData);
     }
-
-  
   }, [closeModal, setCloseModal, timer, setTimer]);
-
 
   return (
     <View style={styles.container}>
@@ -107,21 +115,17 @@ export default function HomeScreen({ navigation }) {
           size={40}
           style={{ marginLeft: "auto" }}
         />
-        <Appbar.Content
-          title={"Bienvenue " + user.username}
-          color="#fff"
-        />
+        <Appbar.Content title={"Bienvenue " + user.username} color="#fff" />
       </Appbar.Header>
       <View style={styles.block}>
         <Text style={styles.title}>
-          {
-            "Nous sommes le " + new Date(selectedDate).toLocaleDateString("fr-FR", {
+          {"Nous sommes le " +
+            new Date(selectedDate).toLocaleDateString("fr-FR", {
               weekday: "long",
               year: "numeric",
               month: "long",
               day: "numeric",
-            })
-          }
+            })}
         </Text>
         <CalendarStrip
           scrollable={true}
@@ -157,13 +161,16 @@ export default function HomeScreen({ navigation }) {
               <ListItem
                 key={task.id}
                 containerStyle={{
-                  borderRadius: 20,
                   backgroundColor: "#363636",
-                  width: "90%",
                   alignSelf: "center",
-                  marginTop: 10,
+                  marginTop: 5,
                 }}
-                onPress={() => navigation.navigate("HabitDetail", { task, userId: user.userId })}
+                onPress={() =>
+                  navigation.navigate("HabitDetail", {
+                    task,
+                    userId: user.userId,
+                  })
+                }
               >
                 <Icon
                   name={task.iconType === "music" ? "rocket" : task.iconType}
@@ -186,19 +193,28 @@ export default function HomeScreen({ navigation }) {
                       color: task.color,
                       fontWeight: "400",
                       fontSize: 20,
-                      marginTop: 10,
+                      marginTop: 4,
                     }}
                   >
                     * Fonce !
                   </ListItem.Subtitle>
                 </ListItem.Content>
-                <Icon
-                  name="timer"
-                  type="material"
-                  size={60}
-                  color={task.color}
-                  onPress={() => onChangeModalTimer(task)}
-                />
+                <View>
+                  <Icon
+                    name="timer"
+                    type="material"
+                    size={40}
+                    color={task.color}
+                    onPress={() => onChangeModalTimer(task)}
+                  />
+                  <Icon
+                    name="done"
+                    type="material"
+                    size={40}
+                    color={"green"}
+                    onPress={() => updateTaskStatus(task)}
+                  />
+                </View>
               </ListItem>
             ))
           ) : (
