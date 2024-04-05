@@ -102,7 +102,7 @@ export default function HomeScreen({ navigation }) {
       <Appbar.Header style={styles.appbar}>
         <Appbar.Action
           icon="account-circle"
-          onPress={() => console.log("Profile")}
+          onPress={() => navigation.navigate("Profile")}
           color="#fff"
           size={40}
           style={{ marginLeft: "auto" }}
