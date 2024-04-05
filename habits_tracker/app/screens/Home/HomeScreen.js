@@ -8,8 +8,14 @@ import { getTasksByUserId } from "../../services/habits";
 import TimerView from "../../components/Timer/TimerView";
 import { createTimer } from "../../services/habits";
 import styles from "./styles";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useIsFocused } from '@react-navigation/native';
 export default function HomeScreen({ navigation }) {
+  const isFocused = useIsFocused();
+  useEffect(() => {
+    if (isFocused) {
+      fetchTasks();
+    }
+  }, [isFocused]);
   const [timer, setTimer] = useState(0);
   const [user, setUser] = useState({});
   const [tasks, setTasks] = useState([]);
@@ -37,20 +43,21 @@ export default function HomeScreen({ navigation }) {
 
     fetchUserInfo();
   }, []);
-
+  const fetchTasks = async () => {
+    try {
+      const tasks = await getTasksByUserId(user.userId).then((tasks) => {
+        setTasks(tasks);
+      });
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+    }
+  };
   useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const tasks = await getTasksByUserId(user.userId).then((tasks) => {
-          setTasks(tasks);
-        });
-      } catch (error) {
-        console.error("Error fetching tasks:", error);
-      }
-    };
-
     fetchTasks();
   }, [user]);
+  useEffect(() => {
+    fetchTasks();
+  }, []);
 
   useEffect(() => {
     const filteredTasks = tasks.filter((task) => {
