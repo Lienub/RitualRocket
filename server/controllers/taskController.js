@@ -62,7 +62,7 @@ const getTaskById = async (req, res) => {
 };
 const updateTask = async (req, res) => {
   try {
-    const taskId = req.params.taskId;
+    const taskId = req.params.id;
     const updatedTask = await Task.update(req.body, { where: { id: taskId } });
     res.status(200).json(updatedTask);
   } catch (error) {
