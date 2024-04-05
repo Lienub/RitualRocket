@@ -25,9 +25,9 @@ export default function HomeScreen({ navigation }) {
     new Date().toISOString().split("T")[0]
   );
 
-    const updateTaskStatus = async (task) => {
+    const updateTaskStatus = async (task, status) => {
       const taskData = {
-        is_completed: true,
+        is_completed: status === "done",
       };
       try {
         await updateTask(task.id, taskData);
@@ -67,6 +67,8 @@ export default function HomeScreen({ navigation }) {
   useEffect(() => {
     fetchTasks();
   }, [user]);
+
+  useEffect(() => {}, [tasks]);
 
   useEffect(() => {
     const filteredTasks = tasks.filter((task) => {
@@ -207,13 +209,27 @@ export default function HomeScreen({ navigation }) {
                     color={task.color}
                     onPress={() => onChangeModalTimer(task)}
                   />
-                  <Icon
-                    name="done"
-                    type="material"
-                    size={40}
-                    color={"green"}
-                    onPress={() => updateTaskStatus(task)}
-                  />
+                  {
+                    (task.is_completed) ? (
+                      <Icon
+                        name="close"
+                        type="material"
+                        size={40}
+                        color={"red"}
+                        onPress={() => updateTaskStatus(task, "not_done")}
+                      />
+                    ) :
+                    (
+                      <Icon
+                      name="done"
+                      type="material"
+                      size={40}
+                      color={"green"}
+                      onPress={() => updateTaskStatus(task, "done")}
+                    />
+                    )
+
+                  }
                 </View>
               </ListItem>
             ))

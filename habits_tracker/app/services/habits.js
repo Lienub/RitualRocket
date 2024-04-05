@@ -153,7 +153,6 @@ export const getTimersByUserId = async (userId) => {
       const errorData = await response.json();
       throw errorData || "Network response was not ok";
     }
-    console.log(response)
     return await response.json();
   } catch (error) {
     console.error("Error fetching timers by user ID:", error);
