@@ -11,6 +11,13 @@ export default function StatisticsScreen({ navigation }) {
   const isFocused = useIsFocused();
   const [user, setUser] = useState({});
   const [timers, setTimers] = useState([]);
+  const today = new Date();
+  const currentDayOfWeek = today.getDay();
+  const startDate = new Date(today);
+  startDate.setDate(startDate.getDate() - currentDayOfWeek);
+
+  const endDate = new Date(startDate);
+  endDate.setDate(endDate.getDate() + 6);
 
   useEffect(() => {
     if (isFocused) {
@@ -49,12 +56,54 @@ export default function StatisticsScreen({ navigation }) {
     });
     return stats;
   };
+  const calculateThisWeekStatistics = () => {
+    const stats = [0, 0, 0, 0, 0, 0, 0];
+    const today = new Date();
+    const currentDayOfWeek = today.getDay();
+    const firstDayOfWeek = new Date(today);
+    firstDayOfWeek.setDate(firstDayOfWeek.getDate() - currentDayOfWeek);
 
-  const lineChartData = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+    const timersThisWeek = timers.filter((timer) => {
+      const timerDate = new Date(timer.date);
+      return timerDate >= firstDayOfWeek && timerDate <= today;
+    });
+
+    timersThisWeek.forEach((timer) => {
+      const dayIndex = new Date(timer.date).getDay();
+      stats[dayIndex] += timer.durationSeconds;
+    });
+
+    return stats;
+  };
+
+  const lineChartDataMonths = {
+    labels: [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ],
     datasets: [
       {
         data: calculateMonthlyStatistics(),
+        strokeWidth: 2,
+      },
+    ],
+  };
+
+  const lineChartDataLastDays = {
+    labels: ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"],
+    datasets: [
+      {
+        data: calculateThisWeekStatistics(),
         strokeWidth: 2,
       },
     ],
@@ -78,10 +127,20 @@ export default function StatisticsScreen({ navigation }) {
           Statistiques
         </Text>
         <View>
-          <Text style={{color: "white", textAlign: 'center', fontSize: 20, marginTop: 40, fontWeight: 'bold'}}>Temps passé par mois</Text>
+          <Text
+            style={{
+              color: "white",
+              fontSize: 25,
+              marginTop: 40,
+              marginLeft: 40,
+              fontWeight: "bold",
+            }}
+          >
+            Temps passé par mois
+          </Text>
           <LineChart
-            data={lineChartData}
-            width={Dimensions.get("window").width} // from react-native
+            data={lineChartDataMonths}
+            width={Dimensions.get("window").width}
             height={Dimensions.get("window").height / 2}
             formatYLabel={(yValue) => yValue + "s"}
             chartConfig={{
@@ -90,13 +149,61 @@ export default function StatisticsScreen({ navigation }) {
               backgroundGradientTo: "#ffa726",
               decimalPlaces: 2,
               color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-              style: {
-              },
+              style: {},
             }}
             bezier
             style={{
               marginVertical: 8,
-              marginTop: 20
+              marginTop: 20,
+              borderTopColor: "white",
+              borderTopWidth: 4,
+              borderBottomColor: "white",
+              borderBottomWidth: 4,
+            }}
+          />
+        </View>
+        <View style={{ marginTop: 0 }}>
+          <Text
+            style={{
+              color: "white",
+              fontSize: 25,
+              marginTop: 40,
+              marginLeft: 40,
+              fontWeight: "bold",
+            }}
+          >
+            Temps passé cette semaine
+          </Text>
+          <Text style={{
+              color: "white",
+              fontSize: 15,
+              textAlign: "center",
+              fontWeight: "bold",
+            }}>
+          {startDate.toLocaleDateString("fr-FR")}{" "}
+            - {endDate.toLocaleDateString("fr-FR")}
+          </Text>
+          <LineChart
+            data={lineChartDataLastDays}
+            width={Dimensions.get("window").width}
+            height={Dimensions.get("window").height / 2}
+            formatYLabel={(yValue) => yValue + "s"}
+            chartConfig={{
+              backgroundColor: "#e26a00",
+              backgroundGradientFrom: "#fb8c00",
+              backgroundGradientTo: "#ffa726",
+              decimalPlaces: 2,
+              color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+              style: {},
+            }}
+            bezier
+            style={{
+              marginVertical: 8,
+              marginTop: 20,
+              borderTopColor: "white",
+              borderTopWidth: 4,
+              borderBottomColor: "white",
+              borderBottomWidth: 4,
             }}
           />
         </View>
