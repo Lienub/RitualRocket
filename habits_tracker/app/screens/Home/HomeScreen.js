@@ -8,6 +8,8 @@ import TimerView from "../../components/Timer/TimerView";
 import { createTimer } from "../../services/habits";
 import styles from "./styles";
 import { useIsFocused } from "@react-navigation/native";
+import CircularProgressBar from "../../components/CircularProgressBar/CiruclarProgressBar";
+
 export default function HomeScreen({ navigation, route }) {
   const isFocused = useIsFocused();
   useEffect(() => {
@@ -36,7 +38,6 @@ export default function HomeScreen({ navigation, route }) {
       console.error("Error updating task:", error);
     }
   };
-
   const [closeModal, setCloseModal] = useState(true);
 
   const onChangeModalTimer = (task) => {
@@ -147,6 +148,9 @@ export default function HomeScreen({ navigation, route }) {
         />
         <ScrollView style={styles.taskList}>
           <Text style={styles.title}>Consultez vos habitudes du jour!</Text>
+          <>
+          <CircularProgressBar date={selectedDate} user={user} />
+          </>
           {filteredTasks.length > 0 ? (
             filteredTasks.map((task) => (
               <ListItem
