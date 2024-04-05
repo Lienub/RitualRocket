@@ -159,10 +159,30 @@ const verifyGoogleId = async (req, res) => {
   }
 };
 
+const changeInformations = async (req, res) => {
+  try {
+    const { email, username, userId } = req.body;
+    const user = await Users.findOne({ where: { userId } });
+    console.log(user)
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+
+    await user.update({ email, username });
+
+    res.status(200).json({ message: "Informations mises à jour avec succès" });
+  }
+  catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Erreur interne du serveur" });
+  }
+}
+
 module.exports = {
   register,
   login,
   getUserByGoogleId,
   resetPassword,
   verifyGoogleId,
+  changeInformations,
 };
