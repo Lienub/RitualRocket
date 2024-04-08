@@ -1,36 +1,47 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { View, ScrollView, TouchableOpacity, Modal, Text, Animated, Keyboard, TouchableWithoutFeedback, ActivityIndicator, FlatList, Alert, useColorScheme } from "react-native";
-import { TextInput, Button, Switch } from "react-native-paper";
-import ModalSelector from "react-native-modal-selector";
+import { View, TouchableOpacity, Text, Keyboard, TouchableWithoutFeedback, ActivityIndicator, FlatList, Alert, useColorScheme } from "react-native";
 import { Appbar } from "react-native-paper";
 import { Calendar } from "react-native-calendars";
-import { DayPicker } from "react-native-picker-weekday";
 import { iconNames } from "../../../utils/constants/icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { NiceModal, NiceTextInput, StyleContainer } from "../../../components/index"
-import { COLORS } from "../../../utils/constants/colors";
-
+import { NiceModal, NiceTextInput, NiceTextButton, StyleContainer } from "../../../components/index"
+import DropDownPicker from 'react-native-dropdown-picker';
+import { DayPicker } from 'react-native-picker-weekday'
 import ColorPicker, {
   Panel1,
   Swatches,
-  Preview,
-  OpacitySlider,
   HueSlider,
-  useColorPickerContext,
   colorKit,
 } from "reanimated-color-picker";
-
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { getUserInfo } from "../../../services/users";
 import { createTask, createHabit } from "../../../services/habits";
 import { getStyles } from "./styles";
-import { on } from "events";
-import { SafeAreaView } from "react-native";
 import { useSharedValue } from "react-native-reanimated";
+
+function convertDays(arr) {
+  const daysOfWeek = [
+    "sunday",
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday"
+  ];
+
+  const res = arr.filter((dayIndex) => dayIndex !== -1)
+          .map((dayIndex) => {
+            return daysOfWeek[dayIndex-1];
+          })
+          .join(",")
+
+  return res;
+}
 
 export default function TaskFormScreen({ navigation, route }) {
   const { habitId, categoryId, habitTitle } = route.params;
-  const [repeat, setRepeat] = useState("none");
+  const [repeat, setRepeat] = useState(new Date());
   const [user, setUser] = useState({});
   const [name, setName] = useState(habitTitle);
   const [description, setDescription] = useState("");
@@ -43,17 +54,28 @@ export default function TaskFormScreen({ navigation, route }) {
   const [selectedIcon, setSelectedIcon] = useState("coffee");
   const [modalVisible, setModalVisible] = useState(false);
   const [showModalColor, setShowModalColor] = useState(false);
-  const [repeatDays, setRepeatDays] = useState("");
-  const [selectedDays, setSelectedDays] = useState([-1]);
+  const [showFreqModal, setShowFreqModal] = useState(false);
   const [selectedInput, setSelectedInput] = useState(null);
+  const [rappelTimeAsDate, setRappelTimeAsDate] = useState(new Date());
   const [rappelTime, setRappelTime] = useState(new Date().toISOString().split("T")[1].split(".")[0]);
-  const [showRappel, setShowRappel] = useState(false);
+  const [rappelHint, setRappelHint] = useState(false);
   const [searchIcon, setSearchIcon] = useState("");
+  const [isWeekly, setIsWeekly] = useState(false);
+  const [isMonthly, setIsMonthly] = useState(false);
   const [loadingIcons, setLoadingIcons] = useState(true);
   const [originalIcons, setOriginalIcons] = useState([]);
   const [icons, setIcons] = useState([]);
   const scheme = useColorScheme();
   const styles = useMemo(() => getStyles(scheme));
+  const [openFreq, setOpenFreq] = useState(false);
+  const [valueFreq, setValueFreq] = useState(null);
+  const itemsFreq = [
+    { label: 'Une seule fois', value: 'none' },
+    { label: 'Une fois par semaine', value: 'weekly'},
+    { label: 'Une fois par mois', value: 'monthly'},
+    { label: 'Autre', value: 'daily' }
+  ]
+  const [weekdays, setWeekdays] = useState([-1])
 
   const customSwatches = new Array(6).fill('#fff').map(() => colorKit.randomRgbColor().hex());
   const selectedColor = useSharedValue(customSwatches[0]);
@@ -62,9 +84,8 @@ export default function TaskFormScreen({ navigation, route }) {
   const onColorSelect = (color) => {
     'worklet';
     selectedColor.value = color.hex;
-    
-  };
 
+  };
 
   // Generate icon components on component mount
   useEffect(() => {
@@ -124,10 +145,6 @@ export default function TaskFormScreen({ navigation, route }) {
     setShowModalColor(false);
   };
 
-  const onRepeatChange = (key) => {
-    setRepeat(key ?? repeat);
-  };
-
   const handleStartDateChange = (text) => {
     setStartDate(text);
   };
@@ -136,14 +153,11 @@ export default function TaskFormScreen({ navigation, route }) {
     setEndDate(text);
   };
   const handleRappelChange = (event, selectedTime) => {
-    if (selectedTime !== undefined && selectedTime !== null) {
-      let time = selectedTime.toISOString().split("T")[1].split(".")[0];
-      if (rappelTime == time) { return; }
-      setRappelTime(time);
-      setShowRappel(false);
-      return;
-    }
-    setShowRappel(true);
+    const current = selectedTime || new Date();
+    let time = current.toISOString().split("T")[1].split(".")[0];
+    if (rappelTime == time) { return; }
+    setRappelTime(time);
+    setRappelTimeAsDate(selectedTime)
   };
 
   const handleShowCalendar = (mode) => {
@@ -159,11 +173,6 @@ export default function TaskFormScreen({ navigation, route }) {
     );
     // Update the displayed icons based on the filtered result
     setIcons(filteredIcons);
-  };
-
-  const resetIconList = () => {
-    setSearchIcon("");
-    setIcons(originalIcons);
   };
 
   const handleDayPress = (day, mode) => {
@@ -190,30 +199,15 @@ export default function TaskFormScreen({ navigation, route }) {
 
   const handleSubmit = async () => {
     try {
-      console.log("rappelTime", rappelTime);
       const taskData = {
         name,
         description,
         iconType,
         color,
         repeat,
-        repeatDays: selectedDays
-          .filter((dayIndex) => dayIndex !== -1)
-          .map((dayIndex) => {
-            const daysOfWeek = [
-              "sunday",
-              "monday",
-              "tuesday",
-              "wednesday",
-              "thursday",
-              "friday",
-              "saturday",
-            ];
-            return daysOfWeek[dayIndex];
-          })
-          .join(","),
-        repeatWeeks: "",
-        repeatMonths: "",
+        repeatDays: convertDays(weekdays),
+        repeatWeeks: isWeekly,
+        repeatMonths: isMonthly,
         endDate,
         reminder,
         is_completed: isCompleted,
@@ -233,8 +227,6 @@ export default function TaskFormScreen({ navigation, route }) {
         });
         taskData.habitId = habitResponse.id;
       }
-
-      console.log("taskData", taskData);
 
       const taskResponse = await createTask(taskData);
       navigation.goBack();
@@ -324,6 +316,101 @@ export default function TaskFormScreen({ navigation, route }) {
               style={{ alignSelf: "flex-end", padding: 4 }}
             />
           </TouchableOpacity>
+        </NiceModal>
+        {/* Date selection modal */}
+        <NiceModal
+          visible={showCalendar}
+          onRequestClose={() => {
+            setShowModalColor(false);
+          }}
+        >
+          <Calendar
+            theme={styles.calendar}
+            onDayPress={handleDayPress}
+            minDate={new Date().toISOString().split("T")[0]}
+            markingType={"period"}
+            markedDates={{
+              [startDate]: { startingDay: true, color: "blue" },
+              [endDate]: { endingDay: true, color: "blue" },
+            }}
+          />
+          <TouchableOpacity
+            onPress={() => setShowCalendar(false)}
+            style={styles.btnSelectIcon}
+          >
+            <Icon
+              name="close"
+              size={30}
+              color={styles.btnSelectIcon.color}
+              style={{ alignSelf: "flex-end", padding: 4 }}
+            />
+          </TouchableOpacity>
+        </NiceModal>
+        {/* Frequency selection modal */}
+        <NiceModal
+          visible={showFreqModal}
+          onRequestClose={() => {
+            setShowFreqModal(false);
+          }}
+        >
+          <Text >Choisissez les jours de rappel</Text>
+          <DayPicker
+            weekdays={weekdays}
+            setWeekdays={setWeekdays}
+            activeColor='orange'
+            textColor='white'
+            inactiveColor='grey'
+            itemStyles={{ margin: 5 }}
+          />
+          {rappelHint && <Text style={{color:'red'}}>Vous devez choisir au moins un jour de la semaine !</Text> }
+          <StyleContainer
+            label="Heure"
+          >
+            <DateTimePicker
+              value={rappelTimeAsDate}
+              mode="time"
+              onChange={handleRappelChange}
+            />
+          </StyleContainer>
+          <View style={{ flexDirection: 'row', gap: 30 }}>
+            <TouchableOpacity
+              onPress={() => {
+                setRappelHint(false);
+                setShowFreqModal(false);
+                setValueFreq(null);
+
+                setWeekdays([-1]);
+              }}
+              style={styles.btnSelectIcon}
+            >
+              <Icon
+                name="close"
+                size={30}
+                color={styles.btnSelectIcon.color}
+                style={{ alignSelf: "flex-end", padding: 4 }}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                if(weekdays.length == 1 && weekdays[0] == -1) {
+                  setRappelHint(true);
+                } else {
+                  setRappelHint(false);
+                  return setShowFreqModal(false);
+                }
+                
+
+              }}
+              style={styles.btnSelectIcon}
+            >
+              <Icon
+                name="done"
+                size={30}
+                color={styles.btnSelectIcon.color}
+                style={{ alignSelf: "flex-end", padding: 4 }}
+              />
+            </TouchableOpacity>
+          </View>
         </NiceModal>
         {/* Appbar */}
         <Appbar.Header style={styles.appbar}>
@@ -425,322 +512,71 @@ export default function TaskFormScreen({ navigation, route }) {
         <StyleContainer
           label="Gestion du temps"
         >
+          {/* Start date, End date*/}
+          <StyleContainer
+            label="Dates"
+            row
+          >
+            <StyleContainer
+              label="Début"
+            >
+              <NiceTextButton
+                text={startDate ? startDate : "YYYY-MM-DD"}
+                onChangeText={handleStartDateChange}
+                onPressIn={() => handleShowCalendar("startDate")}
+              />
+            </StyleContainer>
+            <StyleContainer
+              label="Fin"
+            >
+              <NiceTextButton
+                text={endDate ? endDate : "YYYY-MM-DD"}
+                onChangeText={handleEndDateChange}
+                onPressIn={() => handleShowCalendar("endDate")}
+              />
+
+            </StyleContainer>
+          </StyleContainer>
+          {/* Frequency selector */}
+          <StyleContainer
+            label="Fréquence"
+          >
+            <DropDownPicker
+              open={openFreq}
+              value={valueFreq}
+              items={itemsFreq}
+              setOpen={setOpenFreq}
+              setValue={setValueFreq}
+              onSelectItem={(item) => {
+                if (item.value == 'daily') {
+                  setShowFreqModal(true);
+                  setIsWeekly(false);
+                  setIsMonthly(false);
+                } else if (item.value == 'weekly') {
+                  setIsWeekly(true);
+                  setIsMonthly(false);
+                  setWeekdays([-1]);
+                } else if (item.value == 'monthly') {
+                  setIsMonthly(true);
+                  setIsWeekly(false);
+                  setWeekdays([-1]);
+                } else {
+                  setIsMonthly(false);
+                  setIsWeekly(false);
+                  setWeekdays([-1]);
+                }
+              }}
+            />
+            { 
+            convertDays(weekdays) && rappelTime && 
+              <View style={{flexDirection: 'row', justifyContent: 'space-evenly', flexWrap: 'wrap'}}>
+                <Text style={styles.text}>{convertDays(weekdays)}</Text>
+                <Text style={styles.text}>{rappelTime}</Text>
+              </View>
+            }
+          </StyleContainer>
         </StyleContainer>
       </View>
     </TouchableWithoutFeedback>
   );
 }
-
-{ /*
- <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-    <View 
-      onPress={() => Keyboard.dismiss()}
-      style={ styles.container }
-    >
-      {showCalendar && (
-          <View
-            style={{
-              position: "absolute",
-              backgroundColor: "rgba(0, 0, 0, 0.5)",
-              top: 0,
-              bottom: 0,
-              left: 0,
-              right: 0,
-              zIndex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          /> 
-        )}
-      <Appbar.Header style={styles.appbar}>
-        <Appbar.BackAction onPress={() => navigation.goBack()} color="#fff" />
-        <Appbar.Content title={"Habitude"} titleStyle={styles.title} />
-        <Appbar.Content
-          onPress={handleSubmit}
-          color="#F1A44A"
-          titleStyle={styles.saveBtn}
-          title="Sauvegarder"
-        />
-      </Appbar.Header>
-        {showCalendar && (
-          <View
-          style={{
-            position: "absolute",
-            display: "flex",
-            flexDirection: "row",
-            zIndex: 2,
-            justifyContent: "center",
-            alignItems: "center",
-            top: 0,
-            bottom: 0,
-            left: 0,
-            right: 0,
-            margin: 20,
-          }}
-        >
-          <TouchableOpacity onPress={() => setShowCalendar(false)} style={{ position: "absolute", top: "20%", right: 10 }}>
-            <Icon name="close" size={30} color={"white"} />
-          </TouchableOpacity>
-          <View style={{ width: "80%", height: 300 }}>
-            <Calendar
-              style={ styles.calendar }
-              onDayPress={handleDayPress}
-              minDate={new Date().toISOString().split("T")[0]}
-              markingType={"period"}
-              markedDates={{
-                [startDate]: { startingDay: true, color: "blue" },
-                [endDate]: { endingDay: true, color: "blue" },
-              }}
-            />
-          </View>
-        </View>
-        )}
-
-      <View style={{ marginTop: 40 }}>
-        <TextInput
-          style={styles.input}
-          label="Titre de l'habitude"
-          value={name}
-          onChangeText={(text) => setName(text)}
-          textColor="#fff"
-        />
-        <TextInput
-          style={styles.input}
-          label="Description"
-          value={description}
-          selectTextStyle={{ color: "white" }}
-          onChangeText={(text) => setDescription(text)}
-          textColor="#fff"
-          multiline
-        />
-        <View style={styles.selectElement}>
-          <TouchableOpacity
-            onPress={() => setModalVisible(true)}
-            style={styles.selectElement}
-          >
-            {selectedIcon ? (
-              <Icon
-                name={selectedIcon}
-                size={40}
-                color="white"
-                style={{
-                  alignSelf: "center",
-                  padding: 15,
-                  borderColor: "white",
-                  borderWidth: 2,
-                  borderRadius: 40,
-                  margin: 10,
-                }}
-              />
-            ) : (
-              <Text
-                style={{
-                  alignSelf: "center",
-                  padding: 15,
-                  borderColor: "white",
-                  borderWidth: 1,
-                  margin: 10,
-                  color: "white",
-                  fontSize: 20,
-                  fontWeight: "bold",
-                }}
-              >
-                Select Icon
-              </Text>
-            )}
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setShowModalColor(true)}
-            style={styles.selectElement}
-          >
-            {color ? (
-              <View
-                style={{
-                  backgroundColor: color,
-                  alignSelf: "center",
-                  borderColor: "white",
-                  borderWidth: 2,
-                  borderRadius: 40,
-                  margin: 10,
-                  width: 70,
-                  height: 70,
-                }}
-              />
-            ) : (
-              <Text
-                style={{
-                  alignSelf: "center",
-                  padding: 15,
-                  borderColor: "white",
-                  borderWidth: 1,
-                  margin: 10,
-                  color: "white",
-                  fontSize: 20,
-                  fontWeight: "bold",
-                }}
-              >
-                Select Color
-              </Text>
-            )}
-          </TouchableOpacity>
-        </View>
-        <ModalSelector
-          style={{
-            alignSelf: "center",
-            padding: 15,
-            margin: 10,
-            fontWeight: "bold",
-            color: "white",
-          }}
-          data={[
-            { key: "none", label: "Répéter: 1 seule fois" },
-            { key: "daily", label: "Répéter: Tous les jours" },
-          ]}
-          selectedKey={repeat}
-          textStyle={{ color: "white" }}
-          initValue="Select Repeat"
-          selectTextStyle={{ color: "white", fontSize: 20 }}
-          onChange={(option) => onRepeatChange(option.key)}
-        />
-        <View style={{ flexDirection: "column" }}>
-          <View>
-            <Text style={{ color: "white", fontSize: 20, marginLeft: 10 }}>
-              Date de début
-            </Text>
-
-            <TextInput
-              style={styles.input}
-              placeholder="Date de début"
-              value={startDate}
-              onChangeText={handleStartDateChange}
-              textColor="#fff"
-              inputMode="none"
-              pointerEvents="box-only"
-              onPressIn={() => handleShowCalendar("startDate")}
-            />
-          </View>
-
-          <View>
-            <Text style={{ color: "white", fontSize: 20, marginLeft: 10 }}>
-              Date de fin
-            </Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Date de fin"
-              value={endDate}
-              onChangeText={handleEndDateChange}
-              textColor="#fff"
-              inputMode="none"
-              pointerEvents="box-only"
-              onPressIn={() => handleShowCalendar("endDate")}
-            />
-          </View>
-          <View>
-            <Text style={{ color: "white", fontSize: 20, marginLeft: 10 }}>
-              Rappel
-            </Text>
-            <TouchableOpacity
-              style={{alignSelf: "flex-start", backgroundColor: "#F1A44A", padding: 10, borderRadius: 10, margin: 10, width: 100, alignItems: "center"}}
-              textColor="#fff"
-              onPress={handleRappelChange}
-            >
-              <Text style={{ color: "white" }}>{rappelTime}</Text>
-            </TouchableOpacity>
-            {
-              showRappel && (
-                <DateTimePicker
-                  value={new Date()}
-                  mode="time"
-                  onChange={handleRappelChange}
-                />
-              )
-            }
-          </View>
-        </View>
-
-        <View style={{ flexDirection: "column" }}>
-          {repeat === "daily" ? (
-            <Text style={{ color: "white", fontSize: 20 }}>
-              Répéter tous les jours
-            </Text>
-          ) : null}
-          {repeat === "daily" ? (
-            <DayPicker
-              weekdays={selectedDays}
-              setWeekdays={setSelectedDays}
-              activeColor="violet"
-              textColor="white"
-              inactiveColor="grey"
-            />
-          ) : null}
-        </View>
-        <Modal
-          visible={showModalColor}
-          animationType="slide"
-          style={styles.modalColor}
-          transparent
-        >
-          <ColorPicker
-            value="red"
-            onComplete={onColorChange}
-            style={{
-              marginTop: 100,
-              width: "80%",
-              alignSelf: "center",
-              backgroundColor: "#303030",
-              padding: 20,
-              borderRadius: 20,
-            }}
-          >
-            <Preview />
-            <Panel1 />
-            <HueSlider />
-            <OpacitySlider />
-            <Swatches />
-          </ColorPicker>
-
-          <Button title="Ok" onPress={() => setShowModalColor(false)} />
-        </Modal>
-        <Modal
-          style={styles.modal}
-          animationType="slide"
-          visible={modalVisible}
-          onRequestClose={() => {
-            setShowModalColor(false);
-          }}
-          transparent
-        >
-          <View style={styles.viewModal}>
-            <ScrollView style={styles.modalSelectIcons} horizontal={true}>
-              {iconNames.map((iconName, index) => (
-                <TouchableOpacity
-                  key={index}
-                  onPress={() => handleIconSelection(iconName)}
-                  style={styles.btnSelectIcon}
-                >
-                  <Icon
-                    name={iconName}
-                    size={60}
-                    style={{ margin: 10 }}
-                    color={"white"}
-                  />
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-            <TouchableOpacity
-              onPress={() => setModalVisible(false)}
-              style={styles.btnSelectIcon}
-            >
-              <Icon
-                name="close"
-                size={30}
-                color={"white"}
-                style={{ alignSelf: "flex-end", padding: 4 }}
-              />
-            </TouchableOpacity>
-          </View>
-        </Modal>
-      </View>
-    </View>
-    </TouchableWithoutFeedback>
-*/}

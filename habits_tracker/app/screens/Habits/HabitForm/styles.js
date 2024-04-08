@@ -9,25 +9,10 @@ export const getStyles = (mode) => {
       flex: 1,
       backgroundColor: colors.background,
     },
-
     modalSelectIcons: {
       flexDirection: "row",
       flexWrap: "wrap",
       width: "100%",
-    },
-    input: {
-      width: "95%",
-      padding: 4,
-      backgroundColor: colors.tertiary,
-      marginTop: 4,
-      alignSelf: "center",
-      borderRadius: 10,
-      color: colors.text,
-      fontSize: 20,
-    },
-    modal: {
-      flex:1,
-      justifyContent: "center",
     },
     btnSelectIcon: {
       borderRadius: 10,
@@ -36,39 +21,10 @@ export const getStyles = (mode) => {
       fontWeight: "500",
       marginBottom: 10,
     },
-    viewModal: {
-      margin: 20,
-      backgroundColor: colors.background,
-      borderRadius: 20,
-      padding: 35,
-      alignItems: 'center',
-      shadowColor: '#000',
-      shadowOffset: {
-        width: 0,
-        height: 2,
-      },
-      shadowOpacity: 0.25,
-      shadowRadius: 4,
-      elevation: 5,
-    },
-    selectedIcon: {
-      color: colors.text,
-      fontSize: 20,
-      fontWeight: "500",
-      marginBottom: 10,
-      alignSelf: "center",
-    },
     selectElement: {
       flexDirection: "row",
       flexWrap: "wrap",
       justifyContent: "space-around",
-    },
-    modalColor: {
-      marginTop: 100,
-      width: "60%",
-    },
-    dateTimePicker: {
-      fontSize: 20,
     },
     title: {
       color: colors.text,
@@ -94,6 +50,7 @@ export const getStyles = (mode) => {
     saveBtn: {
       fontSize: 20,
       alignSelf: "flex-end",
+      fontWeight: 'bold'
     },
     iconButton: {
       alignSelf: "center",
@@ -104,7 +61,14 @@ export const getStyles = (mode) => {
       margin: 10,
     },
     colorPicker:{
-      padding: 10,
+      gap: 25,
+    },
+    text: {
+      color: colors.text
+    },
+    calendar: {
+      selectedDayBackgroundColor: colors.primary,
+      selectedDayTextColor: 'white'
     }
   });
 }
