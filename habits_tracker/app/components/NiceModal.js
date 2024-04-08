@@ -8,7 +8,6 @@ export function NiceModal({ ...props }) {
 
     return (
         <Modal
-            //put props except children
             {...props}
             animationType="slide"
             transparent={true}
