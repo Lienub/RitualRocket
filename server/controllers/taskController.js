@@ -2,7 +2,7 @@ const { Task } = require("../models");
 
 const createTask = async (req, res) => {
   try {
-    const { name, description, iconType, color, repeat, repeatDays, repeatWeeks, repeatMonths, endDate, reminder, sound, is_completed, rappelTime, completedDate, habitId, userId, categoryId, startDate } = req.body;
+    const { name, description, iconType, color, repeat, repeatDays, repeatWeeks, repeatMonths, endDate, reminder, sound, is_completed, rappelTime, goalTimeByDay, completedDate, habitId, userId, categoryId, startDate } = req.body;
     const task = await Task.create({ 
       name, 
       description, 
@@ -19,6 +19,7 @@ const createTask = async (req, res) => {
       completedDate, 
       HabitId: habitId, 
       UserId: userId, 
+      goalTimeByDay,
       CategoryId: categoryId,
       rappelTime,
       endDate: new Date(endDate) || new Date(),
