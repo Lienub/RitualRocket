@@ -1,15 +1,22 @@
 import React from 'react';
-import { SafeAreaView, Text, TouchableOpacity, Dimensions } from 'react-native';
+import { SafeAreaView, Text, TouchableOpacity, Dimensions, StyleSheet, useColorScheme } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { COLORS } from '../utils/constants/colors';
 
 export function BottomTabBar({ state, descriptors, navigation }) {
+  const scheme = useColorScheme();
+  const styles = getStyles(scheme);
   const middleIndex = Math.floor(state.routes.length / 2);
 
   return (
     <SafeAreaProvider style={styles.navSection}>
       <SafeAreaView style={styles.leftPanel}>
-        {state.routes.slice(0, middleIndex).map((route, index) => renderTab(route, index, state, descriptors, navigation))}
+        {state.routes.slice(0, middleIndex).map((route, index) => {
+          if (route.name !== "Statistics") {
+            return renderTab(route, index, state, descriptors, scheme, navigation)
+          }
+        })}
       </SafeAreaView>
       <SafeAreaView style={styles.middlePanel}>
         <TouchableOpacity
@@ -24,26 +31,31 @@ export function BottomTabBar({ state, descriptors, navigation }) {
             bottom: 0,
             zIndex: 1,
           }}
-          onPress={() => navigation.navigate('MainTest')}
+          onPress={() => navigation.navigate('Statistics')}
         >
           <Icon name="rocket-launch" size={30} color="white" />
         </TouchableOpacity>
       </SafeAreaView>
       <SafeAreaView style={styles.rightPanel}>
-        {state.routes.slice(middleIndex).map((route, index) => renderTab(route, index + middleIndex, state, descriptors, navigation))}
+        {state.routes.slice(middleIndex).map((route, index) => {
+          console.log(route.name)
+          if (route.name !== "Statistics") {
+            return renderTab(route, index + middleIndex, state, descriptors, scheme, navigation)
+          }
+        })}
       </SafeAreaView>
     </SafeAreaProvider>
   );
 }
 
-const renderTab = (route, index, state, descriptors, navigation) => {
+const renderTab = (route, index, state, descriptors, scheme, navigation) => {
   const { options } = descriptors[route.key];
   const label =
     options.tabBarLabel !== undefined
       ? options.tabBarLabel
       : options.title !== undefined
-      ? options.title
-      : route.name;
+        ? options.title
+        : route.name;
 
   const isFocused = state.index === index;
 
@@ -66,19 +78,19 @@ const renderTab = (route, index, state, descriptors, navigation) => {
     });
   };
 
-   let icon;
-   if (route.name === 'Home') {
-     icon = 'home';
-   } else if (route.name === 'Profile') {
-     icon = 'person';
+  let icon;
+  if (route.name === 'Home') {
+    icon = 'home';
+  } else if (route.name === 'Profile') {
+    icon = 'person';
 
-   } else if (route.name === 'Calendar') {
-     icon = 'calendar-today';
-   } else if (route.name === 'Completed') {
-     icon = 'check-circle';
-   } else {
-     icon = 'circle'; // Default icon
-   }
+  } else if (route.name === 'Calendar') {
+    icon = 'calendar-today';
+  } else if (route.name === 'Completed') {
+    icon = 'check-circle';
+  } else {
+    icon = 'circle'; // Default icon
+  }
 
   return (
     <TouchableOpacity
@@ -91,94 +103,96 @@ const renderTab = (route, index, state, descriptors, navigation) => {
       onLongPress={onLongPress}
       style={{ flex: 1, ...styles.panelContent }}
     >
-      <Icon name={icon} size={30} color={isFocused ? '#F2994A' : '#404040'} />
-      <Text style={{ color: isFocused ? '#F2994A' : '#404040', fontSize: 10 }}>
+      <Icon name={icon} size={30} color={isFocused ? COLORS[scheme].primary : COLORS[scheme].text} />
+      <Text style={{ color: isFocused ? COLORS[scheme].primary : COLORS[scheme].text, fontSize: 10 }}>
         {label}
       </Text>
     </TouchableOpacity>
   );
 };
 
-const styles = {
-  navSection: {
-    position: 'absolute', 
-    bottom: 0, left: 0, right: 0,
-     elevation: 0, 
-     flexDirection: 'row', 
-     justifyContent: 'center', 
-     alignItems: 'center', 
-     backgroundColor: 'transparent',
-     paddingBottom: Dimensions.get('window').height * 0.03,
-     height: Dimensions.get('window').height * 0.1,
-  },
+const getStyles = (mode) => {
+  return styles = {
+    navSection: {
+      position: 'absolute',
+      bottom: 0, left: 0, right: 0,
+      elevation: 0,
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'transparent',
+      paddingBottom: Dimensions.get('window').height * 0.03,
+      height: Dimensions.get('window').height * 0.1,
+    },
 
-  leftPanel: {
-    display: 'flex',
-    flex: 1,
-    flexGrow: 1,
-    flexDirection: 'row',
-    
-    height: "100%",
+    leftPanel: {
+      display: 'flex',
+      flex: 1,
+      flexGrow: 1,
+      flexDirection: 'row',
 
-    // Need to change that with dynamic value
-    backgroundColor: '#fff',
+      height: "100%",
 
-    borderWidth: 1,
-    borderLeftWidth: 0,
-    borderColor: '#F2994A',
-    borderRadius: 10,
-    borderTopLeftRadius: 0,
-    borderBOTtomLeftRadius: 0,
+      // Need to change that with dynamic value
+      backgroundColor: COLORS[mode].tertiary,
 
-    // Add shadow
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+      borderWidth: 1,
+      borderLeftWidth: 0,
+      borderColor: '#F2994A',
+      borderRadius: 10,
+      borderTopLeftRadius: 0,
+      borderBOTtomLeftRadius: 0,
 
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+      // Add shadow
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
 
-  middlePanel: { 
-    width: 100,
-     height: "100%", 
-     display: 'flex', 
-     alignItems: 'center',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
 
-     marginBottom: Dimensions.get('window').height * 0.02,
-  },
+    middlePanel: {
+      width: 100,
+      height: "100%",
+      display: 'flex',
+      alignItems: 'center',
 
-  rightPanel: { 
-    flex: 1,
-    flexGrow: 1,
-    flexDirection: 'row',
-    
-    height: "100%",
+      marginBottom: Dimensions.get('window').height * 0.02,
+    },
 
-    // Need to change that with dynamic value
-    backgroundColor: '#fff',
+    rightPanel: {
+      flex: 1,
+      flexGrow: 1,
+      flexDirection: 'row',
 
-    borderWidth: 1,
-    borderRightWidth: 0,
-    borderColor: '#F2994A',
-    borderRadius: 10,
-    borderTopRightRadius: 0,
+      height: "100%",
 
-    // Add shadow
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
+      // Need to change that with dynamic value
+      backgroundColor: COLORS[mode].tertiary,
 
-  panelContent: {
-    paddingTop: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: "100%",
-    flex: 1,
-  },
+      borderWidth: 1,
+      borderRightWidth: 0,
+      borderColor: '#F2994A',
+      borderRadius: 10,
+      borderTopRightRadius: 0,
+
+      // Add shadow
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
+    },
+
+    panelContent: {
+      paddingTop: 5,
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: "100%",
+      flex: 1,
+    },
+  }
 };

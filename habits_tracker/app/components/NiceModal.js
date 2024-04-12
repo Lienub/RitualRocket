@@ -29,7 +29,7 @@ const getStyles = (scheme) => StyleSheet.create({
 
       viewModal: {
         margin: 20,
-        backgroundColor: COLORS[scheme].background,
+        backgroundColor: COLORS[scheme].tertiary,
         borderRadius: 20,
         padding: 35,
         alignItems: 'center',

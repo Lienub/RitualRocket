@@ -18,6 +18,14 @@ export function NiceTextButton({ ...props }) {
     return (
         <Pressable
             {...props}
+            style={({ pressed }) => [
+                {
+                    backgroundColor: pressed
+                        ? COLORS[scheme].secondary
+                        : COLORS[scheme].primary,
+                },
+                styles.container,
+            ]}
         >
             <View style={styles.container}>
                 <Text style={styles.text}>
@@ -30,7 +38,6 @@ export function NiceTextButton({ ...props }) {
 
 const getStyles = (scheme) => StyleSheet.create({
     container: {
-        backgroundColor: COLORS[scheme].primary,
         borderRadius: 10,
         padding: 5,
         alignItems: "center",

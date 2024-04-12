@@ -31,10 +31,10 @@ function convertDays(arr) {
   ];
 
   const res = arr.filter((dayIndex) => dayIndex !== -1)
-          .map((dayIndex) => {
-            return daysOfWeek[dayIndex-1];
-          })
-          .join(",")
+    .map((dayIndex) => {
+      return daysOfWeek[dayIndex - 1];
+    })
+    .join(",")
 
   return res;
 }
@@ -71,8 +71,8 @@ export default function TaskFormScreen({ navigation, route }) {
   const [valueFreq, setValueFreq] = useState(null);
   const itemsFreq = [
     { label: 'Une seule fois', value: 'none' },
-    { label: 'Une fois par semaine', value: 'weekly'},
-    { label: 'Une fois par mois', value: 'monthly'},
+    { label: 'Une fois par semaine', value: 'weekly' },
+    { label: 'Une fois par mois', value: 'monthly' },
     { label: 'Autre', value: 'daily' }
   ]
   const [weekdays, setWeekdays] = useState([-1])
@@ -198,6 +198,11 @@ export default function TaskFormScreen({ navigation, route }) {
   }, []);
 
   const handleSubmit = async () => {
+    if (startDate === "" || endDate === "") {
+      Alert.alert("Erreur", "Veuillez sélectionner une date de début et une date de fin");
+      return;
+    }
+
     try {
       const taskData = {
         name,
@@ -362,7 +367,7 @@ export default function TaskFormScreen({ navigation, route }) {
             inactiveColor='grey'
             itemStyles={{ margin: 5 }}
           />
-          {rappelHint && <Text style={{color:'red'}}>Vous devez choisir au moins un jour de la semaine !</Text> }
+          {rappelHint && <Text style={{ color: 'red' }}>Vous devez choisir au moins un jour de la semaine !</Text>}
           <StyleContainer
             label="Heure"
           >
@@ -392,13 +397,13 @@ export default function TaskFormScreen({ navigation, route }) {
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
-                if(weekdays.length == 1 && weekdays[0] == -1) {
+                if (weekdays.length == 1 && weekdays[0] == -1) {
                   setRappelHint(true);
                 } else {
                   setRappelHint(false);
                   return setShowFreqModal(false);
                 }
-                
+
 
               }}
               style={styles.btnSelectIcon}
@@ -514,28 +519,23 @@ export default function TaskFormScreen({ navigation, route }) {
         >
           {/* Start date, End date*/}
           <StyleContainer
-            label="Dates"
-            row
+            label="Début"
           >
-            <StyleContainer
-              label="Début"
-            >
-              <NiceTextButton
-                text={startDate ? startDate : "YYYY-MM-DD"}
-                onChangeText={handleStartDateChange}
-                onPressIn={() => handleShowCalendar("startDate")}
-              />
-            </StyleContainer>
-            <StyleContainer
-              label="Fin"
-            >
-              <NiceTextButton
-                text={endDate ? endDate : "YYYY-MM-DD"}
-                onChangeText={handleEndDateChange}
-                onPressIn={() => handleShowCalendar("endDate")}
-              />
+            <NiceTextButton
+              text={startDate ? startDate : "YYYY-MM-DD"}
+              onChangeText={handleStartDateChange}
+              onPressIn={() => handleShowCalendar("startDate")}
+            />
+          </StyleContainer>
+          <StyleContainer
+            label="Fin"
+          >
+            <NiceTextButton
+              text={endDate ? endDate : "YYYY-MM-DD"}
+              onChangeText={handleEndDateChange}
+              onPressIn={() => handleShowCalendar("endDate")}
+            />
 
-            </StyleContainer>
           </StyleContainer>
           {/* Frequency selector */}
           <StyleContainer
@@ -567,9 +567,9 @@ export default function TaskFormScreen({ navigation, route }) {
                 }
               }}
             />
-            { 
-            convertDays(weekdays) && rappelTime && 
-              <View style={{flexDirection: 'row', justifyContent: 'space-evenly', flexWrap: 'wrap'}}>
+            {
+              convertDays(weekdays) && rappelTime &&
+              <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', flexWrap: 'wrap' }}>
                 <Text style={styles.text}>{convertDays(weekdays)}</Text>
                 <Text style={styles.text}>{rappelTime}</Text>
               </View>

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, ScrollView, Button } from "react-native";
+import React, { useState, useEffect, useMemo } from "react";
+import { View, Text, ScrollView, Button, useColorScheme } from "react-native";
 import { ListItem, Icon } from "react-native-elements";
 import CalendarStrip from "react-native-calendar-strip";
 import { Appbar } from "react-native-paper";
@@ -9,8 +9,11 @@ import { createTimer } from "../../services/habits";
 import styles from "./styles";
 import { useIsFocused } from "@react-navigation/native";
 import CircularProgressBar from "../../components/CircularProgressBar/CiruclarProgressBar";
+import { getStyles } from "./styles";
 
 export default function HomeScreen({ navigation, route }) {
+  const scheme = useColorScheme();
+  const styles = useMemo(() => getStyles(scheme))
   const isFocused = useIsFocused();
   useEffect(() => {
     if (isFocused) {

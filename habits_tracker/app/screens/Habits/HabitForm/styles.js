@@ -3,7 +3,7 @@ import { COLORS } from "../../../utils/constants/colors";
 
 export const getStyles = (mode) => {
   const colors = mode === 'dark' ? COLORS.dark : COLORS.light;
-  
+
   return StyleSheet.create({
     container: {
       flex: 1,
@@ -27,6 +27,13 @@ export const getStyles = (mode) => {
       justifyContent: "space-around",
     },
     title: {
+      color: colors.text,
+      fontSize: 20,
+      fontWeight: "700",
+      alignSelf: "center",
+      margin: 10,
+    },
+    modalTitle: {
       color: colors.text,
       fontSize: 20,
       fontWeight: "700",
@@ -60,15 +67,35 @@ export const getStyles = (mode) => {
       borderRadius: 40,
       margin: 10,
     },
-    colorPicker:{
+    colorPicker: {
       gap: 25,
     },
     text: {
       color: colors.text
     },
     calendar: {
+      borderRadius: 10,
+      backgroundColor: colors.background,
+      calendarBackground: colors.background,
+      textSectionTitleColor: '#b6c1cd',
+      textSectionTitleDisabledColor: '#d9e1e8',
       selectedDayBackgroundColor: colors.primary,
-      selectedDayTextColor: 'white'
+      selectedDayTextColor: '#ffffff',
+      todayTextColor: '#00adf5',
+      dayTextColor: 'white',
+      textDisabledColor: '#d9e1e8',
+      dotColor: colors.primary,
+      selectedDotColor: '#ffffff',
+      arrowColor: 'orange',
+      disabledArrowColor: '#d9e1e8',
+      monthTextColor: colors.primary,
+      indicatorColor: colors.primary,
+      textDayFontWeight: '300',
+      textMonthFontWeight: 'bold',
+      textDayHeaderFontWeight: '300',
+      textDayFontSize: 16,
+      textMonthFontSize: 16,
+      textDayHeaderFontSize: 16
     }
   });
 }
