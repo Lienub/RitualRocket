@@ -70,7 +70,7 @@ const register = async (req, res) => {
     };
     res.status(200).json(responseData);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
+    console.log(error);
   }
 };
 
@@ -110,7 +110,7 @@ const login = async (req, res) => {
     };
     res.status(200).json(responseData);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
+    console.log(error);
   }
 };
 
@@ -142,7 +142,6 @@ const resetPassword = async (req, res) => {
     res.status(200).json({ message: "Mot de passe réinitialisé avec succès" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Erreur interne du serveur" });
   }
 };
 
@@ -155,7 +154,6 @@ const verifyGoogleId = async (req, res) => {
     res.status(200).json({ user });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Erreur interne du serveur" });
   }
 };
 
@@ -174,7 +172,6 @@ const changeInformations = async (req, res) => {
   }
   catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Erreur interne du serveur" });
   }
 }
 

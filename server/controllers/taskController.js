@@ -27,7 +27,6 @@ const createTask = async (req, res) => {
     res.status(201).json(task);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
   }
 };
 
@@ -37,7 +36,6 @@ const getAllTasks = async (req, res) => {
     res.status(200).json(tasks);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -48,7 +46,6 @@ const getTasksByUserId = async (req, res) => {
     res.status(200).json(tasks);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
   }
 };
 const getTaskById = async (req, res) => {
@@ -58,7 +55,6 @@ const getTaskById = async (req, res) => {
     res.status(200).json(task);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
   }
 };
 const updateTask = async (req, res) => {
@@ -68,7 +64,6 @@ const updateTask = async (req, res) => {
     res.status(200).json(updatedTask);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -79,7 +74,6 @@ const deleteTask = async (req, res) => {
     res.status(204).end();
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
   }
 };
 

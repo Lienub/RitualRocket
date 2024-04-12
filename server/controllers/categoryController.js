@@ -7,7 +7,6 @@ const createCategory = async (req, res) => {
     res.status(201).json(category);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
   }
 };
 
@@ -18,7 +17,7 @@ const createCategoryByUserId = async (req, res) => {
     res.status(201).json(category);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
+
   }
 }
 
@@ -29,7 +28,6 @@ const removeCategoryById = async (req, res) => {
     res.status(204).end();
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
   }
 }
 
@@ -40,7 +38,6 @@ const getAllCategpryByUserId = async (req, res) => {
     res.status(200).json(category);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
   }
 }
 
@@ -51,7 +48,6 @@ const updateCategoryById = async (req, res) => {
     res.status(200).json(updatedCategory);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
   }
 }
 
@@ -61,7 +57,6 @@ const getAllCategories = async (req, res) => {
     res.status(200).json(category);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
   }
 }
 
