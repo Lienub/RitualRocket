@@ -3,53 +3,62 @@ import { View, Text, ScrollView, Button } from "react-native";
 import { ListItem, Icon } from "react-native-elements";
 import CalendarStrip from "react-native-calendar-strip";
 import { Appbar } from "react-native-paper";
-import { getUserInfo } from "../../services/users";
-import { getTasksByUserId } from "../../services/habits";
+import { getTasksByUserId, updateTask } from "../../services/habits";
 import TimerView from "../../components/Timer/TimerView";
 import { createTimer } from "../../services/habits";
 import styles from "./styles";
+import { useIsFocused } from "@react-navigation/native";
+import CircularProgressBar from "../../components/CircularProgressBar/CiruclarProgressBar";
 
-export default function HomeScreen({ navigation }) {
+export default function HomeScreen({ navigation, route }) {
+  const isFocused = useIsFocused();
+  useEffect(() => {
+    if (isFocused) {
+      fetchTasks();
+    }
+  }, [isFocused]);
   const [timer, setTimer] = useState(0);
-  const [user, setUser] = useState({});
+  const { user } = route.params;
   const [tasks, setTasks] = useState([]);
   const [filteredTasks, setFilteredTasks] = useState([]);
   const [selectedTask, setSelectedTask] = useState({});
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split("T")[0]
   );
+
+  const updateTaskStatus = async (task, status) => {
+    const taskData = {
+      is_completed: status === "done",
+      completedDate: new Date().toISOString(),
+    };
+    try {
+      await updateTask(task.id, taskData);
+      fetchTasks();
+    } catch (error) {
+      console.error("Error updating task:", error);
+    }
+  };
   const [closeModal, setCloseModal] = useState(true);
 
   const onChangeModalTimer = (task) => {
     setSelectedTask(task);
     setCloseModal(!closeModal);
   };
+
+  const fetchTasks = async () => {
+    try {
+      const tasks = await getTasksByUserId(user.userId).then((tasks) => {
+        setTasks(tasks);
+      });
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+    }
+  };
   useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const userInfo = await getUserInfo();
-        setUser(userInfo);
-      } catch (error) {
-        console.error("Error fetching user info:", error);
-      }
-    };
-
-    fetchUserInfo();
-  }, []);
-
-  useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const tasks = await getTasksByUserId(user.userId).then((tasks) => {
-          setTasks(tasks);
-        });
-      } catch (error) {
-        console.error("Error fetching tasks:", error);
-      }
-    };
-
     fetchTasks();
   }, [user]);
+
+  useEffect(() => {}, [tasks]);
 
   useEffect(() => {
     const filteredTasks = tasks.filter((task) => {
@@ -86,38 +95,29 @@ export default function HomeScreen({ navigation }) {
       };
       createTimer(createTimerData);
     }
-
-  
   }, [closeModal, setCloseModal, timer, setTimer]);
-
-  // console.log("filteredTasks", filteredTasks);
-  // console.log("tasks", tasks);
 
   return (
     <View style={styles.container}>
       <Appbar.Header style={styles.appbar}>
         <Appbar.Action
           icon="account-circle"
-          onPress={() => console.log("Profile")}
+          onPress={() => navigation.navigate("Profile")}
           color="#fff"
           size={40}
           style={{ marginLeft: "auto" }}
         />
-        <Appbar.Content
-          title={"Bienvenue " + user.username}
-          color="#fff"
-        />
+        <Appbar.Content title={"Bienvenue " + user.username} color="#fff" />
       </Appbar.Header>
       <View style={styles.block}>
         <Text style={styles.title}>
-          {
-            "Nous sommes le " + new Date(selectedDate).toLocaleDateString("fr-FR", {
+          {"Nous sommes le " +
+            new Date(selectedDate).toLocaleDateString("fr-FR", {
               weekday: "long",
               year: "numeric",
               month: "long",
               day: "numeric",
-            })
-          }
+            })}
         </Text>
         <CalendarStrip
           scrollable={true}
@@ -148,53 +148,92 @@ export default function HomeScreen({ navigation }) {
         />
         <ScrollView style={styles.taskList}>
           <Text style={styles.title}>Consultez vos habitudes du jour!</Text>
+          <>
+          <CircularProgressBar date={selectedDate} user={user} />
+          </>
           {filteredTasks.length > 0 ? (
             filteredTasks.map((task) => (
               <ListItem
                 key={task.id}
                 containerStyle={{
-                  borderRadius: 20,
-                  backgroundColor: "#363636",
-                  width: "90%",
+                  backgroundColor: task.is_completed ? "#42A445" : "#363636",
                   alignSelf: "center",
-                  marginTop: 10,
+                  marginTop: 5,
                 }}
-                onPress={() => navigation.navigate("HabitDetail", { task, userId: user.userId })}
+                onPress={() =>
+                  navigation.navigate("HabitDetail", {
+                    task,
+                    userId: user.userId,
+                  })
+                }
               >
-                <Icon
-                  name={task.iconType === "music" ? "rocket" : task.iconType}
-                  type="material"
-                  size={50}
-                  color={task.color}
-                />
+                {task.is_completed ? (
+                  <Icon
+                    name={"done"}
+                    type="material"
+                    size={50}
+                    color={"white"}
+                  />
+                ) : (
+                  <Icon
+                    name={task.iconType === "music" ? "rocket" : task.iconType}
+                    type="material"
+                    size={50}
+                    color={task.color}
+                  />
+                )}
                 <ListItem.Content>
                   <ListItem.Title
                     style={{
-                      color: task.color,
+                      color: task.is_completed ? "white" : task.color,
                       fontWeight: "bold",
                       fontSize: 20,
+                      textDecorationLine: task.is_completed
+                        ? "line-through"
+                        : "none",
                     }}
                   >
                     {task.name}
                   </ListItem.Title>
                   <ListItem.Subtitle
                     style={{
-                      color: task.color,
+                      color: task.is_completed ? "white" : task.color,
                       fontWeight: "400",
                       fontSize: 20,
-                      marginTop: 10,
+                      marginTop: 4,
                     }}
                   >
-                    * Fonce !
+                    {(task.is_completed) ? "* Bien joué " : "* Fonce !"}
                   </ListItem.Subtitle>
                 </ListItem.Content>
-                <Icon
-                  name="timer"
-                  type="material"
-                  size={60}
-                  color={task.color}
-                  onPress={() => onChangeModalTimer(task)}
-                />
+                <View>
+                  {task.is_completed ? (
+                    <Icon
+                      name="close"
+                      type="material"
+                      size={60}
+                      color={"red"}
+                      onPress={() => updateTaskStatus(task, "not_done")}
+                    />
+                  ) : (
+                    <>
+                      <Icon
+                        name="done"
+                        type="material"
+                        size={40}
+                        color={"green"}
+                        onPress={() => updateTaskStatus(task, "done")}
+                      />
+                      <Icon
+                        name="timer"
+                        type="material"
+                        size={40}
+                        color={task.color}
+                        onPress={() => onChangeModalTimer(task)}
+                      />
+                    </>
+                  )}
+                </View>
               </ListItem>
             ))
           ) : (

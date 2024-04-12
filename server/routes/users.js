@@ -27,4 +27,9 @@ module.exports = [
     method: "post",
     func: controller.verifyGoogleId,
   },
+  {
+    url : "/auth/change-informations",
+    method : "post",
+    func : controller.changeInformations,
+  },
 ];

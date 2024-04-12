@@ -217,3 +217,30 @@ export const storeUserInfoInStorage = async (userInfo) => {
     AsyncStorage.setItem("user", JSON.stringify(user));
   } catch (error) {}
 };
+
+/**
+ * This function removes the user information from the AsyncStorage
+ */
+export const removeUserInfo = async () => {
+  try {
+    await AsyncStorage.removeItem("user");
+  } catch (error) {}
+};
+
+export const changeUserInformations = async (email, username, userId) => {
+  const apiUrl = useApiUrl("/auth/change-informations");
+  const response = await fetch(apiUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, username, userId}),
+  });
+  
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw errorData || "Network response was not ok";
+  }
+
+  storeUserInfoInStorage({ email, username, userId });
+}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeScreen from "../screens/Home/HomeScreen";
 import StatisticsScreen from "../screens/Statistics/StatisticsScreen";
@@ -6,24 +6,69 @@ import CategoryListScreen from "../screens/Habits/CategoryList/CategoryList";
 import {Profile} from "../screens/Profile/profile.js";
 import {Settings} from "../screens/Settings/settings.js";
 import {BottomTabBar} from "../components/BottomTabBar.js";
+import { getUserInfo } from "../services/users";
 
 const Tab = createBottomTabNavigator();
 
 export default function TabNavigation() {
+  const [user, setUser] = useState({});
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const userInfo = await getUserInfo();
+        setUser(userInfo);
+      } catch (error) {
+        console.error("Error fetching user info:", error);
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
   return (
-    <Tab.Navigator 
-    screenOptions={{
-            tabBarStyle: {
-              borderTopWidth: 0,
-              elevation: 0,
-            },
-    }}
-    tabBar={props => <BottomTabBar {...props} />}
-  >
-    <Tab.Screen name="Home" component={HomeScreen} />
-    <Tab.Screen name="Catégories" component={CategoryListScreen} />
-    <Tab.Screen name="Profile" component={Profile} />
-    <Tab.Screen name="Settings" component={Settings} />
-  </Tab.Navigator>
-  );
+    <>
+      {
+        (user.userId) ? (
+          <Tab.Navigator initialRouteName="Home">
+          <Tab.Screen
+            name="Home"
+            component={HomeScreen}
+            options={{
+              headerShown: false,
+              tabBarIcon: ({ color, size }) => (
+                <Ionicons name="home" size={size} color={color} />
+              ),
+            }}
+            initialParams={{ user }}
+          />
+          <Tab.Screen
+            name="CategoryList"
+            component={CategoryListScreen}
+            options={{
+              headerShown: false,
+              tabBarIcon: ({ color, size }) => (
+                <Ionicons name="add" size={40} color={color} style={{fontWeight: 'bold'}} />
+              ),
+              tabBarLabel: () => null,
+            }}
+            initialParams={{ user }}
+          />
+          <Tab.Screen
+            name="Statistics"
+            component={StatisticsScreen}
+            options={{
+              headerShown: false,
+              tabBarIcon: ({ color, size }) => (
+                <Ionicons name="stats-chart" size={size} color={color} />
+              ),
+            }}
+            initialParams={{ user }}
+          />
+        </Tab.Navigator>
+        ) : (
+          <>
+          </>
+        )
+      }
+    </>
+  )
 }

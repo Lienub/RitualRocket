@@ -229,7 +229,7 @@ export default function TaskFormScreen({ navigation, route }) {
       }
 
       const taskResponse = await createTask(taskData);
-      navigation.goBack();
+      navigation.navigate('TabNavigation');
     } catch (error) {
       console.error("Error creating task:", error);
     }

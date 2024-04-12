@@ -88,6 +88,27 @@ export const getTasksByUserId = async (userId) => {
   }
 };
 
+export const updateTask = async (taskId, taskData) => {
+  try {
+    const apiUrl = useApiUrl(`/tasks/${taskId}`);
+    const response = await fetch(apiUrl, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(taskData),
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw errorData || "Network response was not ok";
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error updating task:", error);
+    throw error;
+  }
+}
+
 export const createTimer = async (timerData) => {
   try {
     const apiUrl = useApiUrl("/timers");
@@ -123,3 +144,35 @@ export const getTimersByTaskId = async (taskId, userId) => {
     throw error;
   }
 };
+
+export const getTimersByUserId = async (userId) => {
+  try {
+    const apiUrl = useApiUrl(`/timers/user/${userId}`);
+    const response = await fetch(apiUrl);
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw errorData || "Network response was not ok";
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching timers by user ID:", error);
+    throw error;
+  }
+};
+
+export const removeTask = async (taskId) => {
+  try {
+    const apiUrl = useApiUrl(`/tasks/${taskId}`);
+    const response = await fetch(apiUrl, {
+      method: "DELETE",
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw errorData || "Network response was not ok";
+    }
+    return null;
+  } catch (error) {
+    console.error("Error removing task:", error);
+    throw error;
+  }
+}

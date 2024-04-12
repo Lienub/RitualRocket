@@ -2,7 +2,7 @@ const { Task } = require("../models");
 
 const createTask = async (req, res) => {
   try {
-    const { name, description, iconType, color, repeat, repeatDays, repeatWeeks, repeatMonths, endDate, reminder, sound, is_completed, rappelTime, completedDate, habitId, userId, categoryId } = req.body;
+    const { name, description, iconType, color, repeat, repeatDays, repeatWeeks, repeatMonths, endDate, reminder, sound, is_completed, rappelTime, completedDate, habitId, userId, categoryId, startDate } = req.body;
     const task = await Task.create({ 
       name, 
       description, 
@@ -12,7 +12,7 @@ const createTask = async (req, res) => {
       repeatDays, 
       repeatWeeks, 
       repeatMonths, 
-      endDate, 
+      startDate: new Date(startDate) || new Date(), 
       reminder, 
       sound, 
       is_completed, 
@@ -20,7 +20,8 @@ const createTask = async (req, res) => {
       HabitId: habitId, 
       UserId: userId, 
       CategoryId: categoryId,
-      rappelTime
+      rappelTime,
+      endDate: new Date(endDate) || new Date(),
     });
     res.status(201).json(task);
   } catch (error) {
@@ -61,7 +62,7 @@ const getTaskById = async (req, res) => {
 };
 const updateTask = async (req, res) => {
   try {
-    const taskId = req.params.taskId;
+    const taskId = req.params.id;
     const updatedTask = await Task.update(req.body, { where: { id: taskId } });
     res.status(200).json(updatedTask);
   } catch (error) {
@@ -72,7 +73,7 @@ const updateTask = async (req, res) => {
 
 const deleteTask = async (req, res) => {
   try {
-    const taskId = req.params.taskId;
+    const taskId = req.params.id;
     await Task.destroy({ where: { id: taskId } });
     res.status(204).end();
   } catch (error) {

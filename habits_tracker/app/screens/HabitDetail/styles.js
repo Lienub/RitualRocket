@@ -67,7 +67,6 @@ export default StyleSheet.create({
   },
   statsContainer: {
     flexDirection: "column",
-    justifyContent: "space-around",
     marginTop: 20,
     backgroundColor: "#2D2D2D",
     height: 400,
