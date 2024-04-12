@@ -1,5 +1,5 @@
 // Native imports
-import { Platform } from 'react-native';
+import { Platform, useColorScheme } from 'react-native';
 // Navigation imports
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -53,14 +53,16 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer>
+    <NavigationContainer
+      style={{ marginBottom: 20 }}
+    >
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {!userExists ? (
           <>
             <Stack.Screen name="Signin" component={SigninScreen} />
             <Stack.Screen name="Signup" component={SignupScreen} />
             <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
-            <Stack.Screen name="Home" component={MainNavigation} />
+            <Stack.Screen name="MainNavigation" component={MainNavigation} />
           </>
         ) : (
           <Stack.Screen name="MainNavigation" component={MainNavigation} />
