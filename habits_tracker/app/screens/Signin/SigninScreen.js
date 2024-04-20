@@ -38,7 +38,6 @@ export default function SigninScreen({ navigation }) {
     androidClientId: ANDROID_CLIENT_ID,
     webClientId: WEB_CLIENT_ID,
     redirectUri: Platform.OS == "ios" ? REDIRECT_URL_IOS : REDIRECT_URL_ANDROID,
-    behavior: 'web',
   });
 
   useEffect(() => {
@@ -54,7 +53,6 @@ export default function SigninScreen({ navigation }) {
   });
 
   useEffect(() => {
-    console.log(response?.type);
     if (response?.type === "success" && response.authentication.accessToken) {
       signInWithGoogle(setUserData, response, "login", navigation);
     }
