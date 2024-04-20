@@ -3,7 +3,8 @@ import {
   IOS_CLIENT_ID,
   ANDROID_CLIENT_ID,
   WEB_CLIENT_ID,
-  REDIRECT_URL,
+  REDIRECT_URL_ANDROID,
+  REDIRECT_URL_IOS,
 } from "@env";
 import {
   SafeAreaView,
@@ -13,6 +14,7 @@ import {
   TouchableOpacity,
   View,
   ActivityIndicator,
+  Platform
 } from "react-native";
 import * as Google from "expo-auth-session/providers/google";
 import SocialMediaButton from "../../components/Buttons/SocialMediaButton";
@@ -35,8 +37,16 @@ export default function SigninScreen({ navigation }) {
     iosClientId: IOS_CLIENT_ID,
     androidClientId: ANDROID_CLIENT_ID,
     webClientId: WEB_CLIENT_ID,
-    redirectUri: REDIRECT_URL,
+    redirectUri: Platform.OS == "ios" ? REDIRECT_URL_IOS : REDIRECT_URL_ANDROID,
+    behavior: 'web',
   });
+
+  useEffect(() => {
+    console.log(response?.type);
+    if (response?.type === "success" && response.authentication.accessToken) {
+    console.log("SUCCESS", response);
+    }
+  }, [response]);
 
   const [userData, setUserData] = useState({
     email: "",
@@ -44,6 +54,7 @@ export default function SigninScreen({ navigation }) {
   });
 
   useEffect(() => {
+    console.log(response?.type);
     if (response?.type === "success" && response.authentication.accessToken) {
       signInWithGoogle(setUserData, response, "login", navigation);
     }
