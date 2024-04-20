@@ -9,31 +9,17 @@ import {
 } from "react-native";
 import { Appbar } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
-import { getUserInfo, changeUserInformations } from "../../services/users";
+import { getUserInfo, changeUserInformations, removeUserInfo } from "../../services/users";
 import styles from "./styles";
 import Images from "../../utils/constants/images";
 
-export default function ResetPasswordScreen({ navigation }) {
-  const [user, setUser] = useState("");
-  const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
+export default function ResetPasswordScreen({ navigation, route }) {
+  const { user } = route.params;
+  const [email, setEmail] = useState(user.email);
+  const [username, setUsername] = useState(user.username);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const userInfo = await getUserInfo();
-        setUser(userInfo);
-        setEmail(userInfo.email);
-        setUsername(userInfo.username);
-      } catch (error) {
-        console.error("Error fetching user info:", error);
-      }
-    };
-
-    fetchUserInfo();
-  }, []);
 
   const handleResetPassword = async () => {
     if (!email || !username) {
@@ -44,7 +30,7 @@ export default function ResetPasswordScreen({ navigation }) {
     setLoading(true);
     try {
       await changeUserInformations(email, username, user.userId);
-      navigation.navigate("Profile");
+      navigation.navigate("AuthNavigation");
     } catch (error) {
       setError("Erreur lors des modifications.");
     }

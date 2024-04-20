@@ -23,9 +23,8 @@ import styles from "./styles";
 import { on } from "events";
 
 export default function TaskFormScreen({ navigation, route }) {
-  const { habitId, categoryId, habitTitle } = route.params;
+  const { habitId, categoryId, habitTitle, user } = route.params;
   const [repeat, setRepeat] = useState("none");
-  const [user, setUser] = useState({});
   const [name, setName] = useState(habitTitle);
   const [description, setDescription] = useState("");
   const [iconType, setIconType] = useState("coffee");
@@ -89,19 +88,6 @@ export default function TaskFormScreen({ navigation, route }) {
     }
     setShowCalendar(false);
   };
-
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const userInfo = await getUserInfo();
-        setUser(userInfo);
-      } catch (error) {
-        console.error("Error fetching user info:", error);
-      }
-    };
-
-    fetchUserInfo();
-  }, []);
 
   const handleSubmit = async () => {
     try {

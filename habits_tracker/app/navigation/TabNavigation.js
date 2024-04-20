@@ -8,6 +8,9 @@ import { getUserInfo } from "../services/users";
 
 const Tab = createBottomTabNavigator();
 
+/**
+ * This navigation manages tab navigation of the application
+ */
 export default function TabNavigation() {
   const [user, setUser] = useState({});
   useEffect(() => {
