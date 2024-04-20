@@ -40,13 +40,6 @@ export default function SigninScreen({ navigation }) {
     redirectUri: Platform.OS == "ios" ? REDIRECT_URL_IOS : REDIRECT_URL_ANDROID,
   });
 
-  useEffect(() => {
-    console.log(response?.type);
-    if (response?.type === "success" && response.authentication.accessToken) {
-    console.log("SUCCESS", response);
-    }
-  }, [response]);
-
   const [userData, setUserData] = useState({
     email: "",
     password: "",
