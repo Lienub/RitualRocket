@@ -6,22 +6,45 @@ import { Ionicons } from "@expo/vector-icons";
 import { getUserInfo, removeUserInfo } from "../../services/users";
 import styles from "./styles";
 
-export default function ProfileScreen({ navigation }) {
-  const [user, setUser] = useState({});
+export default function ProfileScreen({ navigation, route }) {
+  const { user } = route.params;
+  const [csvData, setCsvData] = useState([]); 
   const isFocused = useIsFocused();
 
   useEffect(() => {
     if (isFocused) {
-      fetchUserInfo();
+      fetchUserTasks(); // Fetch tasks whenever user info is fetched or screen is focused
     }
   }, [isFocused]);
 
-  const fetchUserInfo = async () => {
+  const fetchUserTasks = async () => {
     try {
-      const userInfo = await getUserInfo();
-      setUser(userInfo);
+      if (user.userId) {
+        const userTasks = await getTasksByUserId(user.userId);
+        setCsvData(userTasks);
+      }
     } catch (error) {
-      console.error("Error fetching user info:", error);
+      console.error("Error fetching user tasks:", error);
+    }
+  };
+
+  const exportCSV = async () => {
+    try {
+      console.log(csvData)
+      const headers = Object.keys(csvData[0]).join(',') + '\n';
+      const csvContent = headers + csvData.map(row => Object.values(row).join(',')).join('\n');
+  
+      const filePath = `${FileSystem.documentDirectory}user_tasks.csv`;
+
+      await FileSystem.writeAsStringAsync(filePath, csvContent, { encoding: FileSystem.EncodingType.UTF8 });
+  
+      if (Platform.OS === 'ios' || Platform.OS === 'android') {
+        await Sharing.shareAsync(filePath);
+      } else {
+        console.error('Plateforme non supportée pour le partage de fichier.');
+      }
+    } catch (error) {
+      console.error('Erreur lors de la création ou du partage du fichier CSV:', error);
     }
   };
 
