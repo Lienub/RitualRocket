@@ -24,4 +24,12 @@ export default StyleSheet.create({
     margin: 10,
     alignSelf: "center",
   },
+  buttonRemove: {
+    backgroundColor: "#EC2C35",
+    padding: 10,
+    borderRadius: 5,
+    margin: 10,
+    alignSelf: "center",
+    fontWeight: "bold",
+  },
 });

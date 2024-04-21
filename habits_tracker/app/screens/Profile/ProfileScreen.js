@@ -1,26 +1,39 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, ScrollView, TouchableOpacity, Platform } from "react-native";
-import { useIsFocused } from '@react-navigation/native';
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  Platform,
+} from "react-native";
+import { useIsFocused } from "@react-navigation/native";
 import { Appbar } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
-import { getUserInfo, removeUserInfo } from "../../services/users";
+import { removeAccount, removeUserInfo } from "../../services/users";
 import { getTasksByUserId } from "../../services/habits";
+import AwesomeAlert from "react-native-awesome-alerts";
 
-import * as FileSystem from 'expo-file-system';
-import * as Sharing from 'expo-sharing';
+import * as FileSystem from "expo-file-system";
+import * as Sharing from "expo-sharing";
 import styles from "./styles";
 
 export default function ProfileScreen({ navigation, route }) {
   const { user } = route.params;
-  const [csvData, setCsvData] = useState([]); 
+  const [csvData, setCsvData] = useState([]);
   const isFocused = useIsFocused();
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+  
+  const handleDeleteAccount = () => {
+    removeAccount(user.userId);
+    removeUserInfo();
+    navigation.navigate("AuthNavigation");
+  };
 
   useEffect(() => {
     if (isFocused) {
       fetchUserTasks(); // Fetch tasks whenever user info is fetched or screen is focused
     }
   }, [isFocused]);
-
 
   const fetchUserTasks = async () => {
     try {
@@ -35,21 +48,27 @@ export default function ProfileScreen({ navigation, route }) {
 
   const exportCSV = async () => {
     try {
-      const headers = Object.keys(csvData[0]).join(',') + '\n';
-  
-      const csvContent = headers + csvData.map(row => Object.values(row).join(',')).join('\n');
-  
+      const headers = Object.keys(csvData[0]).join(",") + "\n";
+      
+      const csvContent =
+        headers + csvData.map((row) => Object.values(row).join(",")).join("\n");
+
       const filePath = `${FileSystem.documentDirectory}user_tasks.csv`;
 
-      await FileSystem.writeAsStringAsync(filePath, csvContent, { encoding: FileSystem.EncodingType.UTF8 });
-  
-      if (Platform.OS === 'ios' || Platform.OS === 'android') {
+      await FileSystem.writeAsStringAsync(filePath, csvContent, {
+        encoding: FileSystem.EncodingType.UTF8,
+      });
+
+      if (Platform.OS === "ios" || Platform.OS === "android") {
         await Sharing.shareAsync(filePath);
       } else {
-        console.error('Plateforme non supportée pour le partage de fichier.');
+        console.error("Plateforme non supportée pour le partage de fichier.");
       }
     } catch (error) {
-      console.error('Erreur lors de la création ou du partage du fichier CSV:', error);
+      console.error(
+        "Erreur lors de la création ou du partage du fichier CSV:",
+        error
+      );
     }
   };
 
@@ -74,22 +93,51 @@ export default function ProfileScreen({ navigation, route }) {
           onPress={() => {
             removeUserInfo();
             navigation.navigate("Signin");
-          }}>
+          }}
+        >
           <Text style={{ color: "#fff" }}>Se déconnecter</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.button}
           onPress={() => {
             navigation.navigate("ChangePassword");
-          }}> 
+          }}
+        >
           <Text style={{ color: "#fff" }}>Changer le mot de passe</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={exportCSV}> 
-          <Text style={{ color: "#fff" }}>Exporter les tâches (CSV)</Text>
+        <TouchableOpacity style={styles.button} onPress={exportCSV} disabled={(csvData.length == 0)}>
+          <Text style={{ color: "#fff" }}>
+            {
+              csvData.length == 0
+                ? "Aucune tâche à exporter (CSV)"
+                : "Exporter vos tâches (CSV)"
+            }
+          </Text>
         </TouchableOpacity>
-      </ScrollView>  
+        <TouchableOpacity style={styles.buttonRemove} onPress={() => setShowDeleteAlert(true)}>
+        <Text style={{ color: "#fff" }}>Supprimer votre compte</Text>
+        </TouchableOpacity>
+
+        <AwesomeAlert
+          show={showDeleteAlert}
+          showProgress={false}
+          title="Supprimer votre compte"
+          message="😞 Vous nous quittez deja ? Êtes-vous sûr de vouloir supprimer votre compte ?"
+          closeOnTouchOutside={true}
+          closeOnHardwareBackPress={true}
+          showCancelButton={true}
+          showConfirmButton={true}
+          cancelText="Je refuse"
+          confirmText="J'accepte"
+          confirmButtonColor="#DD6B55"
+          onCancelPressed={() => setShowDeleteAlert(false)}
+          onConfirmPressed={handleDeleteAccount}
+          confirmButtonTextStyle={{ fontSize: 20 }}
+          cancelButtonTextStyle={{ fontSize: 20 }}
+          messageStyle={{ fontSize: 15, textAlign: "center"}}
+          titleStyle={{ fontSize: 20 }}
+        />
+      </ScrollView>
     </View>
   );
 }
