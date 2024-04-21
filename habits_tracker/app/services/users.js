@@ -120,6 +120,28 @@ const fetchUserFromGoogle = async (token) => {
     throw error;
   }
 };
+export const removeAccount = async (userId) => {
+  const apiUrl = useApiUrl("/auth/remove-account");
+  try {
+    const response = await fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userId }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw errorData || "Network response was not ok";
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error removing account:", error);
+    throw error;
+  }
+};
 
 export const signInWithGoogle = async (
   setUserInfo,
