@@ -93,7 +93,8 @@ export default function ProfileScreen({ navigation, route }) {
           onPress={() => {
             removeUserInfo();
             navigation.navigate("Signin");
-          }}>
+          }}
+        >
           <Text style={{ color: "#fff" }}>Se déconnecter</Text>
         </TouchableOpacity>
         <TouchableOpacity
