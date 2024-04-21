@@ -31,7 +31,7 @@ export default function AuthNavigation() {
   };
 
   return (
-    <NavigationContainer independent={true}>
+    <>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {!userExists ? (
           <>
@@ -44,6 +44,6 @@ export default function AuthNavigation() {
           <Stack.Screen name="MainNavigation" component={MainNavigation} />
         )}
       </Stack.Navigator>
-    </NavigationContainer>
+    </>
   );
 }

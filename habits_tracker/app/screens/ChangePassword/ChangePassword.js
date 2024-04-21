@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { Appbar } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
-import { resetPassword, getUserInfo } from "../../services/users";
+import { resetPassword, removeUserInfo } from "../../services/users";
 import styles from "./styles";
 import Images from "../../utils/constants/images";
 
@@ -35,7 +35,8 @@ export default function ResetPasswordScreen({ navigation, route }) {
     setLoading(true);
     try {
       await resetPassword(email, newPassword);
-      navigation.navigate("AuthNavigation");
+      removeUserInfo();
+      navigation.navigate("Signin");
     } catch (error) {
       setError("Erreur lors de la réinitialisation du mot de passe.");
     }

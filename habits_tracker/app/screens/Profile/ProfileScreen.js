@@ -73,7 +73,7 @@ export default function ProfileScreen({ navigation, route }) {
           style={styles.button}
           onPress={() => {
             removeUserInfo();
-            navigation.navigate("AuthNavigation");
+            navigation.navigate("Signin");
           }}>
           <Text style={{ color: "#fff" }}>Se déconnecter</Text>
         </TouchableOpacity>
