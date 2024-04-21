@@ -5,9 +5,9 @@ import HabitsListScreen from "../screens/Habits/HabitsList/HabitsList";
 import TaskFormScreen from "../screens/Habits/HabitForm/TaskForm";
 import HabitDetailScreen from "../screens/HabitDetail/HabitDetail";
 import TabNavigation from "./TabNavigation";
+import AuthNavigation from "./AuthNavigation";
 import ProfileScreen from "../screens/Profile/ProfileScreen";
 import ChangePassword from "../screens/ChangePassword/ChangePassword";
-import AuthNavigation from "../navigation/AuthNavigation";
 import ChangeInformations from "../screens/ChangeInformations/ChangeInformations";
 import { getUserInfo } from "../services/users";
 
@@ -18,7 +18,7 @@ const Stack = createNativeStackNavigator();
  * when the user is logged in
  */
 export default function MainNavigation() {
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState(null);
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
@@ -33,7 +33,7 @@ export default function MainNavigation() {
   }, []);
   return (
     <>
-      {user.userId ? (
+      {user ? (
         <Stack.Navigator
           initialRouteName="TabNavigation"
           screenOptions={{ headerShown: false }}
@@ -45,12 +45,12 @@ export default function MainNavigation() {
           <Stack.Screen name="HabitDetail" component={HabitDetailScreen} initialParams={{ user }} />
           <Stack.Screen name="Profile" component={ProfileScreen}  initialParams={{ user }} />
           <Stack.Screen name="ChangePassword" component={ChangePassword} initialParams={{ user }} />
-          <Stack.Screen name="AuthNavigation" component={AuthNavigation} />
           <Stack.Screen
             name="ChangeInformations"
             component={ChangeInformations}
             initialParams={{ user }}
           />
+          <Stack.Screen name="AuthNavigation" component={AuthNavigation} />
         </Stack.Navigator>
       ) : (
         <></>

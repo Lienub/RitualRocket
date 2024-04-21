@@ -12,7 +12,7 @@ const Tab = createBottomTabNavigator();
  * This navigation manages tab navigation of the application
  */
 export default function TabNavigation() {
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState(null);
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
@@ -28,7 +28,7 @@ export default function TabNavigation() {
   return (
     <>
       {
-        (user.userId) ? (
+        (user) ? (
           <Tab.Navigator initialRouteName="Home">
           <Tab.Screen
             name="Home"
