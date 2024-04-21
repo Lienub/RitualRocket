@@ -32,4 +32,9 @@ module.exports = [
     method : "post",
     func : controller.changeInformations,
   },
+  {
+    url : "/auth/remove-account",
+    method : "post",
+    func : controller.removeAccount,
+  }
 ];

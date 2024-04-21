@@ -175,6 +175,22 @@ const changeInformations = async (req, res) => {
   }
 }
 
+const removeAccount = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const user = await Users.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+
+    await user.destroy();
+
+    res.status(200).json({ message: "Compte supprimé avec succès" });
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 module.exports = {
   register,
   login,
@@ -182,4 +198,5 @@ module.exports = {
   resetPassword,
   verifyGoogleId,
   changeInformations,
+  removeAccount
 };
