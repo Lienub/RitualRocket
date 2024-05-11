@@ -21,6 +21,7 @@ export default function HomeScreen({ navigation, route }) {
     }
   }, [isFocused]);
   const [timer, setTimer] = useState(0);
+  console.log("route", route.params);
   const { user } = route.params;
   const [tasks, setTasks] = useState([]);
   const [filteredTasks, setFilteredTasks] = useState([]);
@@ -29,6 +30,7 @@ export default function HomeScreen({ navigation, route }) {
     new Date().toISOString().split("T")[0]
   );
 
+  console.log(user);
   const updateTaskStatus = async (task, status) => {
     const taskData = {
       is_completed: status === "done",
@@ -61,7 +63,7 @@ export default function HomeScreen({ navigation, route }) {
     fetchTasks();
   }, [user]);
 
-  useEffect(() => {}, [tasks]);
+  useEffect(() => { }, [tasks]);
 
   useEffect(() => {
     const filteredTasks = tasks.filter((task) => {
@@ -103,13 +105,6 @@ export default function HomeScreen({ navigation, route }) {
   return (
     <View style={styles.container}>
       <Appbar.Header style={styles.appbar}>
-        <Appbar.Action
-          icon="account-circle"
-          onPress={() => navigation.navigate("Profile")}
-          color="#fff"
-          size={40}
-          style={{ marginLeft: "auto" }}
-        />
         <Appbar.Content title={"Bienvenue " + user.username} color="#fff" />
       </Appbar.Header>
       <View style={styles.block}>
@@ -152,7 +147,7 @@ export default function HomeScreen({ navigation, route }) {
         <ScrollView style={styles.taskList}>
           <Text style={styles.title}>Consultez vos habitudes du jour!</Text>
           <>
-          <CircularProgressBar date={selectedDate} user={user} />
+            <CircularProgressBar date={selectedDate} user={user} />
           </>
           {filteredTasks.length > 0 ? (
             filteredTasks.map((task) => (

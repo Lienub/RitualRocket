@@ -64,6 +64,8 @@ export default function TaskFormScreen({ navigation, route }) {
   const [isMonthly, setIsMonthly] = useState(false);
   const [loadingIcons, setLoadingIcons] = useState(true);
   const [originalIcons, setOriginalIcons] = useState([]);
+  const [timeToSpendAsDate, setTimeToSpendAsDate] = useState(new Date());
+  const [timeToSpend, setTimeToSpend] = useState(new Date().toISOString().split("T")[1].split(".")[0])
   const [icons, setIcons] = useState([]);
   const scheme = useColorScheme();
   const styles = useMemo(() => getStyles(scheme));
@@ -164,6 +166,15 @@ export default function TaskFormScreen({ navigation, route }) {
     setSelectedInput(mode);
     setShowCalendar(true);
   };
+
+  const handleTimeToSpend = (selectedTime) => {
+    const current = selectedTime || new Date();
+    console.log(current);
+    let time = current.toISOString().split("T")[1].split(".")[0];
+    if (rappelTime == time) { return; }
+    setRappelTime(time);
+    setRappelTimeAsDate(selectedTime)
+  }
 
   const handleIconSearch = (text) => {
     setSearchIcon(text.toLowerCase());
@@ -517,26 +528,40 @@ export default function TaskFormScreen({ navigation, route }) {
         <StyleContainer
           label="Gestion du temps"
         >
-          {/* Start date, End date*/}
-          <StyleContainer
-            label="Début"
-          >
-            <NiceTextButton
-              text={startDate ? startDate : "YYYY-MM-DD"}
-              onChangeText={handleStartDateChange}
-              onPressIn={() => handleShowCalendar("startDate")}
-            />
-          </StyleContainer>
-          <StyleContainer
-            label="Fin"
-          >
-            <NiceTextButton
-              text={endDate ? endDate : "YYYY-MM-DD"}
-              onChangeText={handleEndDateChange}
-              onPressIn={() => handleShowCalendar("endDate")}
-            />
+          <View style={{ display: 'flex', flexDirection: 'row' }}>
+            {/* Start date, End date*/}
+            <View>
+              <StyleContainer
+                label="Début"
+              >
+                <NiceTextButton
+                  text={startDate ? startDate : "YYYY-MM-DD"}
+                  onChangeText={handleStartDateChange}
+                  onPressIn={() => handleShowCalendar("startDate")}
+                />
+              </StyleContainer>
+              <StyleContainer
+                label="Fin"
+              >
+                <NiceTextButton
+                  text={endDate ? endDate : "YYYY-MM-DD"}
+                  onChangeText={handleEndDateChange}
+                  onPressIn={() => handleShowCalendar("endDate")}
+                />
 
-          </StyleContainer>
+              </StyleContainer>
+            </View>
+            {/* Time per day */}
+            <StyleContainer
+              label="Temps par jour"
+            >
+              <DateTimePicker
+                value={timeToSpendAsDate}
+                mode="time"
+                onChange={handleTimeToSpend}
+              />
+            </StyleContainer>
+          </View>
           {/* Frequency selector */}
           <StyleContainer
             label="Fréquence"
