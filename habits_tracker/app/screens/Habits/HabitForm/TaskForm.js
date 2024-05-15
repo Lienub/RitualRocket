@@ -20,7 +20,6 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { getUserInfo } from "../../../services/users";
 import { createTask, createHabit } from "../../../services/habits";
 import styles from "./styles";
-import { on } from "events";
 
 export default function TaskFormScreen({ navigation, route }) {
   const { habitId, categoryId, habitTitle, user } = route.params;
