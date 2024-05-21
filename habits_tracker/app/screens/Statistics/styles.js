@@ -31,6 +31,19 @@ export const getStyles = (mode) => {
       marginLeft: 30,
       marginTop: 20,
     },
+    subtitle: {
+      color: colors.text,
+      fontSize: 25,
+      marginTop: 40,
+      marginLeft: 40,
+      fontWeight: "bold",
+    },
+    subsubtitle: {
+      color: colors.text,
+      fontSize: 15,
+      textAlign: "center",
+      fontWeight: "bold",
+    },
     taskItem: {
       backgroundColor: colors.background,
       borderRadius: 10,

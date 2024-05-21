@@ -6,10 +6,10 @@ import { Appbar } from "react-native-paper";
 import { getTasksByUserId, updateTask } from "../../services/habits";
 import TimerView from "../../components/Timer/TimerView";
 import { createTimer } from "../../services/habits";
-import styles from "./styles";
 import { useIsFocused } from "@react-navigation/native";
 import CircularProgressBar from "../../components/CircularProgressBar/CiruclarProgressBar";
 import { getStyles } from "./styles";
+import { COLORS } from "../../utils/constants/colors";
 
 export default function HomeScreen({ navigation, route }) {
   const scheme = useColorScheme();
@@ -21,7 +21,6 @@ export default function HomeScreen({ navigation, route }) {
     }
   }, [isFocused]);
   const [timer, setTimer] = useState(0);
-  console.log("route", route.params);
   const { user } = route.params;
   const [tasks, setTasks] = useState([]);
   const [filteredTasks, setFilteredTasks] = useState([]);
@@ -30,7 +29,6 @@ export default function HomeScreen({ navigation, route }) {
     new Date().toISOString().split("T")[0]
   );
 
-  console.log(user);
   const updateTaskStatus = async (task, status) => {
     const taskData = {
       is_completed: status === "done",
@@ -75,6 +73,10 @@ export default function HomeScreen({ navigation, route }) {
       const selectedDayOfWeek = new Date(selectedDate)
         .toLocaleString("en-US", { weekday: "long" })
         .toLowerCase();
+
+      console.log("DATE: ", startDate, " - ", endDate);
+      console.log("repeatDaysArray: ", repeatDaysArray);
+      console.log("selectedDayOfWeek", selectedDayOfWeek);
       if (task.repeat === "none" && startDate === selectedDate) {
         return true;
       }
@@ -86,6 +88,7 @@ export default function HomeScreen({ navigation, route }) {
       }
       return false;
     });
+    console.log(filteredTasks)
     setFilteredTasks(filteredTasks);
   }, [selectedDate, tasks]);
 
@@ -126,16 +129,16 @@ export default function HomeScreen({ navigation, route }) {
             duration: 300,
           }}
           style={styles.calendarStrip}
-          calendarHeaderStyle={{ color: "#fff", fontSize: 20 }}
-          dateNumberStyle={{ color: "white", fontSize: 20 }}
-          dateNameStyle={{ color: "white", fontSize: 10 }}
+          calendarHeaderStyle={{ color: COLORS[scheme].text, fontSize: 20 }}
+          dateNumberStyle={{ color: COLORS[scheme].text, fontSize: 20 }}
+          dateNameStyle={{ color: COLORS[scheme].text, fontSize: 10 }}
           highlightDateNumberStyle={{
-            color: "yellow",
+            color: "orange",
             fontSize: 23,
             fontWeight: "bold",
           }}
           highlightDateNameStyle={{
-            color: "yellow",
+            color: "orange",
             fontSize: 14,
             fontWeight: "bold",
           }}
@@ -154,9 +157,13 @@ export default function HomeScreen({ navigation, route }) {
               <ListItem
                 key={task.id}
                 containerStyle={{
-                  backgroundColor: task.is_completed ? "#42A445" : "#363636",
+                  backgroundColor: task.is_completed ? "#42A445" : COLORS[scheme].tertiary,
                   alignSelf: "center",
                   marginTop: 5,
+                  borderRadius: "10",
+                  borderWidth: "3",
+                  borderColor: COLORS[scheme].primary,
+                  width:"95%"
                 }}
                 onPress={() =>
                   navigation.navigate("HabitDetail", {

@@ -1,19 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Text,
   View,
   ScrollView,
   Dimensions,
   ProgressBarAndroid,
+  useColorScheme,
 } from "react-native";
 import { Appbar } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
 import { Icon } from "react-native-elements";
-import styles from "./styles";
+import { getStyles } from "./styles";
 import { BarChart } from "react-native-chart-kit";
 import { getTimersByTaskId, removeTask } from "../../services/habits";
 
 export default function HabitDetailScreen({ navigation, route }) {
+  const scheme = useColorScheme();
+  const styles = useMemo(() => getStyles(scheme));
   const { task, userId } = route.params;
   const [chartDays, setChartDays] = useState([]);
   const [timeSpent, setTimeSpent] = useState({});

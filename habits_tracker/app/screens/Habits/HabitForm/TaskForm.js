@@ -31,11 +31,15 @@ function convertDays(arr) {
     "saturday"
   ];
 
-  const res = arr.filter((dayIndex) => dayIndex !== -1)
+  let res = arr.filter((dayIndex) => dayIndex !== -1)
     .map((dayIndex) => {
       return daysOfWeek[dayIndex - 1];
     })
     .join(",")
+
+  if(res == [""]) {
+    res = "monday";
+  }
 
   return res;
 }
@@ -106,6 +110,20 @@ export default function TaskFormScreen({ navigation, route }) {
 
     initIcons();
   }, []);
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const userInfo = await getUserInfo();
+        setUser(userInfo);
+      } catch (error) {
+        console.error("Error fetching user info:", error);
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
+
 
   // Generate icon components
   const generateIconComponents = async (iconNames) => {
@@ -204,6 +222,7 @@ export default function TaskFormScreen({ navigation, route }) {
     }
 
     try {
+
       const taskData = {
         name,
         description,
@@ -234,6 +253,7 @@ export default function TaskFormScreen({ navigation, route }) {
       }
 
       const taskResponse = await createTask(taskData);
+      console.log("RESPONSE", taskResponse);
       navigation.navigate('TabNavigation');
     } catch (error) {
       console.error("Error creating task:", error);

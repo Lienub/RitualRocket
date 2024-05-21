@@ -125,13 +125,7 @@ export default function StatisticsScreen({ navigation, route }) {
                 }}
               >
                 <Text
-                  style={{
-                    color: "white",
-                    fontSize: 25,
-                    marginTop: 40,
-                    marginLeft: 40,
-                    fontWeight: "bold",
-                  }}
+                  style={styles.subtitle}
                 >
                   Temps passé par mois
                 </Text>
@@ -161,23 +155,12 @@ export default function StatisticsScreen({ navigation, route }) {
                 paddingBottom: "333px"
               }}>
                 <Text
-                  style={{
-                    color: "white",
-                    fontSize: 25,
-                    marginTop: 40,
-                    marginLeft: 40,
-                    fontWeight: "bold",
-                  }}
+                  style={styles.subtitle}
                 >
                   Temps passé cette semaine
                 </Text>
                 <Text
-                  style={{
-                    color: "white",
-                    fontSize: 15,
-                    textAlign: "center",
-                    fontWeight: "bold",
-                  }}
+                  style={styles.subsubtitle}
                 >
                   {startDate.toLocaleDateString("fr-FR")} -{" "}
                   {endDate.toLocaleDateString("fr-FR")}
