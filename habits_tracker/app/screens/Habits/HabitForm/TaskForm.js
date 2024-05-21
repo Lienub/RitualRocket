@@ -195,19 +195,6 @@ export default function TaskFormScreen({ navigation, route }) {
     setShowCalendar(false);
   };
 
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const userInfo = await getUserInfo();
-        setUser(userInfo);
-      } catch (error) {
-        console.error("Error fetching user info:", error);
-      }
-    };
-
-    fetchUserInfo();
-  }, []);
-
   const handleSubmit = async () => {
     if (startDate === "" || endDate === "") {
       Alert.alert("Erreur", "Veuillez sélectionner une date de début et une date de fin");

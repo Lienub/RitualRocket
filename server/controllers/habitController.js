@@ -16,7 +16,6 @@ const createHabit = async (req, res) => {
     res.status(201).json(habit);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -27,7 +26,6 @@ const createHabitByUserId = async (req, res) => {
     res.status(201).json(habit);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -38,7 +36,6 @@ const removeHabitById = async (req, res) => {
     res.status(204).end();
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -51,7 +48,6 @@ const updateHabitById = async (req, res) => {
     res.status(200).json(updatedHabit);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -65,7 +61,6 @@ const getAllHabits = async (req, res) => {
     res.status(200).json(habits);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -84,7 +79,6 @@ const getAllHabitsByCategory = async (req, res) => {
     res.status(200).json(habits);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -97,7 +91,6 @@ const getAllHabitsByUserId = async (req, res) => {
     res.status(200).json(habits);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
   }
 };
 

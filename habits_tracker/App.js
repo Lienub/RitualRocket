@@ -15,8 +15,12 @@ import ResetPasswordScreen from "./app/screens/ResetPassword/ResetPassword";
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import AuthNavigation from "./app/navigation/AuthNavigation";
+import { LogBox } from "react-native";
 
 const Stack = createNativeStackNavigator();
+
+LogBox.ignoreAllLogs();
 
 export default function App() {
   const [userExists, setUserExists] = useState(false);
@@ -57,16 +61,7 @@ export default function App() {
       style={{ marginBottom: 20 }}
     >
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {!userExists ? (
-          <>
-            <Stack.Screen name="Signin" component={SigninScreen} />
-            <Stack.Screen name="Signup" component={SignupScreen} />
-            <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
-            <Stack.Screen name="MainNavigation" component={MainNavigation} />
-          </>
-        ) : (
-          <Stack.Screen name="MainNavigation" component={MainNavigation} />
-        )}
+        <Stack.Screen name="AuthNavigation" component={AuthNavigation} />
       </Stack.Navigator>
     </NavigationContainer>
   );

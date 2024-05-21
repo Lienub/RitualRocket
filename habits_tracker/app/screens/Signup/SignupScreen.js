@@ -3,7 +3,8 @@ import {
   IOS_CLIENT_ID,
   ANDROID_CLIENT_ID,
   WEB_CLIENT_ID,
-  REDIRECT_URL,
+  REDIRECT_URL_ANDROID,
+  REDIRECT_URL_IOS,
 } from "@env";
 import {
   SafeAreaView,
@@ -13,6 +14,7 @@ import {
   TouchableOpacity,
   View,
   ActivityIndicator,
+  Platform
 } from "react-native";
 import * as Google from "expo-auth-session/providers/google";
 import SocialMediaButton from "../../components/Buttons/SocialMediaButton";
@@ -33,7 +35,7 @@ export default function SignupScreen({ navigation }) {
     iosClientId: IOS_CLIENT_ID,
     androidClientId: ANDROID_CLIENT_ID,
     webClientId: WEB_CLIENT_ID,
-    redirectUri: REDIRECT_URL,
+    redirectUri: Platform.OS == "ios" ? REDIRECT_URL_IOS : REDIRECT_URL_ANDROID,
   });
 
   const [userData, setUserData] = useState({
@@ -57,7 +59,7 @@ export default function SignupScreen({ navigation }) {
         try {
           const response = await register(userData);
           await storeUserInfoInStorage(response);
-          navigation.navigate("MainNavigation");
+          navigation.navigate("Home");
         } catch (error) {
           if (error.status === "username_failed") setErrorUsername(error.message);
           else if (error.status === "email_failed") setErrorMail(error.message);

@@ -9,29 +9,18 @@ import {
 } from "react-native";
 import { Appbar } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
-import { resetPassword, getUserInfo } from "../../services/users";
+import { resetPassword, removeUserInfo } from "../../services/users";
 import styles from "./styles";
 import Images from "../../utils/constants/images";
 
-export default function ResetPasswordScreen({ navigation }) {
-  const [email, setEmail] = useState("");
+export default function ResetPasswordScreen({ navigation, route }) {
+  const { user } = route.params;
+  const email = user.email;
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const userInfo = await getUserInfo();
-        setEmail(userInfo.email);
-      } catch (error) {
-        console.error("Error fetching user info:", error);
-      }
-    };
-
-    fetchUserInfo();
-  }, []);
 
   const handleResetPassword = async () => {
     if (!email || !newPassword || !confirmPassword) {
@@ -46,6 +35,7 @@ export default function ResetPasswordScreen({ navigation }) {
     setLoading(true);
     try {
       await resetPassword(email, newPassword);
+      removeUserInfo();
       navigation.navigate("Signin");
     } catch (error) {
       setError("Erreur lors de la réinitialisation du mot de passe.");

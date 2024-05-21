@@ -24,10 +24,10 @@
         "foregroundImage": "./app/assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.anonymous.habits_tracker",
-      "scheme": "habits_tracker"
+      "bundleIdentifier": "com.anonymous.habits_tracker",
+      "package": "com.anonymous.habits_tracker"
     },
-    "scheme":"habitstracker",
+    "scheme":"habits_tracker",
     "web": {
       "favicon": "./app/assets/images/favicon.png"
     },
