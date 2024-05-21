@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
   Platform,
+  useColorScheme,
 } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
 import { Appbar } from "react-native-paper";
@@ -15,14 +16,16 @@ import AwesomeAlert from "react-native-awesome-alerts";
 
 import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
-import styles from "./styles";
+import { getStyles } from './styles';
 
 export default function ProfileScreen({ navigation, route }) {
   const { user } = route.params;
   const [csvData, setCsvData] = useState([]);
   const isFocused = useIsFocused();
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
-  
+  const scheme = useColorScheme();
+  const styles = useMemo(() => getStyles(scheme))
+
   const handleDeleteAccount = () => {
     removeAccount(user.userId);
     removeUserInfo();

@@ -4,7 +4,7 @@ import { COLORS } from '../utils/constants/colors';
 
 export const StyleContainer = ({ ...props }) => {
   const scheme = useColorScheme();
-  const styles = useMemo(() => getStyles(scheme));
+  const styles = useMemo(() => getStyles(scheme, props.custom));
 
   return (
     <View style={styles.field}>
@@ -23,7 +23,7 @@ export const StyleContainer = ({ ...props }) => {
   )
 }
 
-const getStyles = (scheme) => StyleSheet.create({
+const getStyles = (scheme, custom = undefined) => StyleSheet.create({
   field: {
     borderWidth: 2,
     borderColor: COLORS[scheme].primary,
@@ -35,7 +35,7 @@ const getStyles = (scheme) => StyleSheet.create({
     position: 'absolute',
     top: -10,
     left: 10,
-    backgroundColor: COLORS[scheme].background,
+    backgroundColor: custom !== undefined ? custom : COLORS[scheme].background,
     paddingHorizontal: 5,
   },
   label: {

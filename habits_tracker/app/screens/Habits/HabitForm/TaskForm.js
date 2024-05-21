@@ -18,6 +18,7 @@ import { getUserInfo } from "../../../services/users";
 import { createTask, createHabit } from "../../../services/habits";
 import { getStyles } from "./styles";
 import { useSharedValue } from "react-native-reanimated";
+import { COLORS } from "../../../utils/constants/colors";
 
 function convertDays(arr) {
   const daysOfWeek = [
@@ -156,6 +157,7 @@ export default function TaskFormScreen({ navigation, route }) {
   };
   const handleRappelChange = (event, selectedTime) => {
     const current = selectedTime || new Date();
+    console.log("CURRENT RAPPEL", current);
     let time = current.toISOString().split("T")[1].split(".")[0];
     if (rappelTime == time) { return; }
     setRappelTime(time);
@@ -167,9 +169,9 @@ export default function TaskFormScreen({ navigation, route }) {
     setShowCalendar(true);
   };
 
-  const handleTimeToSpend = (selectedTime) => {
+  const handleTimeToSpend = (event, selectedTime) => {
     const current = selectedTime || new Date();
-    console.log(current);
+    console.log("CURRENT", current);
     let time = current.toISOString().split("T")[1].split(".")[0];
     if (rappelTime == time) { return; }
     setRappelTime(time);
@@ -356,7 +358,7 @@ export default function TaskFormScreen({ navigation, route }) {
             setShowFreqModal(false);
           }}
         >
-          <Text >Choisissez les jours de rappel</Text>
+          <Text style={styles.title}>Choisissez les jours de rappel</Text>
           <DayPicker
             weekdays={weekdays}
             setWeekdays={setWeekdays}
@@ -368,6 +370,7 @@ export default function TaskFormScreen({ navigation, route }) {
           {rappelHint && <Text style={{ color: 'red' }}>Vous devez choisir au moins un jour de la semaine !</Text>}
           <StyleContainer
             label="Heure"
+            custom="#303030"
           >
             <DateTimePicker
               value={rappelTimeAsDate}
@@ -540,7 +543,7 @@ export default function TaskFormScreen({ navigation, route }) {
             </View>
             {/* Time per day */}
             <StyleContainer
-              label="Temps par jour"
+              label="Temps"
             >
               <DateTimePicker
                 value={timeToSpendAsDate}

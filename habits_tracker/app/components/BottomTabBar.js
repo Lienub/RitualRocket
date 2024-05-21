@@ -83,11 +83,10 @@ const renderTab = (route, index, state, descriptors, scheme, navigation) => {
     icon = 'home';
   } else if (route.name === 'Profile') {
     icon = 'person';
-
-  } else if (route.name === 'Calendar') {
-    icon = 'calendar-today';
-  } else if (route.name === 'Completed') {
-    icon = 'check-circle';
+  } else if (route.name === 'Catégories') {
+    icon = 'folder';
+  } else if (route.name === 'Settings') {
+    icon = 'settings'
   } else {
     icon = 'circle'; // Default icon
   }
