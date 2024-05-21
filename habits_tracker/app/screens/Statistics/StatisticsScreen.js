@@ -1,17 +1,19 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, ScrollView, Button, Dimensions } from "react-native";
+import React, { useState, useEffect, useMemo } from "react";
+import { View, Text, ScrollView, Button, Dimensions, useColorScheme } from "react-native";
 import { Appbar } from "react-native-paper";
 import { LineChart } from "react-native-chart-kit";
 import { useIsFocused } from "@react-navigation/native";
 import { getTimersByUserId } from "../../services/habits";
-import styles from "./styles";
+import { getStyles } from "./styles";
 
 export default function StatisticsScreen({ navigation, route }) {
   const isFocused = useIsFocused();
-  const {user} = route.params;
+  const { user } = route.params;
   const [timers, setTimers] = useState([]);
   const today = new Date();
   const currentDayOfWeek = today.getDay();
+  const scheme = useColorScheme();
+  const styles = useMemo(() => getStyles(scheme));
 
   const startDate = new Date(today);
   startDate.setDate(startDate.getDate() - currentDayOfWeek);
@@ -105,113 +107,89 @@ export default function StatisticsScreen({ navigation, route }) {
 
   return (
     <View style={styles.container}>
-      <Appbar.Header style={styles.appbar}>
-        <Appbar.Action
-          icon="account-circle"
-          onPress={() => navigation.navigate("Profile")}
-          color="#fff"
-          size={40}
-          style={{ marginLeft: "auto" }}
-        />
-        <Appbar.Content title={""} color="#fff" />
-      </Appbar.Header>
-      <ScrollView style={styles.block}>
-        {(user.username && user.username !== "") ? (
-          <>
-            <Text style={styles.title}>
-              Progressions /{"\n"}
-              Statistiques
-            </Text>
-            <View>
-              <Text
+      <View style={styles.subcontainer}>
+        <Appbar.Header style={styles.appbar}>
+          <Appbar.Content title={"Vos statistiques, " + user.username} color="#fff" />
+        </Appbar.Header>
+        <ScrollView style={styles.block}>
+          {(user.username && user.username !== "") ? (
+            <>
+              <Text style={styles.title}>
+                Progressions /
+                Statistiques
+              </Text>
+              <View
                 style={{
-                  color: "white",
-                  fontSize: 25,
-                  marginTop: 40,
-                  marginLeft: 40,
-                  fontWeight: "bold",
+                  justifyContent: "center",
+                  alignItems: "center",
                 }}
               >
-                Temps passé par mois
-              </Text>
-              <LineChart
-                data={lineChartDataMonths}
-                width={Dimensions.get("window").width}
-                height={Dimensions.get("window").height / 2}
-                formatYLabel={(yValue) => yValue + "s"}
-                chartConfig={{
-                  backgroundColor: "#e26a00",
-                  backgroundGradientFrom: "#fb8c00",
-                  backgroundGradientTo: "#ffa726",
-                  decimalPlaces: 2,
-                  color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-                  style: {},
-                }}
-                bezier
-                style={{
-                  marginVertical: 8,
-                  marginTop: 20,
-                  borderTopColor: "white",
-                  borderTopWidth: 4,
-                  borderBottomColor: "white",
-                  borderBottomWidth: 4,
-                }}
-              />
-            </View>
-            <View style={{ marginTop: 0 }}>
-              <Text
-                style={{
-                  color: "white",
-                  fontSize: 25,
-                  marginTop: 40,
-                  marginLeft: 40,
-                  fontWeight: "bold",
-                }}
-              >
-                Temps passé cette semaine
-              </Text>
-              <Text
-                style={{
-                  color: "white",
-                  fontSize: 15,
-                  textAlign: "center",
-                  fontWeight: "bold",
-                }}
-              >
-                {startDate.toLocaleDateString("fr-FR")} -{" "}
-                {endDate.toLocaleDateString("fr-FR")}
-              </Text>
-              <LineChart
-                data={lineChartDataLastDays}
-                width={Dimensions.get("window").width}
-                height={Dimensions.get("window").height / 2}
-                formatYLabel={(yValue) => yValue + "s"}
-                chartConfig={{
-                  backgroundColor: "#e26a00",
-                  backgroundGradientFrom: "#fb8c00",
-                  backgroundGradientTo: "#ffa726",
-                  decimalPlaces: 2,
-                  color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-                  style: {},
-                }}
-                bezier
-                style={{
-                  marginVertical: 8,
-                  marginTop: 20,
-                  borderTopColor: "white",
-                  borderTopWidth: 4,
-                  borderBottomColor: "white",
-                  borderBottomWidth: 4,
-                }}
-              />
-            </View>
-          </>
-        ) : 
-        (
-          <Text style={styles.noTasks}>Pas d'habitudes à cette date</Text>
-        )
-        }
-      </ScrollView>
+                <Text
+                  style={styles.subtitle}
+                >
+                  Temps passé par mois
+                </Text>
+                <LineChart
+                  data={lineChartDataMonths}
+                  width={Dimensions.get("window").width * 0.9}
+                  height={Dimensions.get("window").height / 2 * 0.9}
+                  formatYLabel={(yValue) => yValue + "s"}
+                  chartConfig={{
+                    backgroundColor: "#e26a00",
+                    backgroundGradientFrom: "#fb8c00",
+                    backgroundGradientTo: "#ffa726",
+                    decimalPlaces: 2,
+                    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                    style: {
+                    },
+
+                  }}
+                  bezier
+                  style={styles.chart}
+                />
+              </View>
+              <View style={{
+                marginTop: 0,
+                justifyContent: "center",
+                alignItems: "center",
+                paddingBottom: "333px"
+              }}>
+                <Text
+                  style={styles.subtitle}
+                >
+                  Temps passé cette semaine
+                </Text>
+                <Text
+                  style={styles.subsubtitle}
+                >
+                  {startDate.toLocaleDateString("fr-FR")} -{" "}
+                  {endDate.toLocaleDateString("fr-FR")}
+                </Text>
+                <LineChart
+                  data={lineChartDataLastDays}
+                  width={Dimensions.get("window").width * 0.9}
+                  height={Dimensions.get("window").height / 2 * 0.9}
+                  formatYLabel={(yValue) => yValue + "s"}
+                  chartConfig={{
+                    backgroundColor: "#e26a00",
+                    backgroundGradientFrom: "#fb8c00",
+                    backgroundGradientTo: "#ffa726",
+                    decimalPlaces: 2,
+                    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                    style: {},
+                  }}
+                  bezier
+                  style={styles.chart}
+                />
+              </View>
+            </>
+          ) :
+            (
+              <Text style={styles.noTasks}>Pas d'habitudes à cette date</Text>
+            )
+          }
+        </ScrollView>
+      </View>
     </View>
   );
 }

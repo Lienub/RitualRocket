@@ -1,16 +1,19 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, ScrollView, Button } from "react-native";
+import React, { useState, useEffect, useMemo } from "react";
+import { View, Text, ScrollView, Button, useColorScheme } from "react-native";
 import { ListItem, Icon } from "react-native-elements";
 import CalendarStrip from "react-native-calendar-strip";
 import { Appbar } from "react-native-paper";
 import { getTasksByUserId, updateTask } from "../../services/habits";
 import TimerView from "../../components/Timer/TimerView";
 import { createTimer } from "../../services/habits";
-import styles from "./styles";
 import { useIsFocused } from "@react-navigation/native";
 import CircularProgressBar from "../../components/CircularProgressBar/CiruclarProgressBar";
+import { getStyles } from "./styles";
+import { COLORS } from "../../utils/constants/colors";
 
 export default function HomeScreen({ navigation, route }) {
+  const scheme = useColorScheme();
+  const styles = useMemo(() => getStyles(scheme))
   const isFocused = useIsFocused();
   useEffect(() => {
     if (isFocused) {
@@ -58,7 +61,7 @@ export default function HomeScreen({ navigation, route }) {
     fetchTasks();
   }, [user]);
 
-  useEffect(() => {}, [tasks]);
+  useEffect(() => { }, [tasks]);
 
   useEffect(() => {
     const filteredTasks = tasks.filter((task) => {
@@ -70,6 +73,10 @@ export default function HomeScreen({ navigation, route }) {
       const selectedDayOfWeek = new Date(selectedDate)
         .toLocaleString("en-US", { weekday: "long" })
         .toLowerCase();
+
+      console.log("DATE: ", startDate, " - ", endDate);
+      console.log("repeatDaysArray: ", repeatDaysArray);
+      console.log("selectedDayOfWeek", selectedDayOfWeek);
       if (task.repeat === "none" && startDate === selectedDate) {
         return true;
       }
@@ -81,6 +88,7 @@ export default function HomeScreen({ navigation, route }) {
       }
       return false;
     });
+    console.log(filteredTasks)
     setFilteredTasks(filteredTasks);
   }, [selectedDate, tasks]);
 
@@ -100,13 +108,6 @@ export default function HomeScreen({ navigation, route }) {
   return (
     <View style={styles.container}>
       <Appbar.Header style={styles.appbar}>
-        <Appbar.Action
-          icon="account-circle"
-          onPress={() => navigation.navigate("Profile")}
-          color="#fff"
-          size={40}
-          style={{ marginLeft: "auto" }}
-        />
         <Appbar.Content title={"Bienvenue " + user.username} color="#fff" />
       </Appbar.Header>
       <View style={styles.block}>
@@ -128,16 +129,16 @@ export default function HomeScreen({ navigation, route }) {
             duration: 300,
           }}
           style={styles.calendarStrip}
-          calendarHeaderStyle={{ color: "#fff", fontSize: 20 }}
-          dateNumberStyle={{ color: "white", fontSize: 20 }}
-          dateNameStyle={{ color: "white", fontSize: 10 }}
+          calendarHeaderStyle={{ color: COLORS[scheme].text, fontSize: 20 }}
+          dateNumberStyle={{ color: COLORS[scheme].text, fontSize: 20 }}
+          dateNameStyle={{ color: COLORS[scheme].text, fontSize: 10 }}
           highlightDateNumberStyle={{
-            color: "yellow",
+            color: "orange",
             fontSize: 23,
             fontWeight: "bold",
           }}
           highlightDateNameStyle={{
-            color: "yellow",
+            color: "orange",
             fontSize: 14,
             fontWeight: "bold",
           }}
@@ -149,16 +150,20 @@ export default function HomeScreen({ navigation, route }) {
         <ScrollView style={styles.taskList}>
           <Text style={styles.title}>Consultez vos habitudes du jour!</Text>
           <>
-          <CircularProgressBar date={selectedDate} user={user} />
+            <CircularProgressBar date={selectedDate} user={user} />
           </>
           {filteredTasks.length > 0 ? (
             filteredTasks.map((task) => (
               <ListItem
                 key={task.id}
                 containerStyle={{
-                  backgroundColor: task.is_completed ? "#42A445" : "#363636",
+                  backgroundColor: task.is_completed ? "#42A445" : COLORS[scheme].tertiary,
                   alignSelf: "center",
                   marginTop: 5,
+                  borderRadius: "10",
+                  borderWidth: "3",
+                  borderColor: COLORS[scheme].primary,
+                  width:"95%"
                 }}
                 onPress={() =>
                   navigation.navigate("HabitDetail", {

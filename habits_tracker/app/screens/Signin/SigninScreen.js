@@ -59,7 +59,7 @@ export default function SigninScreen({ navigation }) {
           let response = await login(userData);
           // store user info in storage
           await storeUserInfoInStorage(response);
-          navigation.navigate("Home");
+          navigation.navigate("MainNavigation");
         } catch (error) {
           if (error.status === "email_failed") setErrorMail(error.message);
           else if (error.status === "password_failed")

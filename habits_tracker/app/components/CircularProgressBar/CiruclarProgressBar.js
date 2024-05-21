@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, useColorScheme } from "react-native";
 import CircularProgress from "react-native-circular-progress-indicator";
 import { getTimersByUserId } from "../../services/habits";
+import { COLORS } from "../../utils/constants/colors";
 
 export default function CircularProgressBar({ date, user }) {
   const [timers, setTimers] = useState([]);
   const [percentage, setPercentage] = useState(0);
+  const scheme = useColorScheme();
   // TODO: Mettre colonne goalTime dans la table Tasks
   const goalTime = 4 * 60 * 60;
 
@@ -43,9 +45,9 @@ export default function CircularProgressBar({ date, user }) {
     <View style={styles.container}>
       <CircularProgress
         value={percentage * 100}
-        inActiveStrokeColor={"#f2f2f2"}
+        inActiveStrokeColor={COLORS[scheme].text}
         inActiveStrokeOpacity={0.2}
-        progressValueColor={"#fff"}
+        progressValueColor={COLORS[scheme].text}
         valueSuffix={"%"}
         radius={80}
         activeStrokeWidth={30}

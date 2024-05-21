@@ -1,18 +1,19 @@
-import React, {useEffect, useState} from "react";
+import React, { useState, useEffect } from "react";
+import { CommonActions } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Ionicons } from "@expo/vector-icons";
 import HomeScreen from "../screens/Home/HomeScreen";
 import StatisticsScreen from "../screens/Statistics/StatisticsScreen";
 import CategoryListScreen from "../screens/Habits/CategoryList/CategoryList";
-import { getUserInfo } from "../services/users";
+import { Settings } from "../screens/Settings/settings.js";
+import { BottomTabBar } from "../components/BottomTabBar.js";
+import { getUserInfo } from "../services/users.js";
+import ProfileScreen from "../screens/Profile/ProfileScreen.js";
 
 const Tab = createBottomTabNavigator();
 
-/**
- * This navigation manages tab navigation of the application
- */
-export default function TabNavigation() {
-  const [user, setUser] = useState(null);
+export default function TabNavigation({ navigation }) {
+
+  const [user, setUser] = useState({});
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
@@ -25,51 +26,29 @@ export default function TabNavigation() {
 
     fetchUserInfo();
   }, []);
+
   return (
     <>
       {
-        (user) ? (
-          <Tab.Navigator initialRouteName="Home">
-          <Tab.Screen
-            name="Home"
-            component={HomeScreen}
-            options={{
+        (user.userId) ? (
+          <Tab.Navigator
+            screenOptions={{
+              tabBarStyle: {
+                borderTopWidth: 0,
+                elevation: 0,
+              },
               headerShown: false,
-              tabBarIcon: ({ color, size }) => (
-                <Ionicons name="home" size={size} color={color} />
-              ),
             }}
-            initialParams={{ user }}
-          />
-          <Tab.Screen
-            name="CategoryList"
-            component={CategoryListScreen}
-            options={{
-              headerShown: false,
-              tabBarIcon: ({ color, size }) => (
-                <Ionicons name="add" size={40} color={color} style={{fontWeight: 'bold'}} />
-              ),
-              tabBarLabel: () => null,
-            }}
-            initialParams={{ user }}
-          />
-          <Tab.Screen
-            name="Statistics"
-            component={StatisticsScreen}
-            options={{
-              headerShown: false,
-              tabBarIcon: ({ color, size }) => (
-                <Ionicons name="stats-chart" size={size} color={color} />
-              ),
-            }}
-            initialParams={{ user }}
-          />
-        </Tab.Navigator>
-        ) : (
-          <>
-          </>
-        )
-      }
+            tabBar={props => <BottomTabBar {...props} />}
+          >
+            <Tab.Screen name="Home" component={HomeScreen} initialParams={{ user }} />
+            <Tab.Screen name="Catégories" component={CategoryListScreen} initialParams={{ user }} />
+            <Tab.Screen name="Profile" component={ProfileScreen} initialParams={{ user }} />
+            <Tab.Screen name="Settings" component={Settings} initialParams={{ user }} />
+            <Tab.Screen name="Statistics" component={StatisticsScreen} initialParams={{ user }} />
+          </Tab.Navigator>
+        ): <></>
+      } 
     </>
-  )
+  );
 }
