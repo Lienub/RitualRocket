@@ -9,6 +9,7 @@ import AuthNavigation from "./AuthNavigation";
 import ProfileScreen from "../screens/Profile/ProfileScreen";
 import ChangePassword from "../screens/ChangePassword/ChangePassword";
 import ChangeInformations from "../screens/ChangeInformations/ChangeInformations";
+import ModifyTaskFormScreen from "../screens/Habits/HabitForm/ModifyTaskForm";
 import { getUserInfo } from "../services/users";
 
 const Stack = createNativeStackNavigator();
@@ -43,6 +44,7 @@ export default function MainNavigation() {
           <Stack.Screen name="HabitsList" component={HabitsListScreen} initialParams={{ user }} />
           <Stack.Screen name="TaskForm" component={TaskFormScreen} initialParams={{ user }} />
           <Stack.Screen name="HabitDetail" component={HabitDetailScreen} initialParams={{ user }} />
+          <Stack.Screen name="ModifyTask" component={ModifyTaskFormScreen} initialParams={{ user }} />
           <Stack.Screen name="Profile" component={ProfileScreen}  initialParams={{ user }} />
           <Stack.Screen name="ChangePassword" component={ChangePassword} initialParams={{ user }} />
           <Stack.Screen

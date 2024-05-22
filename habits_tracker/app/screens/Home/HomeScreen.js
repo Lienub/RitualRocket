@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { View, Text, ScrollView, Button, useColorScheme } from "react-native";
+import { View, Text, ScrollView, useColorScheme } from "react-native";
 import { ListItem, Icon } from "react-native-elements";
 import CalendarStrip from "react-native-calendar-strip";
 import { Appbar } from "react-native-paper";
@@ -13,21 +13,24 @@ import { COLORS } from "../../utils/constants/colors";
 
 export default function HomeScreen({ navigation, route }) {
   const scheme = useColorScheme();
-  const styles = useMemo(() => getStyles(scheme))
+  const styles = useMemo(() => getStyles(scheme), [scheme]);
   const isFocused = useIsFocused();
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
+
   useEffect(() => {
     if (isFocused) {
       fetchTasks();
     }
   }, [isFocused]);
+
   const [timer, setTimer] = useState(0);
   const { user } = route.params;
   const [tasks, setTasks] = useState([]);
   const [filteredTasks, setFilteredTasks] = useState([]);
   const [selectedTask, setSelectedTask] = useState({});
-  const [selectedDate, setSelectedDate] = useState(
-    new Date().toISOString().split("T")[0]
-  );
+  const [closeModal, setCloseModal] = useState(true);
 
   const updateTaskStatus = async (task, status) => {
     const taskData = {
@@ -41,7 +44,6 @@ export default function HomeScreen({ navigation, route }) {
       console.error("Error updating task:", error);
     }
   };
-  const [closeModal, setCloseModal] = useState(true);
 
   const onChangeModalTimer = (task) => {
     setSelectedTask(task);
@@ -50,84 +52,97 @@ export default function HomeScreen({ navigation, route }) {
 
   const fetchTasks = async () => {
     try {
-      const tasks = await getTasksByUserId(user.userId).then((tasks) => {
-        setTasks(tasks);
-      });
+      const fetchedTasks = await getTasksByUserId(user.userId);
+      setTasks(fetchedTasks);
     } catch (error) {
       console.error("Error fetching tasks:", error);
     }
   };
+
   useEffect(() => {
     fetchTasks();
   }, [user]);
 
-  useEffect(() => { }, [tasks]);
-
   useEffect(() => {
-    const filteredTasks = tasks.filter((task) => {
-      const endDate = new Date(task.endDate).toISOString().split("T")[0];
-      const startDate = new Date(task.startDate).toISOString().split("T")[0];
-      const repeatDaysArray = task.repeatDays
-        .split(",")
-        .map((day) => day.replace(/"/g, "").trim());
-      const selectedDayOfWeek = new Date(selectedDate)
-        .toLocaleString("en-US", { weekday: "long" })
-        .toLowerCase();
+    const filterTasks = () => {
+      const filteredTasks = tasks.filter((task) => {
+        const endDate = new Date(task.endDate).toISOString().split("T")[0];
+        const startDate = new Date(task.startDate).toISOString().split("T")[0];
+        const repeatDaysArray = task.repeatDays
+          .split(",")
+          .map((day) => day.replace(/"/g, "").trim());
+        const selectedDayOfWeek = new Date(selectedDate)
+          .toLocaleString("en-US", { weekday: "long" })
+          .toLowerCase();
 
-      console.log("DATE: ", startDate, " - ", endDate);
-      console.log("repeatDaysArray: ", repeatDaysArray);
-      console.log("selectedDayOfWeek", selectedDayOfWeek);
-      if (task.repeat === "none" && startDate === selectedDate) {
-        return true;
-      }
-      if (endDate < selectedDate) {
+        if (endDate < selectedDate) {
+          return false;
+        }
+
+        if (task.repeat === "monthly") {
+          const taskUpdatedDate = new Date(task.updatedAt);
+          const selectedDayOfMonth = new Date(selectedDate).getDate();
+          if (taskUpdatedDate.getDate() === selectedDayOfMonth) {
+            return true;
+          }
+        }
+        
+        if (task.repeat === "weekly") {
+          const taskUpdatedDate = new Date(task.updatedAt);
+          const taskDayOfWeek = taskUpdatedDate.toLocaleString("en-US", { weekday: "long" }).toLowerCase();
+          if (taskDayOfWeek === selectedDayOfWeek) {
+            return true;
+          }
+        }
+
+        if (startDate === selectedDate) {
+          return true;
+        }
+
+        if (repeatDaysArray.includes(selectedDayOfWeek)) {
+          return true;
+        }
         return false;
-      }
-      if (repeatDaysArray.includes(selectedDayOfWeek)) {
-        return true;
-      }
-      return false;
-    });
-    console.log(filteredTasks)
-    setFilteredTasks(filteredTasks);
+      });
+      setFilteredTasks(filteredTasks);
+    };
+    filterTasks();
   }, [selectedDate, tasks]);
 
   useEffect(() => {
     if (timer > 0 && closeModal === true) {
       setTimer(0);
-      let seconds = timer;
       const createTimerData = {
         taskId: selectedTask.id,
         userId: user.userId,
-        durationSeconds: seconds,
+        durationSeconds: timer,
       };
       createTimer(createTimerData);
     }
-  }, [closeModal, setCloseModal, timer, setTimer]);
+  }, [closeModal, timer]);
 
   return (
     <View style={styles.container}>
       <Appbar.Header style={styles.appbar}>
-        <Appbar.Content title={"Bienvenue " + user.username} color="#fff" />
+        <Appbar.Content title={`Bienvenue ${user.username}`} color="#fff" />
       </Appbar.Header>
       <View style={styles.block}>
         <Text style={styles.title}>
-          {"Nous sommes le " +
-            new Date(selectedDate).toLocaleDateString("fr-FR", {
+          {`Nous sommes le ${new Date(selectedDate).toLocaleDateString(
+            "fr-FR",
+            {
               weekday: "long",
               year: "numeric",
               month: "long",
               day: "numeric",
-            })}
+            }
+          )}`}
         </Text>
         <CalendarStrip
-          scrollable={true}
-          scrollerPaging={true}
+          scrollable
+          scrollerPaging
           calendarAnimation={{ type: "sequence", duration: 30 }}
-          daySelectionAnimation={{
-            type: "border",
-            duration: 300,
-          }}
+          daySelectionAnimation={{ type: "border", duration: 300 }}
           style={styles.calendarStrip}
           calendarHeaderStyle={{ color: COLORS[scheme].text, fontSize: 20 }}
           dateNumberStyle={{ color: COLORS[scheme].text, fontSize: 20 }}
@@ -143,27 +158,27 @@ export default function HomeScreen({ navigation, route }) {
             fontWeight: "bold",
           }}
           selectedDate={selectedDate}
-          onDateSelected={(date) => {
-            setSelectedDate(date.toISOString().split("T")[0]);
-          }}
+          onDateSelected={(date) =>
+            setSelectedDate(date.toISOString().split("T")[0])
+          }
         />
         <ScrollView style={styles.taskList}>
           <Text style={styles.title}>Consultez vos habitudes du jour!</Text>
-          <>
-            <CircularProgressBar date={selectedDate} user={user} />
-          </>
+          <CircularProgressBar date={selectedDate} user={user} />
           {filteredTasks.length > 0 ? (
             filteredTasks.map((task) => (
               <ListItem
                 key={task.id}
                 containerStyle={{
-                  backgroundColor: task.is_completed ? "#42A445" : COLORS[scheme].tertiary,
+                  backgroundColor: task.is_completed
+                    ? "#42A445"
+                    : COLORS[scheme].tertiary,
                   alignSelf: "center",
                   marginTop: 5,
-                  borderRadius: "10",
-                  borderWidth: "3",
+                  borderRadius: 10,
+                  borderWidth: 3,
                   borderColor: COLORS[scheme].primary,
-                  width:"95%"
+                  width: "95%",
                 }}
                 onPress={() =>
                   navigation.navigate("HabitDetail", {
@@ -173,12 +188,7 @@ export default function HomeScreen({ navigation, route }) {
                 }
               >
                 {task.is_completed ? (
-                  <Icon
-                    name={"done"}
-                    type="material"
-                    size={50}
-                    color={"white"}
-                  />
+                  <Icon name="done" type="material" size={50} color="white" />
                 ) : (
                   <Icon
                     name={task.iconType === "music" ? "rocket" : task.iconType}
@@ -203,12 +213,12 @@ export default function HomeScreen({ navigation, route }) {
                   <ListItem.Subtitle
                     style={{
                       color: task.is_completed ? "white" : task.color,
-                      fontWeight: "400",
+                      fontWeight: 400,
                       fontSize: 20,
                       marginTop: 4,
                     }}
                   >
-                    {(task.is_completed) ? "* Bien joué " : "* Fonce !"}
+                    {task.is_completed ? "* Bien joué" : "* Fonce !"}
                   </ListItem.Subtitle>
                 </ListItem.Content>
                 <View>
@@ -217,7 +227,7 @@ export default function HomeScreen({ navigation, route }) {
                       name="close"
                       type="material"
                       size={60}
-                      color={"red"}
+                      color="red"
                       onPress={() => updateTaskStatus(task, "not_done")}
                     />
                   ) : (
@@ -226,7 +236,7 @@ export default function HomeScreen({ navigation, route }) {
                         name="done"
                         type="material"
                         size={40}
-                        color={"green"}
+                        color="green"
                         onPress={() => updateTaskStatus(task, "done")}
                       />
                       <Icon

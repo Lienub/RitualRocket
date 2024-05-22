@@ -175,7 +175,6 @@ export default function TaskFormScreen({ navigation, route }) {
   };
   const handleRappelChange = (event, selectedTime) => {
     const current = selectedTime || new Date();
-    console.log("CURRENT RAPPEL", current);
     let time = current.toISOString().split("T")[1].split(".")[0];
     if (rappelTime == time) { return; }
     setRappelTime(time);
@@ -187,13 +186,18 @@ export default function TaskFormScreen({ navigation, route }) {
     setShowCalendar(true);
   };
 
+
   const handleTimeToSpend = (event, selectedTime) => {
     const current = selectedTime || new Date();
-    console.log("CURRENT", current);
-    let time = current.toISOString().split("T")[1].split(".")[0];
-    if (rappelTime == time) { return; }
-    setRappelTime(time);
-    setRappelTimeAsDate(selectedTime)
+  
+    const hours = current.getHours();
+    const minutes = current.getMinutes();
+    const seconds = current.getSeconds();
+  
+    const time = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  
+    const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+    setTimeToSpendAsDate(totalSeconds);
   }
 
   const handleIconSearch = (text) => {
@@ -240,6 +244,7 @@ export default function TaskFormScreen({ navigation, route }) {
         userId: user.userId,
         startDate,
         rappelTime,
+        goalTimeByDay: timeToSpendAsDate,
       };
 
       if (habitTitle !== name) {
@@ -253,7 +258,6 @@ export default function TaskFormScreen({ navigation, route }) {
       }
 
       const taskResponse = await createTask(taskData);
-      console.log("RESPONSE", taskResponse);
       navigation.navigate('TabNavigation');
     } catch (error) {
       console.error("Error creating task:", error);
@@ -566,7 +570,7 @@ export default function TaskFormScreen({ navigation, route }) {
               label="Temps"
             >
               <DateTimePicker
-                value={timeToSpendAsDate}
+                 value={new Date()}
                 mode="time"
                 onChange={handleTimeToSpend}
               />
@@ -583,6 +587,7 @@ export default function TaskFormScreen({ navigation, route }) {
               setOpen={setOpenFreq}
               setValue={setValueFreq}
               onSelectItem={(item) => {
+                setRepeat(item.value)
                 if (item.value == 'daily') {
                   setShowFreqModal(true);
                   setIsWeekly(false);

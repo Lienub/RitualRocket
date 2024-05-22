@@ -114,6 +114,10 @@ export default function HabitDetailScreen({ navigation, route }) {
         />
         <Appbar.Content title={task.name} titleStyle={styles.title} />
         <Appbar.Action
+          icon={() => <Ionicons name="pencil" size={30} color="#fff" />}
+          onPress={() => navigation.navigate("ModifyTask", { task })}
+        />
+        <Appbar.Action
           icon={() => <Ionicons name="trash" size={30} color="#fff" />}
           onPress={() => removeTaskByTaskId(task.id)}
         />
