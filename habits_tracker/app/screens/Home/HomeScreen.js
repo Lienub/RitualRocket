@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { View, Text, ScrollView, useColorScheme } from "react-native";
+import { View, Text, ScrollView, useColorScheme, Image } from "react-native";
 import { ListItem, Icon } from "react-native-elements";
 import CalendarStrip from "react-native-calendar-strip";
 import { Appbar } from "react-native-paper";
@@ -10,6 +10,7 @@ import { useIsFocused } from "@react-navigation/native";
 import CircularProgressBar from "../../components/CircularProgressBar/CiruclarProgressBar";
 import { getStyles } from "./styles";
 import { COLORS } from "../../utils/constants/colors";
+import NiceSuccesModal from "../../components/NiceSuccessModal";
 
 export default function HomeScreen({ navigation, route }) {
   const scheme = useColorScheme();
@@ -31,17 +32,24 @@ export default function HomeScreen({ navigation, route }) {
   const [filteredTasks, setFilteredTasks] = useState([]);
   const [selectedTask, setSelectedTask] = useState({});
   const [closeModal, setCloseModal] = useState(true);
+  const [showCongratulationsModal, setShowCongratulationsModal] =
+    useState(false);
+  const [taskCompleted, setTaskCompleted] = useState(null);
 
   const updateTaskStatus = async (task, status) => {
     const taskData = {
       is_completed: status === "done",
       completedDate: new Date().toISOString(),
     };
+    setTaskCompleted(task.name);
     try {
       await updateTask(task.id, taskData);
       fetchTasks();
     } catch (error) {
       console.error("Error updating task:", error);
+    }
+    if(status === "done") {
+      setShowCongratulationsModal(true);
     }
   };
 
@@ -86,10 +94,12 @@ export default function HomeScreen({ navigation, route }) {
             return true;
           }
         }
-        
+
         if (task.repeat === "weekly") {
           const taskUpdatedDate = new Date(task.updatedAt);
-          const taskDayOfWeek = taskUpdatedDate.toLocaleString("en-US", { weekday: "long" }).toLowerCase();
+          const taskDayOfWeek = taskUpdatedDate
+            .toLocaleString("en-US", { weekday: "long" })
+            .toLowerCase();
           if (taskDayOfWeek === selectedDayOfWeek) {
             return true;
           }
@@ -162,9 +172,10 @@ export default function HomeScreen({ navigation, route }) {
             setSelectedDate(date.toISOString().split("T")[0])
           }
         />
+        <NiceSuccesModal visible={showCongratulationsModal} onRequestClose={() => setShowCongratulationsModal(false)} taskTitle={taskCompleted} />
         <ScrollView style={styles.taskList}>
           <Text style={styles.title}>Consultez vos habitudes du jour!</Text>
-          <CircularProgressBar date={selectedDate} user={user} />
+          <CircularProgressBar date={selectedDate} user={user} tasks={filteredTasks} />
           {filteredTasks.length > 0 ? (
             filteredTasks.map((task) => (
               <ListItem
