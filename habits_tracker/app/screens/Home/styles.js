@@ -54,11 +54,18 @@ export const getStyles = (mode) => {
       fontSize: 20,
       fontWeight: "bold",
     },
-    noTasks: {
-      fontSize: 18,
+    noTasksTitle: {
+      fontSize: 20,
       color: "gray",
       textAlign: "center",
       marginTop: 20,
+      fontWeight: "bold",
+    },
+    noTasksDesc: {
+      fontSize: 18,
+      color: "gray",
+      textAlign: "center",
+      marginTop: 5,
     },
     appbar: {
       flexDirection: "row-reverse",

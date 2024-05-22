@@ -263,7 +263,10 @@ export default function HomeScreen({ navigation, route }) {
               </ListItem>
             ))
           ) : (
-            <Text style={styles.noTasks}>Pas d'habitudes à cette date</Text>
+            <>
+              <Text style={styles.noTasksTitle}>Aucune activité programmée</Text>
+              <Text style={styles.noTasksDesc}>Ajouter de nouvelles activités</Text>
+            </>
           )}
         </ScrollView>
         {closeModal === false && (
