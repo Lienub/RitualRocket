@@ -16,6 +16,7 @@ export default function NiceSuccesModal({
   visible,
   onRequestClose,
   taskTitle,
+  completedDaysCount=0
 }) {
   const {theme} = useTheme();
   const styles = useMemo(() => getStyles(theme));
@@ -47,7 +48,7 @@ export default function NiceSuccesModal({
           </View>
           <Text style={styles.taskTitle}>{taskTitle}</Text>
           <Text style={styles.detail}>Meilleur Série</Text>
-          <Text style={styles.detailDay}>1 Journée</Text>
+          <Text style={styles.detailDay}>{`${completedDaysCount} ${completedDaysCount > 1 ? " jours" : " jour"}`}</Text>
           <TouchableOpacity
             style={styles.closeButton}
             onPress={onRequestClose}

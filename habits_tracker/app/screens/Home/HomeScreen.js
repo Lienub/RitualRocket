@@ -36,14 +36,15 @@ export default function HomeScreen({ navigation, route }) {
   const [showCongratulationsModal, setShowCongratulationsModal] =
     useState(false);
   const [taskCompleted, setTaskCompleted] = useState(null);
+  const [completedDaysCount, setCompletedDaysCount] = useState("");
 
   const updateTaskStatus = async (task, status) => {
     let completedDates = []
-    if(!task.completedDates) {
+    if (!task.completedDates) {
       completedDates.push(selectedDate);
     } else {
       completedDates = task.completedDates.split(",");
-      if(status === "done") {
+      if (status === "done") {
         completedDates.push(selectedDate);
       } else {
         completedDates = completedDates.filter((date) => !date.includes(selectedDate));
@@ -56,11 +57,17 @@ export default function HomeScreen({ navigation, route }) {
     try {
       await updateTask(task.id, taskData);
       fetchTasks();
+
+      if (status === "done") {
+        const newCount = countCompletedDays({
+          ...task,
+          completedDates: completedDates.join(","),
+        });
+        setCompletedDaysCount(newCount);
+        setShowCongratulationsModal(true);
+      }
     } catch (error) {
       console.error("Error updating task:", error);
-    }
-    if(status === "done") {
-      setShowCongratulationsModal(true);
     }
   };
 
@@ -139,6 +146,16 @@ export default function HomeScreen({ navigation, route }) {
     return false;
   }
 
+  const countCompletedDays = (task) => {
+    console.log("TASK", task);
+    if (task.completedDates) {
+      console.log(task.completedDates);
+      return task.completedDates.split(',').length;
+    }
+
+    return 0;
+  }
+
   useEffect(() => {
     if (timer > 0 && closeModal === true) {
       setTimer(0);
@@ -192,7 +209,7 @@ export default function HomeScreen({ navigation, route }) {
             setSelectedDate(date.toISOString().split("T")[0])
           }
         />
-        <NiceSuccesModal visible={showCongratulationsModal} onRequestClose={() => setShowCongratulationsModal(false)} taskTitle={taskCompleted} />
+        <NiceSuccesModal visible={showCongratulationsModal} onRequestClose={() => setShowCongratulationsModal(false)} taskTitle={taskCompleted} completedDaysCount={completedDaysCount} />
         <ScrollView style={styles.taskList}>
           <Text style={styles.title}>Consultez vos habitudes du jour!</Text>
           <CircularProgressBar date={selectedDate} user={user} tasks={filteredTasks} />
