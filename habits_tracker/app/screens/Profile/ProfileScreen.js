@@ -17,14 +17,15 @@ import AwesomeAlert from "react-native-awesome-alerts";
 import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
 import { getStyles } from './styles';
+import { useTheme } from "../../components/Theme";
 
 export default function ProfileScreen({ navigation, route }) {
   const { user } = route.params;
   const [csvData, setCsvData] = useState([]);
   const isFocused = useIsFocused();
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
-  const scheme = useColorScheme();
-  const styles = useMemo(() => getStyles(scheme))
+  const {theme} = useTheme();
+  const styles = useMemo(() => getStyles(theme))
 
   const handleDeleteAccount = () => {
     removeAccount(user.userId);
@@ -82,7 +83,7 @@ export default function ProfileScreen({ navigation, route }) {
           icon={() => <Ionicons name="close" size={30} color="#fff" />}
           onPress={() => navigation.goBack()}
         />
-        <Appbar.Content title="profile" titleStyle={styles.title} />
+        <Appbar.Content title="Profil" titleStyle={styles.appbarTitle} />
         <Appbar.Action
           icon={() => <Ionicons name="pencil" size={30} color="#fff" />}
           onPress={() => navigation.navigate("ChangeInformations")}

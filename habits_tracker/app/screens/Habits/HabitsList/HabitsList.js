@@ -4,13 +4,14 @@ import { Appbar } from "react-native-paper";
 import { getStyles } from "./styles";
 import { getHabitsByCategory } from "../../../services/habits";
 import { StyleContainer, NiceTextButton } from "../../../components";
+import { useTheme } from "../../../components/Theme"
 
 
 export default function HabitsListScreen({ navigation, route }) {
   const { categoryId, categoryTitle } = route.params;
   const [habits, setHabits] = useState([]);
-  const scheme = useColorScheme();
-  const styles = useMemo(() => getStyles(scheme));
+  const { theme } = useTheme();
+  const styles = useMemo(() => getStyles(theme));
 
   useEffect(() => {
     getHabitsByCategory(categoryId)
@@ -20,16 +21,16 @@ export default function HabitsListScreen({ navigation, route }) {
   
   return (
     <View style={styles.container}>
-      <Appbar.Header style={styles.appbar} >
+      <Appbar.Header style={styles.appbar}>
         <Appbar.BackAction onPress={() => navigation.goBack()} color="#fff" />
-        <Appbar.Content title={categoryTitle} titleStyle={styles.title} />
+        <Appbar.Content title={categoryTitle} titleStyle={styles.appbarTitle} />
       </Appbar.Header>
       <StyleContainer
         label="Tu ne trouves pas ton bonheur ?"
       >
         <NiceTextButton
           text="Réalise ta propre habitude !"
-          onPress={() => navigation.navigate("TaskForm",{ habitId: null, categoryId: null, habitTitle: null})}
+          onPress={() => navigation.navigate("TaskForm",{habitId: 999, categoryId: 999, habitTitle: "Custom"})}
         />
       </StyleContainer>
       <FlatList

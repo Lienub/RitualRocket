@@ -6,6 +6,7 @@ import SignupScreen from "../screens/Signup/SignupScreen";
 import SigninScreen from "../screens/Signin/SigninScreen";
 import MainNavigation from "../navigation/MainNavigation";
 import ResetPasswordScreen from "../screens/ResetPassword/ResetPassword";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Stack = createNativeStackNavigator();
 
@@ -16,7 +17,6 @@ const Stack = createNativeStackNavigator();
  */
 export default function AuthNavigation() {
   const [userExists, setUserExists] = useState(false);
-
   useEffect(() => {
     checkUserExists();
   }, []);

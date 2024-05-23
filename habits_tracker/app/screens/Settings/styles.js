@@ -16,6 +16,7 @@ export const getStyles = (mode) => {
       alignSelf: "center",
       marginTop: 20,
     },
+
     appbarTitle: {
       color: 'white',
       fontSize: 20,
@@ -23,6 +24,7 @@ export const getStyles = (mode) => {
       alignSelf: "center",
       marginTop: 20,
     },
+
     appbar: {
       flexDirection: "row",
       width: "100%",

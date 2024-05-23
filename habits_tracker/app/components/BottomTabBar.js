@@ -3,18 +3,22 @@ import { SafeAreaView, Text, TouchableOpacity, Dimensions, StyleSheet, useColorS
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { COLORS } from '../utils/constants/colors';
+import { useTheme } from './Theme';
 
 export function BottomTabBar({ state, descriptors, navigation }) {
-  const scheme = useColorScheme();
-  const styles = getStyles(scheme);
+  const {theme} = useTheme();
+  const opposite = theme === 'dark' ? 'light' : 'dark';
+  console.log(opposite);
+  const styles = getStyles(theme);
   const middleIndex = Math.floor(state.routes.length / 2);
+  console.log(navigation)
 
   return (
     <SafeAreaProvider style={styles.navSection}>
       <SafeAreaView style={styles.leftPanel}>
         {state.routes.slice(0, middleIndex).map((route, index) => {
           if (route.name !== "Statistics") {
-            return renderTab(route, index, state, descriptors, scheme, navigation)
+            return renderTab(route, index, state, descriptors, theme, navigation)
           }
         })}
       </SafeAreaView>
@@ -40,7 +44,7 @@ export function BottomTabBar({ state, descriptors, navigation }) {
         {state.routes.slice(middleIndex).map((route, index) => {
           console.log(route.name)
           if (route.name !== "Statistics") {
-            return renderTab(route, index + middleIndex, state, descriptors, scheme, navigation)
+            return renderTab(route, index + middleIndex, state, descriptors, theme, navigation)
           }
         })}
       </SafeAreaView>
@@ -48,7 +52,8 @@ export function BottomTabBar({ state, descriptors, navigation }) {
   );
 }
 
-const renderTab = (route, index, state, descriptors, scheme, navigation) => {
+const renderTab = (route, index, state, descriptors, theme, navigation) => {
+  const opposite = theme === 'dark' ? 'light' : 'dark';
   const { options } = descriptors[route.key];
   const label =
     options.tabBarLabel !== undefined
@@ -102,8 +107,8 @@ const renderTab = (route, index, state, descriptors, scheme, navigation) => {
       onLongPress={onLongPress}
       style={{ flex: 1, ...styles.panelContent }}
     >
-      <Icon name={icon} size={30} color={isFocused ? COLORS[scheme].primary : COLORS[scheme].text} />
-      <Text style={{ color: isFocused ? COLORS[scheme].primary : COLORS[scheme].text, fontSize: 10 }}>
+      <Icon name={icon} size={30} color={isFocused ? COLORS[theme].primary : COLORS[opposite].tertiary} />
+      <Text style={{ color: isFocused ? COLORS[theme].primary : COLORS[theme].text, fontSize: 10 }}>
         {label}
       </Text>
     </TouchableOpacity>
@@ -132,7 +137,6 @@ const getStyles = (mode) => {
 
       height: "100%",
 
-      // Need to change that with dynamic value
       backgroundColor: COLORS[mode].tertiary,
 
       borderWidth: 1,

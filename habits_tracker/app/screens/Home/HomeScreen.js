@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { View, Text, ScrollView, useColorScheme, Image } from "react-native";
+import { View, Text, ScrollView, useColortheme, Image } from "react-native";
 import { ListItem, Icon } from "react-native-elements";
 import CalendarStrip from "react-native-calendar-strip";
 import { Appbar } from "react-native-paper";
@@ -11,10 +11,11 @@ import CircularProgressBar from "../../components/CircularProgressBar/CiruclarPr
 import { getStyles } from "./styles";
 import { COLORS } from "../../utils/constants/colors";
 import NiceSuccesModal from "../../components/NiceSuccessModal";
+import { useTheme } from "../../components/Theme";
 
 export default function HomeScreen({ navigation, route }) {
-  const scheme = useColorScheme();
-  const styles = useMemo(() => getStyles(scheme), [scheme]);
+  const { theme } = useTheme();
+  const styles = useMemo(() => getStyles(theme));
   const isFocused = useIsFocused();
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split("T")[0]
@@ -35,14 +36,15 @@ export default function HomeScreen({ navigation, route }) {
   const [showCongratulationsModal, setShowCongratulationsModal] =
     useState(false);
   const [taskCompleted, setTaskCompleted] = useState(null);
+  const [completedDaysCount, setCompletedDaysCount] = useState("");
 
   const updateTaskStatus = async (task, status) => {
     let completedDates = []
-    if(!task.completedDates) {
+    if (!task.completedDates) {
       completedDates.push(selectedDate);
     } else {
       completedDates = task.completedDates.split(",");
-      if(status === "done") {
+      if (status === "done") {
         completedDates.push(selectedDate);
       } else {
         completedDates = completedDates.filter((date) => !date.includes(selectedDate));
@@ -55,11 +57,17 @@ export default function HomeScreen({ navigation, route }) {
     try {
       await updateTask(task.id, taskData);
       fetchTasks();
+
+      if (status === "done") {
+        const newCount = countCompletedDays({
+          ...task,
+          completedDates: completedDates.join(","),
+        });
+        setCompletedDaysCount(newCount);
+        setShowCongratulationsModal(true);
+      }
     } catch (error) {
       console.error("Error updating task:", error);
-    }
-    if(status === "done") {
-      setShowCongratulationsModal(true);
     }
   };
 
@@ -138,6 +146,15 @@ export default function HomeScreen({ navigation, route }) {
     return false;
   }
 
+  const countCompletedDays = (task) => {
+    if (task.completedDates) {
+      console.log(task.completedDates);
+      return task.completedDates.split(',').length;
+    }
+
+    return 0;
+  }
+
   useEffect(() => {
     if (timer > 0 && closeModal === true) {
       setTimer(0);
@@ -173,9 +190,9 @@ export default function HomeScreen({ navigation, route }) {
           calendarAnimation={{ type: "sequence", duration: 30 }}
           daySelectionAnimation={{ type: "border", duration: 300 }}
           style={styles.calendarStrip}
-          calendarHeaderStyle={{ color: COLORS[scheme].text, fontSize: 20 }}
-          dateNumberStyle={{ color: COLORS[scheme].text, fontSize: 20 }}
-          dateNameStyle={{ color: COLORS[scheme].text, fontSize: 10 }}
+          calendarHeaderStyle={{ color: COLORS[theme].text, fontSize: 20 }}
+          dateNumberStyle={{ color: COLORS[theme].text, fontSize: 20 }}
+          dateNameStyle={{ color: COLORS[theme].text, fontSize: 10 }}
           highlightDateNumberStyle={{
             color: "orange",
             fontSize: 23,
@@ -191,7 +208,7 @@ export default function HomeScreen({ navigation, route }) {
             setSelectedDate(date.toISOString().split("T")[0])
           }
         />
-        <NiceSuccesModal visible={showCongratulationsModal} onRequestClose={() => setShowCongratulationsModal(false)} taskTitle={taskCompleted} />
+        <NiceSuccesModal visible={showCongratulationsModal} onRequestClose={() => setShowCongratulationsModal(false)} taskTitle={taskCompleted} completedDaysCount={completedDaysCount} />
         <ScrollView style={styles.taskList}>
           <Text style={styles.title}>Consultez vos habitudes du jour!</Text>
           <CircularProgressBar date={selectedDate} user={user} tasks={filteredTasks} />
@@ -202,12 +219,12 @@ export default function HomeScreen({ navigation, route }) {
                 containerStyle={{
                   backgroundColor: verifyIfTaskCompleted(task)
                     ? "#42A445"
-                    : COLORS[scheme].tertiary,
+                    : COLORS[theme].tertiary,
                   alignSelf: "center",
                   marginTop: 5,
                   borderRadius: 10,
                   borderWidth: 3,
-                  borderColor: COLORS[scheme].primary,
+                  borderColor: COLORS[theme].primary,
                   width: "95%",
                 }}
                 onPress={() =>

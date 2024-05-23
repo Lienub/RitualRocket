@@ -2,10 +2,11 @@ import React, { useState, useEffect } from "react";
 import { View, StyleSheet, useColorScheme } from "react-native";
 import CircularProgress from "react-native-circular-progress-indicator";
 import { COLORS } from "../../utils/constants/colors";
+import { useTheme } from "../Theme";
 
 export default function CircularProgressBar({ date, user, tasks }) {
   const [percentage, setPercentage] = useState(0);
-  const scheme = useColorScheme();
+  const { theme } = useTheme();
 
   useEffect(() => {
     calculateDailyStatistics();
@@ -33,9 +34,9 @@ export default function CircularProgressBar({ date, user, tasks }) {
     <View style={styles.container}>
       <CircularProgress
         value={percentage}
-        inActiveStrokeColor={COLORS[scheme].text}
+        inActiveStrokeColor={COLORS[theme].text}
         inActiveStrokeOpacity={0.2}
-        progressValueColor={COLORS[scheme].text}
+        progressValueColor={COLORS[theme].text}
         valueSuffix={"%"}
         radius={80}
         activeStrokeWidth={30}

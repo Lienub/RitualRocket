@@ -1,10 +1,11 @@
 import React, { useMemo } from 'react';
 import { View, StyleSheet, Text, useColorScheme } from 'react-native';
 import { COLORS } from '../utils/constants/colors';
+import { useTheme } from './Theme';
 
 export const StyleContainer = ({ ...props }) => {
-  const scheme = useColorScheme();
-  const styles = useMemo(() => getStyles(scheme, props.custom));
+  const {theme} = useTheme();
+  const styles = useMemo(() => getStyles(theme, props.custom));
 
   return (
     <View style={styles.field}>

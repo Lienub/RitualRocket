@@ -1,10 +1,11 @@
 import { useColorScheme, StyleSheet, Modal, View } from "react-native";
 import { useMemo } from "react";
 import { COLORS } from "../utils/constants/colors";
+import { useTheme } from "./Theme";
 
 export function NiceModal({ ...props }) {
-    const scheme = useColorScheme();
-    const styles = useMemo(() => getStyles(scheme));
+    const {theme} = useTheme();
+    const styles = useMemo(() => getStyles(theme));
 
     return (
         <Modal

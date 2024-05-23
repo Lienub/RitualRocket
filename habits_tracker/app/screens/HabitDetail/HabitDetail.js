@@ -7,16 +7,19 @@ import {
   ProgressBarAndroid,
   useColorScheme,
 } from "react-native";
+import * as Progress from 'react-native-progress'
 import { Appbar } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
 import { Icon } from "react-native-elements";
 import { getStyles } from "./styles";
 import { BarChart } from "react-native-chart-kit";
 import { getTimersByTaskId, removeTask } from "../../services/habits";
+import { useTheme } from "../../components/Theme"
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 export default function HabitDetailScreen({ navigation, route }) {
-  const scheme = useColorScheme();
-  const styles = useMemo(() => getStyles(scheme));
+  const { theme } = useTheme();
+  const styles = useMemo(() => getStyles(theme),);
   const { task, userId } = route.params;
   const [chartDays, setChartDays] = useState([]);
   const [timeSpent, setTimeSpent] = useState({});
@@ -30,6 +33,18 @@ export default function HabitDetailScreen({ navigation, route }) {
       console.error("Error removing task:", error);
     }
   };
+
+  const getCompletedDaysCount = (task) => {
+    console.log(task);
+    if (task.completedDates) {
+      console.log(task.completedDates.split(',').length)
+      return task.completedDates.split(',').length;
+    }
+
+    return 0;
+  }
+
+  console.log(Object.values(timeSpent).map((seconds) => seconds / 60))
   // Récupérer les timers de la tâche pour la semaine en cours
   useEffect(() => {
     const days = task.repeatDays.split(",").map((day) => {
@@ -71,7 +86,7 @@ export default function HabitDetailScreen({ navigation, route }) {
           if (
             timerDate >= firstDayOfWeek &&
             timerDate <
-              new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000)
+            new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000)
           ) {
             const dayOfWeek = timerDate.getDay();
 
@@ -92,11 +107,12 @@ export default function HabitDetailScreen({ navigation, route }) {
         setChartDays(daysOfWeek);
 
         const startDate = new Date(task.startDate);
-        const elapsedMilliseconds = currentDate - startDate;
-        const elapsedDays = Math.ceil(
-          elapsedMilliseconds / (1000 * 60 * 60 * 24)
-        );
-        setDaysElapsed(elapsedDays);
+        const newCount = getCompletedDaysCount({
+          ...task,
+        });
+
+        setDaysElapsed(newCount);
+        console.log("DAYS: ", daysElapsed)
       } catch (error) {
         console.error("Error fetching timers:", error);
       }
@@ -112,7 +128,7 @@ export default function HabitDetailScreen({ navigation, route }) {
           icon={() => <Ionicons name="close" size={30} color="#fff" />}
           onPress={() => navigation.goBack()}
         />
-        <Appbar.Content title={task.name} titleStyle={styles.title} />
+        <Appbar.Content title={task.name} titleStyle={styles.appbarTitle} />
         <Appbar.Action
           icon={() => <Ionicons name="pencil" size={30} color="#fff" />}
           onPress={() => navigation.navigate("ModifyTask", { task })}
@@ -149,16 +165,17 @@ export default function HabitDetailScreen({ navigation, route }) {
           />
           <Text style={styles.name}>{task.name}</Text>
           <Text style={styles.description}>
-            {task.description == "" ? "Pas description" : task.description}
+            {task.description == "" ? "Pas de description" : task.description}
           </Text>
           <View style={styles.blockStats}>
             <View style={styles.itemInfo}>
               <Text style={styles.statsTitle}>Objectif défini</Text>
-              <ProgressBarAndroid
+              <Progress.Bar
                 styleAttr="Horizontal"
                 indeterminate={false}
-                progress={20 / 100} 
-                color="#007AFF" 
+                progress={20 / 100}
+                color="#007AFF"
+                width={Dimensions.get("window").width * 0.7}
               />
             </View>
             <View
@@ -171,7 +188,7 @@ export default function HabitDetailScreen({ navigation, route }) {
               <View style={styles.itemInfo}>
                 <Text style={styles.statsTitle}>Répétition</Text>
                 <View style={{ flexDirection: "row" }}>
-                  <Ionicons name="calendar" size={30} color="black" />
+                  <Ionicons name="calendar" size={30} color={styles.iconColor} />
                   <Text style={styles.statsValue}>
                     {task.repeatDays == ""
                       ? ""
@@ -183,7 +200,7 @@ export default function HabitDetailScreen({ navigation, route }) {
               <View style={styles.itemInfo}>
                 <Text style={styles.statsTitle}>Rappel</Text>
                 <View style={{ flexDirection: "row" }}>
-                  <Ionicons name="timer" size={30} color="black" />
+                  <Ionicons name="timer" size={30} color={styles.iconColor} />
                   <Text style={styles.statsValue}>{task.rappelTime}</Text>
                 </View>
               </View>
@@ -191,7 +208,7 @@ export default function HabitDetailScreen({ navigation, route }) {
           </View>
         </View>
         <View style={styles.statsContainer}>
-          <Text style={{...styles.title, marginBottom: 20, marginStart: 10}}>Temps passé cette semaine</Text>
+          <Text style={{ ...styles.title, marginBottom: 20, marginStart: 10 }}>Temps passé cette semaine</Text>
           <BarChart
             data={{
               labels: chartDays,
@@ -203,25 +220,11 @@ export default function HabitDetailScreen({ navigation, route }) {
             }}
             width={Dimensions.get("window").width}
             height={220}
-            yAxisLabel="min"
-            chartConfig={{
-              backgroundColor: "#ffffff",
-              backgroundGradientFrom: "#ffffff",
-              backgroundGradientTo: "#ffffff",
-              decimalPlaces: 0,
-              color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-              labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-              style: {
-                borderRadius: 16,
-              },
-              propsForDots: {
-                r: "6",
-                strokeWidth: "2",
-                stroke: "#ffa726",
-              },
-            }}
+            formatYLabel={(yValue) => yValue}
+            yAxisSuffix="min"
+            chartConfig={styles.chartConfig}
             style={{
-              backgroundColor: "transparent",
+              borderRadius: "15",
             }}
           />
         </View>

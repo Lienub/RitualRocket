@@ -15,6 +15,12 @@ export const getStyles = (mode) => {
       alignSelf: "flex-start",
       marginLeft: 20,
     },
+    appbarTitle: {
+      color: "white",
+      fontSize: 20,
+      fontWeight: "500",
+      alignSelf: "flex-start",
+    },
     habitList: {
       width: "95%",
       padding: 10,

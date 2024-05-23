@@ -14,6 +14,12 @@ export const getStyles = (mode) => {
       fontWeight: "500",
       alignSelf: "flex-start",
     },
+    appbarTitle: {
+      color: "white",
+      fontSize: 20,
+      fontWeight: "500",
+      alignSelf: "flex-start",
+    },
     categoryList: {
       width: "95%",
       padding: 15,

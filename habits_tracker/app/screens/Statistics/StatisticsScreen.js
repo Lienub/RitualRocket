@@ -5,6 +5,7 @@ import { LineChart } from "react-native-chart-kit";
 import { useIsFocused } from "@react-navigation/native";
 import { getTimersByUserId } from "../../services/habits";
 import { getStyles } from "./styles";
+import { useTheme } from "../../components/Theme";
 
 export default function StatisticsScreen({ navigation, route }) {
   const isFocused = useIsFocused();
@@ -12,8 +13,8 @@ export default function StatisticsScreen({ navigation, route }) {
   const [timers, setTimers] = useState([]);
   const today = new Date();
   const currentDayOfWeek = today.getDay();
-  const scheme = useColorScheme();
-  const styles = useMemo(() => getStyles(scheme));
+  const {theme} = useTheme();
+  const styles = useMemo(() => getStyles(theme));
 
   const startDate = new Date(today);
   startDate.setDate(startDate.getDate() - currentDayOfWeek);
@@ -169,7 +170,8 @@ export default function StatisticsScreen({ navigation, route }) {
                   data={lineChartDataLastDays}
                   width={Dimensions.get("window").width * 0.9}
                   height={Dimensions.get("window").height / 2 * 0.9}
-                  formatYLabel={(yValue) => yValue + "s"}
+                  formatYLabel={(yValue) => yValue}
+                  yAxisSuffix="s"
                   chartConfig={{
                     backgroundColor: "#e26a00",
                     backgroundGradientFrom: "#fb8c00",
