@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   IOS_CLIENT_ID,
   ANDROID_CLIENT_ID,
@@ -19,8 +19,9 @@ import {
 import * as Google from "expo-auth-session/providers/google";
 import SocialMediaButton from "../../components/Buttons/SocialMediaButton";
 import Images from "../../utils/constants/images";
-import styles from "./styles";
+import { getStyles } from "./styles";
 import { register, signInWithGoogle, storeUserInfoInStorage } from "../../services/users";
+import { useTheme } from "../../components/Theme";
 
 export default function SignupScreen({ navigation }) {
   const [error, setError] = useState("");
@@ -29,6 +30,8 @@ export default function SignupScreen({ navigation }) {
   const [errorUsername, setErrorUsername] = useState("");
   const [userInfo, setUserInfo] = useState({});
   const [loading, setLoading] = useState(false); // State for loading indicator
+  const { theme } = useTheme();
+  const styles = useMemo(() => getStyles(theme))
 
   // Google Auth
   const [request, response, promptAsync] = Google.useAuthRequest({
@@ -91,42 +94,43 @@ export default function SignupScreen({ navigation }) {
       <View style={styles.background}>
         <View style={styles.overlay} />
         <Image style={styles.logo} source={Images.Logo} />
-        <TextInput
-          style={styles.input}
-          placeholder="Nom"
-          placeholderTextColor="#aaaaaa"
-          underlineColorAndroid="transparent"
-          autoCapitalize="none"
-          onChangeText={(text) => setUserData({ ...userData, username: text })}
-        />
-        {errorUsername && <Text style={styles.textError}>{errorUsername}</Text>}
-        <TextInput
-          style={styles.input}
-          placeholder="E-mail"
-          placeholderTextColor="#aaaaaa"
-          underlineColorAndroid="transparent"
-          autoCapitalize="none"
-          onChangeText={(text) => setUserData({ ...userData, email: text })}
-        />
-        {errorMail && <Text style={styles.textError}>{errorMail}</Text>}
-        <TextInput
-          style={styles.input}
-          placeholderTextColor="#aaaaaa"
-          secureTextEntry
-          placeholder="Mot de passe"
-          underlineColorAndroid="transparent"
-          autoCapitalize="none"
-          onChangeText={(text) => setUserData({ ...userData, password: text })}
-        />
-        {errorPassword && <Text style={styles.textError}>{errorPassword}</Text>}
-        <TouchableOpacity style={styles.button} onPress={() => registerUser("register")}>
-          {loading ? (
-            <ActivityIndicator color="#ffffff" /> // Show loading indicator when loading is true
-          ) : (
-            <Text style={styles.buttonTitle}>Créer son compte</Text>
-          )}
-        </TouchableOpacity>
-        <View style={styles.footerView}>
+        <View style={styles.form}>
+          <TextInput
+            style={styles.input}
+            placeholder="Nom"
+            placeholderTextColor="#aaaaaa"
+            underlineColorAndroid="transparent"
+            autoCapitalize="none"
+            onChangeText={(text) => setUserData({ ...userData, username: text })}
+          />
+          {errorUsername && <Text style={styles.textError}>{errorUsername}</Text>}
+          <TextInput
+            style={styles.input}
+            placeholder="E-mail"
+            placeholderTextColor="#aaaaaa"
+            underlineColorAndroid="transparent"
+            autoCapitalize="none"
+            onChangeText={(text) => setUserData({ ...userData, email: text })}
+          />
+          {errorMail && <Text style={styles.textError}>{errorMail}</Text>}
+          <TextInput
+            style={styles.input}
+            placeholderTextColor="#aaaaaa"
+            secureTextEntry
+            placeholder="Mot de passe"
+            underlineColorAndroid="transparent"
+            autoCapitalize="none"
+            onChangeText={(text) => setUserData({ ...userData, password: text })}
+          />
+          {errorPassword && <Text style={styles.textError}>{errorPassword}</Text>}
+          <TouchableOpacity style={styles.button} onPress={() => registerUser("register")}>
+            {loading ? (
+              <ActivityIndicator color="#ffffff" /> // Show loading indicator when loading is true
+            ) : (
+              <Text style={styles.buttonTitle}>Créer son compte</Text>
+            )}
+          </TouchableOpacity>
+          <View style={styles.footerView}>
           <Text style={styles.footerText}>
             As-tu déjà un compte ?{" "}
             <Text
@@ -137,6 +141,7 @@ export default function SignupScreen({ navigation }) {
             </Text>
           </Text>
           <Text style={styles.textError}>{error}</Text>
+        </View>
         </View>
         <View style={styles.divider}>
           <View style={styles.dividerLine} />

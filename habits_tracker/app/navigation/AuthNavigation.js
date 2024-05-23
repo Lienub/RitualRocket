@@ -16,8 +16,8 @@ const Stack = createNativeStackNavigator();
 
  */
 export default function AuthNavigation() {
+  AsyncStorage.clear()
   const [userExists, setUserExists] = useState(false);
-
   useEffect(() => {
     checkUserExists();
   }, []);
