@@ -12,10 +12,21 @@ export default function CircularProgressBar({ date, user, tasks }) {
   }, [date, tasks]);
 
   const calculateDailyStatistics = () => {
-    const completedTasks = tasks.filter(task => task.is_completed == true);
-    // Calculate percentage
-    const percentage = (completedTasks.length / tasks.length) * 100 || 0;
-    setPercentage(percentage);
+    const completedTasks = tasks.filter((task) => {
+      if(task.completedDates == null) return false;
+      let completedDates = task.completedDates.split(",");
+      return completedDates.includes(date);
+    });
+
+    if(tasks.length == 0) {
+      setPercentage(0);
+      return;
+    }
+    const dailyPercentage = Math.round(
+      (completedTasks.length / tasks.length) * 100
+    );
+
+    setPercentage(dailyPercentage);
   };
 
   return (

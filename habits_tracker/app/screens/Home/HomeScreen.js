@@ -37,9 +37,19 @@ export default function HomeScreen({ navigation, route }) {
   const [taskCompleted, setTaskCompleted] = useState(null);
 
   const updateTaskStatus = async (task, status) => {
+    let completedDates = []
+    if(!task.completedDates) {
+      completedDates.push(selectedDate);
+    } else {
+      completedDates = task.completedDates.split(",");
+      if(status === "done") {
+        completedDates.push(selectedDate);
+      } else {
+        completedDates = completedDates.filter((date) => !date.includes(selectedDate));
+      }
+    }
     const taskData = {
-      is_completed: status === "done",
-      completedDate: new Date().toISOString(),
+      completedDates: completedDates.join(","),
     };
     setTaskCompleted(task.name);
     try {
@@ -119,6 +129,15 @@ export default function HomeScreen({ navigation, route }) {
     filterTasks();
   }, [selectedDate, tasks]);
 
+  const verifyIfTaskCompleted = (task) => {
+    if (task.completedDates) {
+      const completedDates = task.completedDates.split(",");
+      const isCompleted = completedDates.some((date) => date.includes(selectedDate));
+      return isCompleted;
+    }
+    return false;
+  }
+
   useEffect(() => {
     if (timer > 0 && closeModal === true) {
       setTimer(0);
@@ -181,7 +200,7 @@ export default function HomeScreen({ navigation, route }) {
               <ListItem
                 key={task.id}
                 containerStyle={{
-                  backgroundColor: task.is_completed
+                  backgroundColor: verifyIfTaskCompleted(task)
                     ? "#42A445"
                     : COLORS[scheme].tertiary,
                   alignSelf: "center",
@@ -198,7 +217,7 @@ export default function HomeScreen({ navigation, route }) {
                   })
                 }
               >
-                {task.is_completed ? (
+                {verifyIfTaskCompleted(task) ? (
                   <Icon name="done" type="material" size={50} color="white" />
                 ) : (
                   <Icon
@@ -211,10 +230,10 @@ export default function HomeScreen({ navigation, route }) {
                 <ListItem.Content>
                   <ListItem.Title
                     style={{
-                      color: task.is_completed ? "white" : task.color,
+                      color: verifyIfTaskCompleted(task) ? "white" : task.color,
                       fontWeight: "bold",
                       fontSize: 20,
-                      textDecorationLine: task.is_completed
+                      textDecorationLine: verifyIfTaskCompleted(task)
                         ? "line-through"
                         : "none",
                     }}
@@ -223,17 +242,17 @@ export default function HomeScreen({ navigation, route }) {
                   </ListItem.Title>
                   <ListItem.Subtitle
                     style={{
-                      color: task.is_completed ? "white" : task.color,
+                      color: verifyIfTaskCompleted(task) ? "white" : task.color,
                       fontWeight: 400,
                       fontSize: 20,
                       marginTop: 4,
                     }}
                   >
-                    {task.is_completed ? "* Bien joué" : "* Fonce !"}
+                    {verifyIfTaskCompleted(task) ? "* Bien joué" : "* Fonce !"}
                   </ListItem.Subtitle>
                 </ListItem.Content>
                 <View>
-                  {task.is_completed ? (
+                  {verifyIfTaskCompleted(task) ? (
                     <Icon
                       name="close"
                       type="material"
