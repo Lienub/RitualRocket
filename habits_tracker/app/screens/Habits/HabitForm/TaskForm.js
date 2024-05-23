@@ -19,6 +19,7 @@ import { createTask, createHabit } from "../../../services/habits";
 import { getStyles } from "./styles";
 import { useSharedValue } from "react-native-reanimated";
 import { COLORS } from "../../../utils/constants/colors";
+import { useTheme } from "../../../components/Theme"
 
 function convertDays(arr) {
   const daysOfWeek = [
@@ -72,8 +73,8 @@ export default function TaskFormScreen({ navigation, route }) {
   const [timeToSpendAsDate, setTimeToSpendAsDate] = useState(new Date());
   const [timeToSpend, setTimeToSpend] = useState(new Date().toISOString().split("T")[1].split(".")[0])
   const [icons, setIcons] = useState([]);
-  const scheme = useColorScheme();
-  const styles = useMemo(() => getStyles(scheme));
+  const { theme } = useTheme();
+  const styles = useMemo(() => getStyles(theme));
   const [openFreq, setOpenFreq] = useState(false);
   const [valueFreq, setValueFreq] = useState(null);
   const itemsFreq = [
@@ -453,7 +454,7 @@ export default function TaskFormScreen({ navigation, route }) {
             title="Sauvegarder"
           />
         </Appbar.Header>
-        <Text style={styles.title}>Créez une nouvelle habitude !</Text>
+        <Text style={styles.title}>Créer une nouvelle habitude !</Text>
         {/* Title and description inputs */}
         <StyleContainer
           label="Quelques informations concernant cette habitude"

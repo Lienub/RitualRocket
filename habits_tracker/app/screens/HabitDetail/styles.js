@@ -2,6 +2,7 @@ import { StyleSheet } from "react-native";
 import { COLORS } from "../../utils/constants/colors";
 export const getStyles = (mode) => {
   const colors = mode === 'dark' ? COLORS.dark : COLORS.light;
+  const opposite = mode === 'dark' ? COLORS.light : COLORS.dark;
 
   return StyleSheet.create({
     container: {
@@ -31,6 +32,10 @@ export const getStyles = (mode) => {
       flexDirection: "row",
       width: "100%",
       backgroundColor: colors.primary,
+    },
+    appbarTitle: {
+      fontWeight: "bold",
+      color: "white",
     },
     title: {
       fontSize: 20,
@@ -106,13 +111,15 @@ export const getStyles = (mode) => {
     blockStats: {
       flexDirection: "column",
       justifyContent: "space-around",
+      alignSelf: "center",
       marginTop: 20,
-      backgroundColor: "white",
+      backgroundColor: colors.primary,
+      width: "90%",
       borderRadius: 20,
       padding: 20,
     },
     itemInfo: {
-      backgroundColor: "white",
+      backgroundColor: opposite.tertiary + "5",
       padding: 10,
       borderRadius: 20,
       borderBottomWidth: 1,
@@ -121,13 +128,13 @@ export const getStyles = (mode) => {
       borderTopWidth: 0.2,
     },
     statsTitle: {
-      color: "#000",
+      color: opposite.text,
       fontSize: 14,
       textAlign: "center",
       fontWeight: "bold",
     },
     statsValue: {
-      color: "#000",
+      color: opposite.text,
       fontSize: 14,
       width: 100,
       textAlign: "center",
@@ -135,5 +142,20 @@ export const getStyles = (mode) => {
       marginTop: 5,
       justifyContent: "center",
     },
+    chartConfig: {
+      backgroundGradientFrom: colors.primary,
+      backgroundGradientFromOpacity: 1,
+      backgroundGradientTo: colors.primary,
+      backgroundGradientToOpacity: 1,
+      decimalPlaces: 0,
+      color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+      labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+      propsForDots: {
+        r: "6",
+        strokeWidth: "2",
+        stroke: "#ffa726",
+      },
+    },
+    iconColor: opposite.text,
   })
 };

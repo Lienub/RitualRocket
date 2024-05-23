@@ -46,10 +46,10 @@ export const getStyles = (mode) => {
       backgroundColor: colors.primary,
     },
     appbarBackaction: {
-      color: colors.text,
+      color: "white",
     },
     appbarTitle: {
-      color: colors.text,
+      color: "white",
       fontSize: 20,
       fontWeight: "500",
       alignSelf: "flex-start",

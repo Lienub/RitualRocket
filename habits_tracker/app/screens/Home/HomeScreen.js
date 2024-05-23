@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { View, Text, ScrollView, useColorScheme, Image } from "react-native";
+import { View, Text, ScrollView, useColortheme, Image } from "react-native";
 import { ListItem, Icon } from "react-native-elements";
 import CalendarStrip from "react-native-calendar-strip";
 import { Appbar } from "react-native-paper";
@@ -11,10 +11,11 @@ import CircularProgressBar from "../../components/CircularProgressBar/CiruclarPr
 import { getStyles } from "./styles";
 import { COLORS } from "../../utils/constants/colors";
 import NiceSuccesModal from "../../components/NiceSuccessModal";
+import { useTheme } from "../../components/Theme";
 
 export default function HomeScreen({ navigation, route }) {
-  const scheme = useColorScheme();
-  const styles = useMemo(() => getStyles(scheme), [scheme]);
+  const { theme } = useTheme();
+  const styles = useMemo(() => getStyles(theme));
   const isFocused = useIsFocused();
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split("T")[0]
@@ -154,9 +155,9 @@ export default function HomeScreen({ navigation, route }) {
           calendarAnimation={{ type: "sequence", duration: 30 }}
           daySelectionAnimation={{ type: "border", duration: 300 }}
           style={styles.calendarStrip}
-          calendarHeaderStyle={{ color: COLORS[scheme].text, fontSize: 20 }}
-          dateNumberStyle={{ color: COLORS[scheme].text, fontSize: 20 }}
-          dateNameStyle={{ color: COLORS[scheme].text, fontSize: 10 }}
+          calendarHeaderStyle={{ color: COLORS[theme].text, fontSize: 20 }}
+          dateNumberStyle={{ color: COLORS[theme].text, fontSize: 20 }}
+          dateNameStyle={{ color: COLORS[theme].text, fontSize: 10 }}
           highlightDateNumberStyle={{
             color: "orange",
             fontSize: 23,
@@ -183,12 +184,12 @@ export default function HomeScreen({ navigation, route }) {
                 containerStyle={{
                   backgroundColor: task.is_completed
                     ? "#42A445"
-                    : COLORS[scheme].tertiary,
+                    : COLORS[theme].tertiary,
                   alignSelf: "center",
                   marginTop: 5,
                   borderRadius: 10,
                   borderWidth: 3,
-                  borderColor: COLORS[scheme].primary,
+                  borderColor: COLORS[theme].primary,
                   width: "95%",
                 }}
                 onPress={() =>

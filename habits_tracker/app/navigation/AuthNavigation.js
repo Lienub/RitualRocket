@@ -6,6 +6,7 @@ import SignupScreen from "../screens/Signup/SignupScreen";
 import SigninScreen from "../screens/Signin/SigninScreen";
 import MainNavigation from "../navigation/MainNavigation";
 import ResetPasswordScreen from "../screens/ResetPassword/ResetPassword";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Stack = createNativeStackNavigator();
 
@@ -38,7 +39,7 @@ export default function AuthNavigation() {
             <Stack.Screen name="Signin" component={SigninScreen} />
             <Stack.Screen name="Signup" component={SignupScreen} />
             <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
-            <Stack.Screen name="Home" component={MainNavigation} />
+            <Stack.Screen name="MainNavigation" component={MainNavigation} />
           </>
         ) : (
           <Stack.Screen name="MainNavigation" component={MainNavigation} />

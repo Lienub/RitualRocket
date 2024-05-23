@@ -5,11 +5,12 @@ import { getStyles } from "./styles";
 import { Appbar } from "react-native-paper";
 import { getCategories } from "../../../services/habits";
 import { NiceTextButton, StyleContainer } from "../../../components";
+import { useTheme } from "../../../components/Theme"
 
 export default function CategoryListScreen({ navigation }) {
   const [categories, setCategories] = useState([]);
-  const scheme = useColorScheme();
-  const styles = useMemo(() => getStyles(scheme));
+  const { theme } = useTheme();
+  const styles = useMemo(() => getStyles(theme));
   useEffect(() => {
     getCategories()
       .then((categories) => setCategories(categories))
@@ -28,14 +29,14 @@ export default function CategoryListScreen({ navigation }) {
           icon={() => <Ionicons name="close" size={30} color="#fff" />}
           onPress={() => navigation.navigate("Home")}
         />
-        <Appbar.Content title="Choisis une catégorie" titleStyle={styles.title} />
+        <Appbar.Content title="Catégories" titleStyle={styles.appbarTitle} />
       </Appbar.Header>
       <StyleContainer
         label="Tu ne trouves pas ton bonheur ?"
       >
         <NiceTextButton
           text="Réalise ta propre habitude !"
-          onPress={() => navigation.navigate("TaskForm",{ habitId: null, categoryId: null, habitTitle: null})}
+          onPress={() => navigation.navigate("TaskForm",{ habitId: 999, categoryId: 999, habitTitle: "Custom"})}
         />
       </StyleContainer>
       <FlatList

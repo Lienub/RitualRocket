@@ -10,14 +10,15 @@ import {
 } from "react-native";
 import { useMemo } from "react";
 import { COLORS } from "../utils/constants/colors";
+import { useTheme } from "./Theme";
 
 export default function NiceSuccesModal({
   visible,
   onRequestClose,
   taskTitle,
 }) {
-  const scheme = useColorScheme();
-  const styles = useMemo(() => getStyles(scheme), [scheme]);
+  const {theme} = useTheme();
+  const styles = useMemo(() => getStyles(theme));
 
   return (
     <Modal
@@ -28,7 +29,7 @@ export default function NiceSuccesModal({
     >
       <View style={styles.modal}>
         <View style={styles.viewModal}>
-          <Text style={styles.congratsText}>Bravo!</Text>
+          <Text style={styles.congratsText}>Bravo !</Text>
           <View style={styles.lineStyle} />
           <View style={styles.imagesContainer}>
             <Image
@@ -64,7 +65,7 @@ const getStyles = (scheme) =>
     modal: {
       flex: 1,
       justifyContent: "center",
-      backgroundColor: "rgba(0, 0, 0, 0.4)",
+      backgroundColor: COLORS[scheme].tertiary +"5",
     },
     viewModal: {
       margin: 20,
@@ -119,11 +120,13 @@ const getStyles = (scheme) =>
       paddingVertical: 10,
       paddingHorizontal: 20,
       borderRadius: 10,
+      borderTopLeftRadius: 0,
+      borderTopRightRadius: 0,
       width: "100%",
       marginTop: 10,
     },
     closeButtonText: {
-      color: COLORS[scheme].text,
+      color: 'white',
       fontWeight: "bold",
       fontSize: 16,
       textAlign: "center",

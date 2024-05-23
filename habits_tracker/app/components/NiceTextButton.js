@@ -1,12 +1,13 @@
 import { useColorScheme, StyleSheet, Pressable, View, Text } from "react-native";
 import React, { useState, useEffect, useMemo } from "react";
 import { COLORS } from "../utils/constants/colors";
+import { useTheme } from "./Theme";
 
 
 export function NiceTextButton({ ...props }) {
     const [displayText, setDisplayText] = useState(props.text);
-    const scheme = useColorScheme();
-    const styles = useMemo(() => getStyles(scheme));
+    const {theme} = useTheme();
+    const styles = useMemo(() => getStyles(theme));
 
     // Update the display text when the text prop changes
     useEffect(() => {
@@ -21,8 +22,8 @@ export function NiceTextButton({ ...props }) {
             style={({ pressed }) => [
                 {
                     backgroundColor: pressed
-                        ? COLORS[scheme].secondary
-                        : COLORS[scheme].primary,
+                        ? COLORS[theme].secondary
+                        : COLORS[theme].primary,
                 },
                 styles.container,
             ]}
@@ -44,7 +45,7 @@ const getStyles = (scheme) => StyleSheet.create({
         justifyContent: "center",
     },
     text: {
-        color: "#fff",
+        color: 'white',
         fontSize: 20
     }
 })

@@ -3,7 +3,7 @@ import { Platform, useColorScheme } from 'react-native';
 // Navigation imports
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import {BottomTabBar} from './app/components/BottomTabBar';
+import { BottomTabBar } from './app/components/BottomTabBar';
 // Component / Screen imports
 import SplashScreen from './app/components/SplashScreen';
 import { authUserExists } from "./app/services/users";
@@ -17,6 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AuthNavigation from "./app/navigation/AuthNavigation";
 import { LogBox } from "react-native";
+import { ThemeProvider } from './app/components/Theme';
 
 const Stack = createNativeStackNavigator();
 
@@ -57,12 +58,14 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer
-      style={{ marginBottom: 20 }}
-    >
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="AuthNavigation" component={AuthNavigation} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <ThemeProvider>
+      <NavigationContainer
+        style={{ marginBottom: 20 }}
+      >
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="AuthNavigation" component={AuthNavigation} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </ThemeProvider>
   );
 }

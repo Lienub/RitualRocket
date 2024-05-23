@@ -11,6 +11,7 @@ import ChangePassword from "../screens/ChangePassword/ChangePassword";
 import ChangeInformations from "../screens/ChangeInformations/ChangeInformations";
 import ModifyTaskFormScreen from "../screens/Habits/HabitForm/ModifyTaskForm";
 import { getUserInfo } from "../services/users";
+import { Text } from "react-native";
 
 const Stack = createNativeStackNavigator();
 
@@ -55,7 +56,8 @@ export default function MainNavigation() {
           <Stack.Screen name="AuthNavigation" component={AuthNavigation} />
         </Stack.Navigator>
       ) : (
-        <></>
+        <>
+        </>
       )}
     </>
   );
