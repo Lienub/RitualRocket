@@ -147,7 +147,6 @@ export default function HomeScreen({ navigation, route }) {
   }
 
   const countCompletedDays = (task) => {
-    console.log("TASK", task);
     if (task.completedDates) {
       console.log(task.completedDates);
       return task.completedDates.split(',').length;

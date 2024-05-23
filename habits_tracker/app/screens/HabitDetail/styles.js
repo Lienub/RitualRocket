@@ -78,6 +78,9 @@ export const getStyles = (mode) => {
       marginTop: 20,
       backgroundColor: colors.background,
       height: 400,
+      shadowColor: 'black',
+      shadowOffset: { width: -2, height: 4 },
+      shadowOpacity: 0.2,
     },
     infoContainer: {
       backgroundColor: colors.background,
@@ -95,11 +98,14 @@ export const getStyles = (mode) => {
       backgroundColor: colors.primary,
       borderRadius: 20,
       flexDirection: "row",
-      borderWidth: 2,
-      borderColor: colors.secondary,
+      shadowColor: 'black',
+      shadowOffset: { width: -2, height: 4 },
+      shadowOpacity: 0.2,
+      shadowRadius: 3,
+      
     },
     followingText: {
-      color: "black",
+      color: colors.text,
       fontSize: 15,
       fontWeight: "400",
     },
@@ -117,6 +123,10 @@ export const getStyles = (mode) => {
       width: "90%",
       borderRadius: 20,
       padding: 20,
+      shadowColor: 'black',
+      shadowOffset: { width: -2, height: 4 },
+      shadowOpacity: 0.2,
+      shadowRadius: 3,
     },
     itemInfo: {
       backgroundColor: opposite.tertiary + "5",
@@ -126,6 +136,7 @@ export const getStyles = (mode) => {
       borderRightWidth: 1,
       borderLeftWidth: 0.2,
       borderTopWidth: 0.2,
+      
     },
     statsTitle: {
       color: opposite.text,
@@ -147,7 +158,7 @@ export const getStyles = (mode) => {
       backgroundGradientFromOpacity: 1,
       backgroundGradientTo: colors.primary,
       backgroundGradientToOpacity: 1,
-      decimalPlaces: 0,
+      decimalPlaces: 2,
       color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
       labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
       propsForDots: {

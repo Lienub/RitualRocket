@@ -170,7 +170,8 @@ export default function StatisticsScreen({ navigation, route }) {
                   data={lineChartDataLastDays}
                   width={Dimensions.get("window").width * 0.9}
                   height={Dimensions.get("window").height / 2 * 0.9}
-                  formatYLabel={(yValue) => yValue + "s"}
+                  formatYLabel={(yValue) => yValue}
+                  yAxisSuffix="s"
                   chartConfig={{
                     backgroundColor: "#e26a00",
                     backgroundGradientFrom: "#fb8c00",
