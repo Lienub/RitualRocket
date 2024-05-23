@@ -21,6 +21,7 @@ const Stack = createNativeStackNavigator();
  */
 export default function MainNavigation() {
   const [user, setUser] = useState(null);
+
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {

@@ -94,6 +94,7 @@ export const createUserGoogleId = async (userFromGoogle, setUserInfo) => {
 export const loginUserGoogleId = async (userFromGoogle, setUserInfo) => {
   let data = await login(userFromGoogle);
   AsyncStorage.setItem("user", JSON.stringify(data));
+  console.log(data)
   setUserInfo(data);
 };
 
@@ -154,7 +155,7 @@ export const signInWithGoogle = async (
       response.authentication.accessToken
     );
 
-    const userExistsInDatabase = await checkUserExistsInDatabase(
+    let userExistsInDatabase = await checkUserExistsInDatabase(
       userFromGoogle.id
     );
 
@@ -166,13 +167,15 @@ export const signInWithGoogle = async (
       token: response.authentication.accessToken,
     };
 
-    if (userExistsInDatabase && userExistsInDatabase.id) {
+    if (userExistsInDatabase && userExistsInDatabase.user && userExistsInDatabase.user.id) {
+      console.log("user exsits")
       await loginUserGoogleId(user, setUserInfo);
     } else {
+      console.log("user not exists")
       await createUserGoogleId(user, setUserInfo);
     }
 
-    navigation.navigate("MainNavigation");
+    navigation.navigate("Home");
   } catch (error) {
     console.error("Error signing in with Google:", error);
   }

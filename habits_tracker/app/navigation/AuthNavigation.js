@@ -42,7 +42,7 @@ export default function AuthNavigation() {
             <Stack.Screen name="MainNavigation" component={MainNavigation} />
           </>
         ) : (
-          <Stack.Screen name="MainNavigation" component={MainNavigation} />
+          <Stack.Screen name="Home" component={MainNavigation} />
         )}
       </Stack.Navigator>
     </>
