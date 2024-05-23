@@ -70,6 +70,10 @@ const Task = sequelize.define("Task", {
     defaultValue: 0,
     type: DataTypes.BIGINT,
   },
+  completedDates: {
+    allowNull: true,
+    type: DataTypes.TEXT,
+  }
 });
 
 Task.associate = (db) => {

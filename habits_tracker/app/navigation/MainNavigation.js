@@ -11,6 +11,7 @@ import ChangePassword from "../screens/ChangePassword/ChangePassword";
 import ChangeInformations from "../screens/ChangeInformations/ChangeInformations";
 import ModifyTaskFormScreen from "../screens/Habits/HabitForm/ModifyTaskForm";
 import { getUserInfo } from "../services/users";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Stack = createNativeStackNavigator();
 
@@ -20,6 +21,7 @@ const Stack = createNativeStackNavigator();
  */
 export default function MainNavigation() {
   const [user, setUser] = useState(null);
+
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
