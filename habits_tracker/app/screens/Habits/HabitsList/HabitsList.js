@@ -30,7 +30,7 @@ export default function HabitsListScreen({ navigation, route }) {
       >
         <NiceTextButton
           text="Réalise ta propre habitude !"
-          onPress={() => navigation.navigate("TaskForm",{habitId: 999, categoryId: 999, habitTitle: "Custom"})}
+          onPress={() => navigation.navigate("TaskForm",{ habitId: 99, categoryId: 13, habitTitle: "Custom"})}
         />
       </StyleContainer>
       <FlatList

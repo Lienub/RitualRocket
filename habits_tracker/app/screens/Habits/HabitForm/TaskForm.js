@@ -62,12 +62,7 @@ export default function TaskFormScreen({ navigation, route }) {
   const [showModalColor, setShowModalColor] = useState(false);
   const [showFreqModal, setShowFreqModal] = useState(false);
   const [selectedInput, setSelectedInput] = useState(null);
-  let utcDate = new Date();
-  let timeZone = 'Europe/Paris';
-  let zonedDate = toZonedTime(utcDate, 2);
   const [rappelTimeAsDate, setRappelTimeAsDate] = useState(new Date());
-  console.log("RAPPELTIME: ", zonedDate);
-  console.log("Current Local Time:", new Date());
   const [rappelTime, setRappelTime] = useState(new Date().toISOString().split("T")[1].split(".")[0]);
   const [rappelHint, setRappelHint] = useState(false);
   const [searchIcon, setSearchIcon] = useState("");
@@ -370,8 +365,8 @@ export default function TaskFormScreen({ navigation, route }) {
             minDate={new Date().toISOString().split("T")[0]}
             markingType={"period"}
             markedDates={{
-              [startDate]: { startingDay: true, color: "blue" },
-              [endDate]: { endingDay: true, color: "blue" },
+              [startDate]: { startingDay: true, color: COLORS[theme].primary },
+              [endDate]: { endingDay: true, color: COLORS[theme].primary },
             }}
           />
           <TouchableOpacity
@@ -405,7 +400,7 @@ export default function TaskFormScreen({ navigation, route }) {
           {rappelHint && <Text style={{ color: 'red' }}>Vous devez choisir au moins un jour de la semaine !</Text>}
           <StyleContainer
             label="Heure"
-            custom="#303030"
+            custom={COLORS[theme].tertiary}
           >
             <DateTimePicker
               value={rappelTimeAsDate}
