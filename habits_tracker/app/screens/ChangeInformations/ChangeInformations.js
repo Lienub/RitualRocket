@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Image,
   Text,
@@ -10,7 +10,8 @@ import {
 import { Appbar } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
 import { getUserInfo, changeUserInformations, removeUserInfo } from "../../services/users";
-import styles from "./styles";
+import { getStyles } from "./styles";
+import { useTheme } from "../../components/Theme";
 import Images from "../../utils/constants/images";
 
 export default function ResetPasswordScreen({ navigation, route }) {
@@ -19,6 +20,8 @@ export default function ResetPasswordScreen({ navigation, route }) {
   const [username, setUsername] = useState(user.username);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const { theme } = useTheme();
+  const styles = useMemo(() => getStyles(theme));
 
 
   const handleResetPassword = async () => {
@@ -40,25 +43,25 @@ export default function ResetPasswordScreen({ navigation, route }) {
   return (
     <View style={styles.container}>
       <Appbar.Header style={styles.appbar}>
-            <Appbar.Action
-                icon={() => <Ionicons name="close" size={30} color="#fff" />}
-                onPress={() => navigation.goBack()}
-            />
-            <Appbar.Content title="Modifier" titleStyle={styles.title} />
-        </Appbar.Header>
+        <Appbar.Action
+          icon={() => <Ionicons name="close" size={30} color="#fff" />}
+          onPress={() => navigation.goBack()}
+        />
+        <Appbar.Content title="Modifier" titleStyle={styles.title} />
+      </Appbar.Header>
       <View style={styles.background}>
         <View style={styles.overlay} />
         <Image style={styles.logo} source={Images.Logo} />
         <TextInput
           style={styles.input}
-          defaultValue = {user.username}
+          defaultValue={user.username}
           placeholder="Nom d'utilisateur"
           placeholderTextColor="#aaaaaa"
           onChangeText={(text) => setUsername(text)}
         />
         <TextInput
           style={styles.input}
-          defaultValue = {user.email}
+          defaultValue={user.email}
           placeholder="Adresse e-mail"
           placeholderTextColor="#aaaaaa"
           onChangeText={(text) => setEmail(text)}

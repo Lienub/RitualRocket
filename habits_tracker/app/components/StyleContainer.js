@@ -5,6 +5,7 @@ import { useTheme } from './Theme';
 
 export const StyleContainer = ({ ...props }) => {
   const {theme} = useTheme();
+  console.log(props.custom);
   const styles = useMemo(() => getStyles(theme, props.custom));
 
   return (
