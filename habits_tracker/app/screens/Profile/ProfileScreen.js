@@ -18,18 +18,20 @@ import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
 import { getStyles } from './styles';
 import { useTheme } from "../../components/Theme";
+import { COLORS } from "../../utils/constants/colors";
 
 export default function ProfileScreen({ navigation, route }) {
   const { user } = route.params;
   const [csvData, setCsvData] = useState([]);
   const isFocused = useIsFocused();
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
-  const {theme} = useTheme();
+  const { theme } = useTheme();
   const styles = useMemo(() => getStyles(theme))
 
   const handleDeleteAccount = () => {
     removeAccount(user.userId);
     removeUserInfo();
+    setShowDeleteAlert(false);
     navigation.navigate("AuthNavigation");
   };
 
@@ -53,7 +55,7 @@ export default function ProfileScreen({ navigation, route }) {
   const exportCSV = async () => {
     try {
       const headers = Object.keys(csvData[0]).join(",") + "\n";
-      
+
       const csvContent =
         headers + csvData.map((row) => Object.values(row).join(",")).join("\n");
 
@@ -85,13 +87,22 @@ export default function ProfileScreen({ navigation, route }) {
         />
         <Appbar.Content title="Profil" titleStyle={styles.appbarTitle} />
         <Appbar.Action
-          icon={() => <Ionicons name="pencil" size={30} color="#fff" />}
+          icon={() => <Ionicons name="pencil" size={20} color="#fff" />}
           onPress={() => navigation.navigate("ChangeInformations")}
         />
       </Appbar.Header>
       <ScrollView style={styles.container}>
-        <Text style={styles.title}>{user.username}</Text>
-        <Text style={styles.title}>{user.email}</Text>
+        <View style={styles.infoContainer}>
+          <Ionicons name="person-circle" size={100} color={COLORS[theme].text} style={{ alignSelf: "center" }} />
+          <View style={styles.textIcon}>
+            <Ionicons name="id-card" size={20} color={COLORS[theme].text} style={{ marginTop: 20, alignSelf: "center" }} />
+            <Text style={styles.title}>{user.username}</Text>
+          </View>
+          <View style={styles.textIcon}>
+            <Ionicons name="mail" size={20} color={COLORS[theme].text} style={{ marginTop: 20, alignSelf: "center" }} />
+            <Text style={styles.title}>{user.email}</Text>
+          </View>
+        </View>
         <TouchableOpacity
           style={styles.button}
           onPress={() => {
@@ -99,7 +110,10 @@ export default function ProfileScreen({ navigation, route }) {
             navigation.navigate("AuthNavigation");
           }}
         >
-          <Text style={{ color: "#fff" }}>Se déconnecter</Text>
+          <View style={styles.textIcon}>
+            <Ionicons name="log-out" size={20} color="white" style={{ alignSelf: "center" }} />
+            <Text style={{ color: "#fff" }}>Se déconnecter</Text>
+          </View>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.button}
@@ -107,19 +121,28 @@ export default function ProfileScreen({ navigation, route }) {
             navigation.navigate("ChangePassword");
           }}
         >
-          <Text style={{ color: "#fff" }}>Changer le mot de passe</Text>
+          <View style={styles.textIcon}>
+            <Ionicons name="key" size={20} color="white" style={{ alignSelf: "center" }} />
+            <Text style={{ color: "#fff" }}>Changer le mot de passe</Text>
+          </View>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={exportCSV} disabled={(csvData.length == 0)}>
-          <Text style={{ color: "#fff" }}>
-            {
-              csvData.length == 0
-                ? "Aucune tâche à exporter (CSV)"
-                : "Exporter vos tâches (CSV)"
-            }
-          </Text>
+          <View style={styles.textIcon}>
+            <Ionicons name="person-add" size={20} color="white" style={{ alignSelf: "center" }} />
+            <Text style={{ color: "#fff" }}>
+              {
+                csvData.length == 0
+                  ? "Aucune tâche à exporter (CSV)"
+                  : "Exporter vos tâches (CSV)"
+              }
+            </Text>
+          </View>
         </TouchableOpacity>
         <TouchableOpacity style={styles.buttonRemove} onPress={() => setShowDeleteAlert(true)}>
-        <Text style={{ color: "#fff" }}>Supprimer votre compte</Text>
+          <View style={styles.textIcon}>
+            <Ionicons name="trash" size={20} color="white" style={{ alignSelf: "center" }} />
+            <Text style={{ color: "#fff" }}>Supprimer votre compte</Text>
+          </View>
         </TouchableOpacity>
 
         <AwesomeAlert
@@ -138,8 +161,17 @@ export default function ProfileScreen({ navigation, route }) {
           onConfirmPressed={handleDeleteAccount}
           confirmButtonTextStyle={{ fontSize: 20 }}
           cancelButtonTextStyle={{ fontSize: 20 }}
-          messageStyle={{ fontSize: 15, textAlign: "center"}}
-          titleStyle={{ fontSize: 20 }}
+          messageStyle={{ fontSize: 15, textAlign: "center" }}
+          titleStyle={{ fontSize: 20, color: COLORS[theme].text }}
+          contentContainerStyle={
+            {
+              backgroundColor: COLORS[theme].tertiary,
+              shadowColor: 'black',
+              shadowOffset: { width: -2, height: 4 },
+              shadowOpacity: 0.2,
+            }
+          }
+          cancelButtonColor={COLORS[theme].primary}
         />
       </ScrollView>
     </View>

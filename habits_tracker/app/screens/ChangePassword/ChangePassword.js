@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Image,
   Text,
@@ -10,7 +10,8 @@ import {
 import { Appbar } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
 import { resetPassword, removeUserInfo } from "../../services/users";
-import styles from "./styles";
+import {getStyles} from "./styles";
+import { useTheme } from "../../components/Theme";
 import Images from "../../utils/constants/images";
 
 export default function ResetPasswordScreen({ navigation, route }) {
@@ -20,7 +21,8 @@ export default function ResetPasswordScreen({ navigation, route }) {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
+  const { theme } = useTheme();
+  const styles = useMemo(() => getStyles(theme));
 
   const handleResetPassword = async () => {
     if (!email || !newPassword || !confirmPassword) {

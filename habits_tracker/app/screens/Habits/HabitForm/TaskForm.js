@@ -20,7 +20,7 @@ import { getStyles } from "./styles";
 import { useSharedValue } from "react-native-reanimated";
 import { COLORS } from "../../../utils/constants/colors";
 import { useTheme } from "../../../components/Theme"
-
+import { toZonedTime } from 'date-fns-tz'
 function convertDays(arr) {
   const daysOfWeek = [
     "sunday",
@@ -38,7 +38,7 @@ function convertDays(arr) {
     })
     .join(",")
 
-  if(res == [""]) {
+  if (res == [""]) {
     res = "monday";
   }
 
@@ -62,7 +62,12 @@ export default function TaskFormScreen({ navigation, route }) {
   const [showModalColor, setShowModalColor] = useState(false);
   const [showFreqModal, setShowFreqModal] = useState(false);
   const [selectedInput, setSelectedInput] = useState(null);
+  let utcDate = new Date();
+  let timeZone = 'Europe/Paris';
+  let zonedDate = toZonedTime(utcDate, 2);
   const [rappelTimeAsDate, setRappelTimeAsDate] = useState(new Date());
+  console.log("RAPPELTIME: ", zonedDate);
+  console.log("Current Local Time:", new Date());
   const [rappelTime, setRappelTime] = useState(new Date().toISOString().split("T")[1].split(".")[0]);
   const [rappelHint, setRappelHint] = useState(false);
   const [searchIcon, setSearchIcon] = useState("");
@@ -71,7 +76,9 @@ export default function TaskFormScreen({ navigation, route }) {
   const [loadingIcons, setLoadingIcons] = useState(true);
   const [originalIcons, setOriginalIcons] = useState([]);
   const [timeToSpendAsDate, setTimeToSpendAsDate] = useState(new Date());
-  const [timeToSpend, setTimeToSpend] = useState(new Date().toISOString().split("T")[1].split(".")[0])
+  const [timeToSpend, setTimeToSpend] = useState(new Date())
+  timeToSpend.setHours(0, 5, 0, 0)
+  console.log("TIMETOSPEND: ", timeToSpend, "TYPE: ", typeof timeToSpend)
   const [icons, setIcons] = useState([]);
   const { theme } = useTheme();
   const styles = useMemo(() => getStyles(theme));
@@ -176,6 +183,7 @@ export default function TaskFormScreen({ navigation, route }) {
   };
   const handleRappelChange = (event, selectedTime) => {
     const current = selectedTime || new Date();
+    console.log("RAPPEL: ", current);
     let time = current.toISOString().split("T")[1].split(".")[0];
     if (rappelTime == time) { return; }
     setRappelTime(time);
@@ -189,15 +197,17 @@ export default function TaskFormScreen({ navigation, route }) {
 
 
   const handleTimeToSpend = (event, selectedTime) => {
-    const current = selectedTime || new Date();
-  
+    console.log("SELECTEDTIME: ", selectedTime)
+    const current = selectedTime || new Date().setHours(0, 5, 0, 0);
+
     const hours = current.getHours();
     const minutes = current.getMinutes();
     const seconds = current.getSeconds();
-  
+
     const time = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  
+
     const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+    console.log("TOTALSECONDS: ", totalSeconds)
     setTimeToSpendAsDate(totalSeconds);
   }
 
@@ -571,7 +581,7 @@ export default function TaskFormScreen({ navigation, route }) {
               label="Temps"
             >
               <DateTimePicker
-                 value={new Date()}
+                value={timeToSpend}
                 mode="time"
                 onChange={handleTimeToSpend}
               />
