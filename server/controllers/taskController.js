@@ -2,7 +2,7 @@ const { Task } = require("../models");
 
 const createTask = async (req, res) => {
   try {
-    const { name, description, iconType, color, repeat, repeatDays, repeatWeeks, repeatMonths, endDate, reminder, sound, is_completed, rappelTime, completedDate, habitId, userId, categoryId, startDate } = req.body;
+    const { name, description, iconType, color, repeat, repeatDays, repeatWeeks, repeatMonths, endDate, reminder, sound, is_completed, rappelTime, goalTimeByDay, completedDate, habitId, userId, categoryId, startDate, completedDates } = req.body;
     const task = await Task.create({ 
       name, 
       description, 
@@ -19,14 +19,15 @@ const createTask = async (req, res) => {
       completedDate, 
       HabitId: habitId, 
       UserId: userId, 
+      goalTimeByDay,
       CategoryId: categoryId,
       rappelTime,
       endDate: new Date(endDate) || new Date(),
+      completedDates
     });
     res.status(201).json(task);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
   }
 };
 
@@ -36,7 +37,6 @@ const getAllTasks = async (req, res) => {
     res.status(200).json(tasks);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -47,7 +47,6 @@ const getTasksByUserId = async (req, res) => {
     res.status(200).json(tasks);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
   }
 };
 const getTaskById = async (req, res) => {
@@ -57,7 +56,6 @@ const getTaskById = async (req, res) => {
     res.status(200).json(task);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
   }
 };
 const updateTask = async (req, res) => {
@@ -67,7 +65,6 @@ const updateTask = async (req, res) => {
     res.status(200).json(updatedTask);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -78,7 +75,6 @@ const deleteTask = async (req, res) => {
     res.status(204).end();
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
   }
 };
 

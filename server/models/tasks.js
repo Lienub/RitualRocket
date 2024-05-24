@@ -60,11 +60,20 @@ const Task = sequelize.define("Task", {
     allowNull: true,
     type: DataTypes.STRING,
   },
+  goalTimeByDay: {
+    allowNull: true,
+    defaultValue: 0,
+    type: DataTypes.BIGINT,
+  },
   totalTime: {
     allowNull: true,
     defaultValue: 0,
     type: DataTypes.BIGINT,
   },
+  completedDates: {
+    allowNull: true,
+    type: DataTypes.TEXT,
+  }
 });
 
 Task.associate = (db) => {

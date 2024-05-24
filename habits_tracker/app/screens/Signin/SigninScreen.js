@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   IOS_CLIENT_ID,
   ANDROID_CLIENT_ID,
   WEB_CLIENT_ID,
-  REDIRECT_URL,
+  REDIRECT_URL_ANDROID,
+  REDIRECT_URL_IOS,
 } from "@env";
 import {
   SafeAreaView,
@@ -13,29 +14,33 @@ import {
   TouchableOpacity,
   View,
   ActivityIndicator,
+  Platform
 } from "react-native";
 import * as Google from "expo-auth-session/providers/google";
 import SocialMediaButton from "../../components/Buttons/SocialMediaButton";
 import Images from "../../utils/constants/images";
-import styles from "./styles";
+import { getStyles } from "./styles";
 import {
   login,
   signInWithGoogle,
   storeUserInfoInStorage,
 } from "../../services/users";
+import { useTheme } from "../../components/Theme";
 
 export default function SigninScreen({ navigation }) {
   const [error, setError] = useState("");
   const [errorMail, setErrorMail] = useState("");
   const [errorPassword, setErrorPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const { theme } = useTheme();
+  const styles = useMemo(() => getStyles(theme))
 
   // Google Auth
   const [request, response, promptAsync] = Google.useAuthRequest({
     iosClientId: IOS_CLIENT_ID,
     androidClientId: ANDROID_CLIENT_ID,
     webClientId: WEB_CLIENT_ID,
-    redirectUri: REDIRECT_URL,
+    redirectUri: Platform.OS == "ios" ? REDIRECT_URL_IOS : REDIRECT_URL_ANDROID,
   });
 
   const [userData, setUserData] = useState({
@@ -89,52 +94,54 @@ export default function SigninScreen({ navigation }) {
       <View style={styles.background}>
         <View style={styles.overlay} />
         <Image style={styles.logo} source={Images.Logo} />
-        <TextInput
-          style={styles.input}
-          placeholder="E-mail"
-          placeholderTextColor="#aaaaaa"
-          underlineColorAndroid="transparent"
-          autoCapitalize="none"
-          onChangeText={(text) => setUserData({ ...userData, email: text })}
-        />
-        {errorMail && <Text style={styles.textError}>{errorMail}</Text>}
-        <TextInput
-          style={styles.input}
-          placeholderTextColor="#aaaaaa"
-          secureTextEntry
-          placeholder="Mot de passe"
-          underlineColorAndroid="transparent"
-          autoCapitalize="none"
-          onChangeText={(text) => setUserData({ ...userData, password: text })}
-        />
-        {errorPassword && <Text style={styles.textError}>{errorPassword}</Text>}
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => signInUser("login")}
-        >
-          {loading ? (
-            <ActivityIndicator color="#ffffff" />
-          ) : (
-            <Text style={styles.buttonTitle}>Se connecter</Text>
-          )}
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("Signup")}
-        >
-          <Text style={styles.buttonTitle}>Se créer un compte</Text>
-        </TouchableOpacity>
-        <View style={styles.footerView}>
-          <Text style={styles.footerText}>
-            Mot de passe oublié ?{" "}
-            <Text
-              onPress={() => navigation.navigate("ResetPassword")}
-              style={styles.footerLink}
-            >
-              Réinitialise-le
+        <View style={styles.form}>
+          <TextInput
+            style={styles.input}
+            placeholder="E-mail"
+            placeholderTextColor="#aaaaaa"
+            underlineColorAndroid="transparent"
+            autoCapitalize="none"
+            onChangeText={(text) => setUserData({ ...userData, email: text })}
+          />
+          {errorMail && <Text style={styles.textError}>{errorMail}</Text>}
+          <TextInput
+            style={styles.input}
+            placeholderTextColor="#aaaaaa"
+            secureTextEntry
+            placeholder="Mot de passe"
+            underlineColorAndroid="transparent"
+            autoCapitalize="none"
+            onChangeText={(text) => setUserData({ ...userData, password: text })}
+          />
+          {errorPassword && <Text style={styles.textError}>{errorPassword}</Text>}
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => signInUser("login")}
+          >
+            {loading ? (
+              <ActivityIndicator color="#ffffff" />
+            ) : (
+              <Text style={styles.buttonTitle}>Se connecter</Text>
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation.navigate("Signup")}
+          >
+            <Text style={styles.buttonTitle}>Se créer un compte</Text>
+          </TouchableOpacity>
+          <View style={styles.footerView}>
+            <Text style={styles.footerText}>
+              Mot de passe oublié ?{" "}
+              <Text
+                onPress={() => navigation.navigate("ResetPassword")}
+                style={styles.footerLink}
+              >
+                Réinitialise-le
+              </Text>
             </Text>
-          </Text>
-          <Text style={styles.textError}>{error}</Text>
+            <Text style={styles.textError}>{error}</Text>
+          </View>
         </View>
         <View style={styles.divider}>
           <View style={styles.dividerLine} />

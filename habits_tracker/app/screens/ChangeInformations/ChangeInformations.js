@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Image,
   Text,
@@ -9,31 +9,20 @@ import {
 } from "react-native";
 import { Appbar } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
-import { getUserInfo, changeUserInformations } from "../../services/users";
-import styles from "./styles";
+import { getUserInfo, changeUserInformations, removeUserInfo } from "../../services/users";
+import { getStyles } from "./styles";
+import { useTheme } from "../../components/Theme";
 import Images from "../../utils/constants/images";
 
-export default function ResetPasswordScreen({ navigation }) {
-  const [user, setUser] = useState("");
-  const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
+export default function ResetPasswordScreen({ navigation, route }) {
+  const { user } = route.params;
+  const [email, setEmail] = useState(user.email);
+  const [username, setUsername] = useState(user.username);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const { theme } = useTheme();
+  const styles = useMemo(() => getStyles(theme));
 
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const userInfo = await getUserInfo();
-        setUser(userInfo);
-        setEmail(userInfo.email);
-        setUsername(userInfo.username);
-      } catch (error) {
-        console.error("Error fetching user info:", error);
-      }
-    };
-
-    fetchUserInfo();
-  }, []);
 
   const handleResetPassword = async () => {
     if (!email || !username) {
@@ -44,7 +33,7 @@ export default function ResetPasswordScreen({ navigation }) {
     setLoading(true);
     try {
       await changeUserInformations(email, username, user.userId);
-      navigation.navigate("Profile");
+      navigation.navigate("AuthNavigation");
     } catch (error) {
       setError("Erreur lors des modifications.");
     }
@@ -54,25 +43,25 @@ export default function ResetPasswordScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Appbar.Header style={styles.appbar}>
-            <Appbar.Action
-                icon={() => <Ionicons name="close" size={30} color="#fff" />}
-                onPress={() => navigation.goBack()}
-            />
-            <Appbar.Content title="Modifier" titleStyle={styles.title} />
-        </Appbar.Header>
+        <Appbar.Action
+          icon={() => <Ionicons name="close" size={30} color="#fff" />}
+          onPress={() => navigation.goBack()}
+        />
+        <Appbar.Content title="Modifier" titleStyle={styles.title} />
+      </Appbar.Header>
       <View style={styles.background}>
         <View style={styles.overlay} />
         <Image style={styles.logo} source={Images.Logo} />
         <TextInput
           style={styles.input}
-          defaultValue = {user.username}
+          defaultValue={user.username}
           placeholder="Nom d'utilisateur"
           placeholderTextColor="#aaaaaa"
           onChangeText={(text) => setUsername(text)}
         />
         <TextInput
           style={styles.input}
-          defaultValue = {user.email}
+          defaultValue={user.email}
           placeholder="Adresse e-mail"
           placeholderTextColor="#aaaaaa"
           onChangeText={(text) => setEmail(text)}

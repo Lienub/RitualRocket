@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./app/assets/images/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./app/assets/images/splash.png",
       "resizeMode": "contain",
@@ -16,20 +16,18 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com-abidwalterwawrzyniak-ritualrocket",
-      "scheme": "com-abidwalterwawrzyniak-ritualrocket"
+      "bundleIdentifier": "com-abidwalterwawrzyniak-ritualrocket"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./app/assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.anonymous.habits_tracker",
-      "scheme": "habits_tracker"
+      "package": "com.anonymous.habits_tracker"
     },
-    "scheme":"habitstracker",
     "web": {
       "favicon": "./app/assets/images/favicon.png"
-    }
+    },
+    
   }
 }

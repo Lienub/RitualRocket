@@ -15,7 +15,6 @@ const createTimer = async (req, res) => {
     res.status(201).json(timer);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -25,7 +24,6 @@ const getAllTimers = async (req, res) => {
     res.status(200).json(timers);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -36,7 +34,6 @@ const getTimersByUserId = async (req, res) => {
     res.status(200).json(timers);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -48,7 +45,6 @@ const getTimersByTaskIdUserId = async (req, res) => {
     res.status(200).json(timers);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -59,7 +55,6 @@ const deleteTimer = async (req, res) => {
     res.status(204).end();
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
   }
 };
 
